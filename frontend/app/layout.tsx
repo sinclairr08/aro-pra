@@ -1,3 +1,5 @@
+import "@/app/globals.css";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -5,7 +7,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <main className="mt-16 mb-20">{children}</main>
+      </body>
     </html>
   );
 }
