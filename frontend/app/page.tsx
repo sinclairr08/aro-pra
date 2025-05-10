@@ -12,7 +12,7 @@ interface LinkCard {
   url: string;
 }
 
-const mocklLinkCards: LinkCard[] = [
+const mockLinkCards: LinkCard[] = [
   { id: 1, name: "Mn", url: "https://molunote.oopy.io" },
   { id: 2, name: "AI", url: "https://arona.ai" },
   { id: 3, name: "GONGSIKJP", url: "https://bluearchive.jp" },
@@ -20,36 +20,50 @@ const mocklLinkCards: LinkCard[] = [
   { id: 5, name: "SG", url: "http://schaledb.com" },
 ];
 
-const fetchLinkCards = async (): Promise<LinkCard[]> => {
-  const useApi = false;
+interface useApiProps<T> {
+  apiUrl: string;
+  defaultValue: T;
+}
 
-  if (useApi) {
-    try {
-      const response = await axios.get("/api/v1/links");
-      return response.data;
-    } catch (error) {
-      return mocklLinkCards;
-    }
-  }
+const useApi = <T,>({ apiUrl, defaultValue }: useApiProps<T>) => {
+  const [data, setData] = useState<T>(defaultValue);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  return Promise.resolve(mocklLinkCards);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(apiUrl);
+        setData(response.data);
+      } catch (error) {
+        setError(error as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return { data, loading, error };
 };
 
 const getFaviconUrl = (url: string): string => {
   return `https://www.google.com/s2/favicons?domain=${url}&sz=64`;
 };
 
+const Loading = () => (
+  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-cyan-400 border-r-pink-200/30 border-b-[#332c30]">
+    <span className="sr-only">Loading...</span>
+  </div>
+);
+
 export default function Home() {
-  const [linkCards, setLinkCards] = useState<LinkCard[]>([]);
-
-  useEffect(() => {
-    const getLinkCards = async () => {
-      const data = await fetchLinkCards();
-      setLinkCards(data);
-    };
-
-    getLinkCards();
-  }, []);
+  const { data: linkCards, loading } = useApi<LinkCard[]>({
+    apiUrl: "/api/v1/links",
+    defaultValue: mockLinkCards,
+  });
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -74,6 +88,7 @@ export default function Home() {
           </div>
         </Link>
       ))}
+      {loading && <Loading />}
     </div>
   );
 }
