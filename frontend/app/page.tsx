@@ -11,7 +11,7 @@ const defaultLinkCards: LinkCardProps[] = [
   { id: 2, name: "한섭 공식", url: "https://forum.nexon.com/bluearchive" },
 ];
 
-export default function Home() {
+export default function HomePage() {
   const { data: linkCards, loading } = useApi<LinkCardProps[]>({
     apiUrl: "/api/v1/links",
     defaultValue: defaultLinkCards,
