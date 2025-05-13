@@ -3,13 +3,8 @@
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
-
-interface VersionCardProps {
-  id: number;
-  version: string;
-  updatedAt: string;
-  description: string[];
-}
+import { VersionCardProps } from "@/types/versionCard";
+import { VersionCard } from "@/components/version/VersionCard";
 
 const defaultVersionCards: VersionCardProps[] = [
   {
@@ -25,30 +20,6 @@ const defaultVersionCards: VersionCardProps[] = [
     description: ["메인 페이지 추가", "버전 페이지 추가"],
   },
 ];
-
-const VersionCard: React.FC<VersionCardProps> = ({
-  version,
-  updatedAt,
-  description,
-}) => {
-  return (
-    <div className="block p-4 rounded-lg border transition-all duration-200 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow">
-      <div className="flex items-center justify-between w-full">
-        <div className="text-sm font-semibold text-gray-800">{version}</div>
-        <div className="text-xs text-gray-500">{updatedAt}</div>
-      </div>
-      <div className="border-t border-gray-200 mt-3 pt-3">
-        <ul className="list-disc list-inside space-y-1">
-          {description.map((item, index) => (
-            <li key={index} className="text-sm text-gray-600">
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
 
 export default function HomePage() {
   const { data: versionCards, loading } = useApi<VersionCardProps[]>({
