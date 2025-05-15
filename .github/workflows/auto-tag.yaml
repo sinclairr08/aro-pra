@@ -21,7 +21,7 @@ jobs:
 
       - name: read
         run: |
-          VERSION=$(cat version.txt)
+          VERSION=$(tr -d '[:space:]' < version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: push tag
