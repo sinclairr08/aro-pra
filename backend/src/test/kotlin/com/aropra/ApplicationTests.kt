@@ -1,13 +1,11 @@
-package com.aro_pra
+package com.aropra
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class AroPraApplicationTests {
-
-	@Test
-	fun contextLoads() {
-	}
-
+class ApplicationTests {
+    @Test
+    fun contextLoads() {
+    }
 }

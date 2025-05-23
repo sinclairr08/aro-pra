@@ -1,11 +1,11 @@
-package com.aro_pra
+package com.aropra
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class AroPraApplication
+class Application
 
 fun main(args: Array<String>) {
-	runApplication<AroPraApplication>(*args)
+    runApplication<Application>(*args)
 }
