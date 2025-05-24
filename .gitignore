@@ -120,4 +120,4 @@ out/
 
 ### spring property
 
-backend/**/application.properties
+backend/**/application-secret.yaml
