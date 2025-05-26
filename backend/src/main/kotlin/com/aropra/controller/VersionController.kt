@@ -1,6 +1,6 @@
 package com.aropra.controller
 
-import com.aropra.service.VersionResponse
+import com.aropra.dto.VersionResponse
 import com.aropra.service.VersionService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
