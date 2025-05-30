@@ -4,7 +4,7 @@ import com.aropra.domain.Link
 import java.time.format.DateTimeFormatter
 
 data class LinkResponse(
-    val id: Long,
+    val id: String,
     val name: String,
     val url: String,
     val createdAt: String,
@@ -12,7 +12,7 @@ data class LinkResponse(
 
 fun Link.toResponse(): LinkResponse =
     LinkResponse(
-        id = this.id,
+        id = this.id!!,
         name = this.name,
         url = this.url,
         createdAt = this.createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),

@@ -1,7 +1,8 @@
 package com.aropra.service
 
-import com.aropra.domain.Link
+import com.aropra.dto.LinkRequest
 import com.aropra.dto.LinkResponse
+import com.aropra.dto.toEntity
 import com.aropra.dto.toResponse
 import com.aropra.repository.LinkRepository
 import org.springframework.stereotype.Service
@@ -15,5 +16,8 @@ class LinkService(
             it.toResponse()
         }
 
-    fun createLink(link: Link): LinkResponse = linkRepository.save(link).toResponse()
+    fun createLink(linkRequest: LinkRequest): LinkResponse {
+        val link = linkRequest.toEntity()
+        return linkRepository.save(link).toResponse()
+    }
 }

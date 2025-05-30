@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 @Document(collection = "links")
 data class Link(
     @Id
-    val id: Long,
+    val id: String? = null,
     val name: String,
     val url: String,
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )

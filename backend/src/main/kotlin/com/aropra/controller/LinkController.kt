@@ -1,6 +1,6 @@
 package com.aropra.controller
 
-import com.aropra.domain.Link
+import com.aropra.dto.LinkRequest
 import com.aropra.dto.LinkResponse
 import com.aropra.service.LinkService
 import org.springframework.http.ResponseEntity
@@ -20,9 +20,9 @@ class LinkController(
 
     @PostMapping
     fun createLink(
-        @RequestBody link: Link,
+        @RequestBody linkRequest: LinkRequest,
     ): ResponseEntity<LinkResponse> {
-        val linkResponse = linkService.createLink(link)
+        val linkResponse = linkService.createLink(linkRequest)
         return ResponseEntity.ok(linkResponse)
     }
 }
