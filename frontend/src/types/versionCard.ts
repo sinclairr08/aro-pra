@@ -1,6 +1,6 @@
 export interface VersionCardProps {
   id: number;
   version: string;
-  updatedAt: string;
+  updatedDate: string;
   description: string[];
 }

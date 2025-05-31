@@ -10,13 +10,13 @@ const defaultVersionCards: VersionCardProps[] = [
   {
     id: 0,
     version: "v0.0.0",
-    updatedAt: "2025-05-04",
+    updatedDate: "2025-05-04",
     description: ["프로젝트 설정"],
   },
   {
     id: 1,
     version: "v0.0.1",
-    updatedAt: "2025-05-13",
+    updatedDate: "2025-05-13",
     description: ["메인 페이지 추가", "버전 페이지 추가"],
   },
 ];
@@ -28,7 +28,8 @@ export default function HomePage() {
   });
 
   const sortedVersionCards = [...versionCards].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    (a, b) =>
+      new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime(),
   );
 
   return (

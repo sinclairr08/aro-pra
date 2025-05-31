@@ -1,6 +1,6 @@
 package com.aropra.controller
 
-import com.aropra.domain.Version
+import com.aropra.dto.VersionRequest
 import com.aropra.dto.VersionResponse
 import com.aropra.service.VersionService
 import org.springframework.http.ResponseEntity
@@ -20,9 +20,9 @@ class VersionController(
 
     @PostMapping
     fun createVersion(
-        @RequestBody version: Version,
+        @RequestBody versionRequest: VersionRequest,
     ): ResponseEntity<VersionResponse> {
-        val versionResponse = versionService.createVersion(version)
+        val versionResponse = versionService.createVersion(versionRequest)
         return ResponseEntity.ok(versionResponse)
     }
 }

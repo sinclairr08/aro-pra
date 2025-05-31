@@ -7,8 +7,9 @@ import java.time.LocalDateTime
 @Document(collection = "versions")
 data class Version(
     @Id
-    val id: Long,
+    val id: String? = null,
     val version: String,
-    val updatedAt: LocalDateTime,
     val description: List<String>,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedDate: String,
 )
