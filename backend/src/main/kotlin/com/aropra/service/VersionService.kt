@@ -12,7 +12,7 @@ class VersionService(
     private val versionRepository: VersionRepository,
 ) {
     fun getAllVersions(): List<VersionResponse> =
-        versionRepository.findAllByOrderByCreatedAtDesc().map {
+        versionRepository.findAllByOrderByUpdatedDateDesc().map {
             it.toResponse()
         }
 

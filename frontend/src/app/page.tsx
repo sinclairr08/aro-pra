@@ -7,8 +7,8 @@ import { LinkCardProps } from "@/types/linkCard";
 import { LinkCard } from "@/components/main/LinkCard";
 
 const defaultLinkCards: LinkCardProps[] = [
-  { id: 1, name: "일섭 공식", url: "https://bluearchive.jp" },
-  { id: 2, name: "한섭 공식", url: "https://forum.nexon.com/bluearchive" },
+  { id: "1", name: "일섭 공식", url: "https://bluearchive.jp" },
+  { id: "2", name: "한섭 공식", url: "https://forum.nexon.com/bluearchive" },
 ];
 
 export default function HomePage() {

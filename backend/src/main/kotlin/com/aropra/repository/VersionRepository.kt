@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface VersionRepository : MongoRepository<Version, Long> {
-    fun findAllByOrderByCreatedAtDesc(): List<Version>
+    fun findAllByOrderByUpdatedDateDesc(): List<Version>
 }
