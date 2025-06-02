@@ -1,9 +1,9 @@
 package com.aropra.service
 
+import com.aropra.converter.toVersion
+import com.aropra.converter.toVersionResponse
 import com.aropra.dto.VersionRequest
 import com.aropra.dto.VersionResponse
-import com.aropra.dto.toEntity
-import com.aropra.dto.toResponse
 import com.aropra.repository.VersionRepository
 import org.springframework.stereotype.Service
 
@@ -13,11 +13,11 @@ class VersionService(
 ) {
     fun getAllVersions(): List<VersionResponse> =
         versionRepository.findAllByOrderByUpdatedDateDesc().map {
-            it.toResponse()
+            it.toVersionResponse()
         }
 
     fun createVersion(versionRequest: VersionRequest): VersionResponse {
-        val version = versionRequest.toEntity()
-        return versionRepository.save(version).toResponse()
+        val version = versionRequest.toVersion()
+        return versionRepository.save(version).toVersionResponse()
     }
 }
