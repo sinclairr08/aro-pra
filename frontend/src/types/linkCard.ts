@@ -1,5 +1,5 @@
 export interface LinkCardProps {
-  id: number;
+  id: string;
   name: string;
   url: string;
 }
