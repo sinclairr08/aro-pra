@@ -20,6 +20,11 @@ fi
   npm version $VERSION --no-git-tag-version
 )
 
+(
+  cd backend || exit 1
+  sed -i "s/version = \"[^\"]*\"/version = \"$VERSION\"/" build.gradle.kts
+)
+
 git add .
 git commit -m "version: update version to $VERSION"
 
