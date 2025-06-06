@@ -2,6 +2,8 @@
 
 import "@/app/globals.css";
 import { useForm } from "react-hook-form";
+import { SubmitButton } from "@/components/common/SubmitButton";
+import { InputField } from "@/components/common/InputField";
 
 interface LinkRequest {
   name: string;
@@ -28,44 +30,34 @@ export default function AdminLinkPage() {
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            이름 *
-          </label>
-          <input
-            {...register("name")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="사이트 이름을 입력하세요"
-          />
-        </div>
+        <InputField
+          label="이름"
+          name="name"
+          type="text"
+          register={register}
+          placeholder="사이트 이름을 입력하세요"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            URL *
-          </label>
-          <input
-            {...register("url")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="https://site.url"
-          />
-        </div>
+        <InputField
+          label="URL"
+          name="url"
+          type="text"
+          register={register}
+          placeholder="https://site.url"
+        />
       </form>
 
       <div className="flex gap-4 mt-6">
-        <button
+        <SubmitButton
           type="submit"
           onClick={handleSubmit(onSubmit)}
-          className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors font-medium"
+          classType="blue"
         >
           제출
-        </button>
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors font-medium"
-        >
+        </SubmitButton>
+        <SubmitButton type="button" onClick={() => reset()} classType="gray">
           초기화
-        </button>
+        </SubmitButton>
       </div>
     </div>
   );
