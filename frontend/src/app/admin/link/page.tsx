@@ -45,20 +45,20 @@ export default function AdminLinkPage() {
           register={register}
           placeholder="https://site.url"
         />
-      </form>
 
-      <div className="flex gap-4 mt-6">
-        <SubmitButton
-          type="submit"
-          onClick={handleSubmit(onSubmit)}
-          classType="blue"
-        >
-          제출
-        </SubmitButton>
-        <SubmitButton type="button" onClick={() => reset()} classType="gray">
-          초기화
-        </SubmitButton>
-      </div>
+        <div className="flex gap-4 mt-6">
+          <SubmitButton
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+            classType="blue"
+          >
+            제출
+          </SubmitButton>
+          <SubmitButton type="button" onClick={() => reset()} classType="gray">
+            초기화
+          </SubmitButton>
+        </div>
+      </form>
     </div>
   );
 }
