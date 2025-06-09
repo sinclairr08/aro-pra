@@ -4,14 +4,37 @@ import "@/app/globals.css";
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/common/SubmitButton";
 import { InputField } from "@/components/common/InputField";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface LinkRequest {
   name: string;
   url: string;
 }
 
+const linkSchema = z.object({
+  name: z
+    .string()
+    .min(1, "이름을 입력해주세요")
+    .max(100, "이름은 100자 이하여야 합니다"),
+  url: z
+    .string()
+    .min(1, "URL을 입력해주세요")
+    .url("올바른 URL 형식을 입력해주세요")
+    .refine(
+      (url: string) => url.startsWith("http://") || url.startsWith("https://"),
+      "http 혹은 https로 시작되는 URL을 입력해주세요",
+    ),
+}) satisfies z.ZodType<LinkRequest>;
+
 export default function AdminLinkPage() {
-  const { register, handleSubmit, reset } = useForm<LinkRequest>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<LinkRequest>({
+    resolver: zodResolver(linkSchema),
     defaultValues: {
       name: "",
       url: "",
@@ -36,6 +59,7 @@ export default function AdminLinkPage() {
           type="text"
           register={register}
           placeholder="사이트 이름을 입력하세요"
+          error={errors.name?.message}
         />
 
         <InputField
@@ -44,6 +68,7 @@ export default function AdminLinkPage() {
           type="text"
           register={register}
           placeholder="https://site.url"
+          error={errors.url?.message}
         />
 
         <div className="flex gap-4 mt-6">

@@ -6,6 +6,7 @@ interface InputFieldProps {
   type: "text" | "number";
   placeholder?: string;
   register: UseFormRegister<any>;
+  error?: string;
 }
 
 export const InputField = ({
@@ -14,6 +15,7 @@ export const InputField = ({
   type,
   placeholder,
   register,
+  error,
 }: InputFieldProps) => {
   return (
     <div className="space-y-2">
@@ -26,6 +28,7 @@ export const InputField = ({
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         placeholder={placeholder}
       />
+      {error && <span className="text-red-600">{error}</span>}
     </div>
   );
 };
