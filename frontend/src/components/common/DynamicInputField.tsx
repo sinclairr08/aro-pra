@@ -16,6 +16,7 @@ interface DynamicInputFieldProps {
   minItems?: number;
   placeholder?: string;
   register: UseFormRegister<any>;
+  errors: any;
 }
 
 export const DynamicInputField = ({
@@ -28,6 +29,7 @@ export const DynamicInputField = ({
   placeholder,
   minItems = 1,
   register,
+  errors,
 }: DynamicInputFieldProps) => {
   const handleAppendItem = () => {
     append(" ");
@@ -42,25 +44,34 @@ export const DynamicInputField = ({
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
-      {fields.map((field, i) => (
-        <div key={i} className="flex gap-2">
-          <input
-            type={type}
-            {...register(`${name}.${i}` as const)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder={`${placeholder} ${i + 1}`}
-          />
+      {fields.map((field, i) => {
+        const error = Array.isArray(errors) ? errors[i] : undefined;
 
-          <SubmitButton
-            type="button"
-            classType="red"
-            onClick={() => handleRemoveItem(i)}
-            disabled={fields.length <= minItems}
-          >
-            삭제
-          </SubmitButton>
-        </div>
-      ))}
+        return (
+          <div key={i} className="space-y-1">
+            <div className="flex gap-2">
+              <input
+                type={type}
+                {...register(`${name}.${i}` as const)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder={`${placeholder} ${i + 1}`}
+              />
+
+              <SubmitButton
+                type="button"
+                classType="red"
+                onClick={() => handleRemoveItem(i)}
+                disabled={fields.length <= minItems}
+              >
+                삭제
+              </SubmitButton>
+            </div>
+            {error && <span className="text-red-600">{error.message}</span>}
+          </div>
+        );
+      })}
+
+      {errors && <span className="text-red-600">{errors.message}</span>}
 
       <SubmitButton type="button" classType="blue" onClick={handleAppendItem}>
         추가
