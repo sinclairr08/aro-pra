@@ -2,8 +2,8 @@
 
 import "@/app/globals.css";
 import { useForm } from "react-hook-form";
-import { SubmitButton } from "@/components/common/SubmitButton";
-import { InputField } from "@/components/common/InputField";
+import { SubmitButton } from "@/components/form/SubmitButton";
+import { InputField } from "@/components/form/InputField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 

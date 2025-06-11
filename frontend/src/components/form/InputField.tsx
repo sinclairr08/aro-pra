@@ -1,11 +1,7 @@
-import { UseFormRegister } from "react-hook-form";
+import { BaseInputFieldProps } from "@/types/form";
+import { BaseInput } from "@/components/form/BaseInput";
 
-interface InputFieldProps {
-  label: string;
-  name: string;
-  type: "text" | "number";
-  placeholder?: string;
-  register: UseFormRegister<any>;
+interface InputFieldProps extends BaseInputFieldProps {
   error?: string;
 }
 
@@ -22,10 +18,10 @@ export const InputField = ({
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
-      <input
+      <BaseInput
+        name={name}
         type={type}
-        {...register(name)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        register={register}
         placeholder={placeholder}
       />
       {error && <span className="text-red-600">{error}</span>}

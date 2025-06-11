@@ -2,20 +2,16 @@ import {
   FieldArrayWithId,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
-  UseFormRegister,
 } from "react-hook-form";
-import { SubmitButton } from "@/components/common/SubmitButton";
+import { SubmitButton } from "@/components/form/SubmitButton";
+import { BaseInputFieldProps } from "@/types/form";
+import { BaseInput } from "@/components/form/BaseInput";
 
-interface DynamicInputFieldProps {
-  label: string;
-  name: string;
-  type: "text" | "number";
+interface DynamicInputFieldProps extends BaseInputFieldProps {
   fields: FieldArrayWithId[];
   append: UseFieldArrayAppend<any>;
   remove: UseFieldArrayRemove;
   minItems?: number;
-  placeholder?: string;
-  register: UseFormRegister<any>;
   errors: any;
 }
 
@@ -50,10 +46,10 @@ export const DynamicInputField = ({
         return (
           <div key={i} className="space-y-1">
             <div className="flex gap-2">
-              <input
+              <BaseInput
+                name={`${name}.${i}` as const}
                 type={type}
-                {...register(`${name}.${i}` as const)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                register={register}
                 placeholder={`${placeholder} ${i + 1}`}
               />
 

@@ -2,9 +2,9 @@
 
 import "@/app/globals.css";
 import { useFieldArray, useForm } from "react-hook-form";
-import { SubmitButton } from "@/components/common/SubmitButton";
-import { InputField } from "@/components/common/InputField";
-import { DynamicInputField } from "@/components/common/DynamicInputField";
+import { SubmitButton } from "@/components/form/SubmitButton";
+import { InputField } from "@/components/form/InputField";
+import { DynamicInputField } from "@/components/form/DynamicInputField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
