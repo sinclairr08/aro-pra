@@ -7,6 +7,8 @@ import { InputField } from "@/components/form/InputField";
 import { DynamicInputField } from "@/components/form/DynamicInputField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePostApi } from "@/lib/usePostApi";
+import { Loading } from "@/components/common/Loading";
 
 interface VersionRequest {
   version: string;
@@ -46,15 +48,22 @@ export default function AdminVersionPage() {
       description: [" "],
     },
   });
+  const { postData, loading } = usePostApi<VersionRequest>({
+    apiUrl: "/api/v1/versions",
+  });
 
   const { fields, append, remove } = useFieldArray<VersionRequest>({
     control,
     name: "description",
   } as any);
 
-  const onSubmit = (data: VersionRequest) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: VersionRequest) => {
+    try {
+      await postData(data);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -107,6 +116,7 @@ export default function AdminVersionPage() {
           </SubmitButton>
         </div>
       </form>
+      {loading && <Loading />}
     </div>
   );
 }

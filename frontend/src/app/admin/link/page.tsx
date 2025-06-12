@@ -6,6 +6,8 @@ import { SubmitButton } from "@/components/form/SubmitButton";
 import { InputField } from "@/components/form/InputField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePostApi } from "@/lib/usePostApi";
+import { Loading } from "@/components/common/Loading";
 
 interface LinkRequest {
   name: string;
@@ -40,10 +42,17 @@ export default function AdminLinkPage() {
       url: "",
     },
   });
+  const { postData, loading } = usePostApi<LinkRequest>({
+    apiUrl: "/api/v1/links",
+  });
 
-  const onSubmit = (data: LinkRequest) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: LinkRequest) => {
+    try {
+      await postData(data);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -84,6 +93,7 @@ export default function AdminLinkPage() {
           </SubmitButton>
         </div>
       </form>
+      {loading && <Loading />}
     </div>
   );
 }
