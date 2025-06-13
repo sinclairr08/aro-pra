@@ -4,30 +4,11 @@ import "@/app/globals.css";
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { InputField } from "@/components/form/InputField";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePostApi } from "@/lib/usePostApi";
 import { Loading } from "@/components/common/Loading";
-
-interface LinkRequest {
-  name: string;
-  url: string;
-}
-
-const linkSchema = z.object({
-  name: z
-    .string()
-    .min(1, "이름을 입력해주세요")
-    .max(100, "이름은 100자 이하여야 합니다"),
-  url: z
-    .string()
-    .min(1, "URL을 입력해주세요")
-    .url("올바른 URL 형식을 입력해주세요")
-    .refine(
-      (url: string) => url.startsWith("http://") || url.startsWith("https://"),
-      "http 혹은 https로 시작되는 URL을 입력해주세요",
-    ),
-}) satisfies z.ZodType<LinkRequest>;
+import { LinkRequest } from "@/types/link";
+import { LinkSchema } from "@/schemas/link";
 
 export default function AdminLinkPage() {
   const {
@@ -36,7 +17,7 @@ export default function AdminLinkPage() {
     reset,
     formState: { errors },
   } = useForm<LinkRequest>({
-    resolver: zodResolver(linkSchema),
+    resolver: zodResolver(LinkSchema),
     defaultValues: {
       name: "",
       url: "",

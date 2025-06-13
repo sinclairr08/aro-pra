@@ -3,7 +3,7 @@
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
-import { VersionCardProps } from "@/types/versionCard";
+import { VersionCardProps } from "@/types/version";
 import { VersionCard } from "@/components/version/VersionCard";
 
 const defaultVersionCards: VersionCardProps[] = [

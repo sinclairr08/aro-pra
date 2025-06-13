@@ -3,7 +3,7 @@
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
-import { LinkCardProps } from "@/types/linkCard";
+import { LinkCardProps } from "@/types/link";
 import { LinkCard } from "@/components/main/LinkCard";
 
 const defaultLinkCards: LinkCardProps[] = [
