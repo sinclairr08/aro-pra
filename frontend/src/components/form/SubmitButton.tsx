@@ -14,7 +14,7 @@ export const SubmitButton = ({
   disabled = false,
 }: SubmitButtonProps) => {
   const baseClass =
-    "flex-1 text-white py-2 px-4 rounded-md transition-colors font-medium";
+    "flex-1 text-white py-2 px-4 rounded-md transition-colors font-medium min-w-[60px] whitespace-nowrap";
 
   const typeClass = {
     blue: "bg-blue-500 hover:bg-blue-600 focus:ring-blue-600 disabled:bg-blue-300",
