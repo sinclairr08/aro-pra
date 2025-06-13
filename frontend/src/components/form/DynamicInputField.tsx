@@ -67,8 +67,6 @@ export const DynamicInputField = ({
         );
       })}
 
-      {errors && <span className="text-red-600">{errors.message}</span>}
-
       <SubmitButton type="button" classType="blue" onClick={handleAppendItem}>
         추가
       </SubmitButton>
