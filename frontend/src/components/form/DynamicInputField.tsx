@@ -1,19 +1,6 @@
-import {
-  FieldArrayWithId,
-  UseFieldArrayAppend,
-  UseFieldArrayRemove,
-} from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
-import { BaseInputFieldProps } from "@/types/form";
+import { DynamicInputFieldProps } from "@/types/form";
 import { BaseInput } from "@/components/form/BaseInput";
-
-interface DynamicInputFieldProps extends BaseInputFieldProps {
-  fields: FieldArrayWithId[];
-  append: UseFieldArrayAppend<any>;
-  remove: UseFieldArrayRemove;
-  minItems?: number;
-  errors: any;
-}
 
 export const DynamicInputField = ({
   label,

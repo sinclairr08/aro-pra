@@ -1,4 +1,9 @@
-import { UseFormRegister } from "react-hook-form";
+import {
+  FieldArrayWithId,
+  UseFieldArrayAppend,
+  UseFieldArrayRemove,
+  UseFormRegister,
+} from "react-hook-form";
 
 export interface BaseInputFieldProps {
   label: string;
@@ -6,4 +11,12 @@ export interface BaseInputFieldProps {
   type: "text" | "number";
   placeholder?: string;
   register: UseFormRegister<any>;
+}
+
+export interface DynamicInputFieldProps extends BaseInputFieldProps {
+  fields: FieldArrayWithId[];
+  append: UseFieldArrayAppend<any>;
+  remove: UseFieldArrayRemove;
+  minItems?: number;
+  errors: any;
 }
