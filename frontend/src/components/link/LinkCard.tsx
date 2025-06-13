@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getFaviconUrl } from "@/lib/utils";
-import { LinkCardProps } from "@/types/linkCard";
+import { LinkCardProps } from "@/types/link";
 
 export const LinkCard: React.FC<LinkCardProps> = ({
   id,

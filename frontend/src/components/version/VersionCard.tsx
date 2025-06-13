@@ -1,4 +1,4 @@
-import { VersionCardProps } from "@/types/versionCard";
+import { VersionCardProps } from "@/types/version";
 
 export const VersionCard: React.FC<VersionCardProps> = ({
   version,

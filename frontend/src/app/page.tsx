@@ -3,8 +3,8 @@
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
-import { LinkCardProps } from "@/types/linkCard";
-import { LinkCard } from "@/components/main/LinkCard";
+import { LinkCardProps } from "@/types/link";
+import { LinkCard } from "@/components/link/LinkCard";
 
 const defaultLinkCards: LinkCardProps[] = [
   { id: "1", name: "일섭 공식", url: "https://bluearchive.jp" },
