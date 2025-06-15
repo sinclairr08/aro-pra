@@ -5,20 +5,40 @@ import { SimpleLinkCard } from "@/components/link/SimpleLinkCard";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/form/SubmitButton";
+import { useRouter } from "next/navigation";
 
 const TMP_ADMIN_PASSWORD = "test123";
 
-const checkAdmin = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("isAdmin") === "true";
+const setCookie = (name: string, value: string, days: number = 1) => {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name: string): string | null => {
+  if (typeof window === "undefined") return null;
+
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const [cookieName, cookieValue] = cookie.trim().split("=");
+    if (cookieName === name) {
+      return cookieValue;
+    }
   }
 
-  return false;
+  return null;
+};
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+const checkAdmin = () => {
+  return getCookie("isAdmin") === "true";
 };
 
 const loginAdmin = (password: string) => {
   if (password === TMP_ADMIN_PASSWORD) {
-    localStorage.setItem("isAdmin", "true");
+    setCookie("isAdmin", "true", 1);
     return true;
   }
 
@@ -26,9 +46,7 @@ const loginAdmin = (password: string) => {
 };
 
 const logoutAdmin = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("isAdmin");
-  }
+  deleteCookie("isAdmin");
 };
 
 interface AdminLoginFormData {
@@ -44,7 +62,7 @@ interface AdminLoginedPageProps {
 }
 
 const AdminLoginForm = ({ doLogin }: AdminLoginFormProps) => {
-  const { register, handleSubmit, setError } = useForm<AdminLoginFormData>();
+  const { register, handleSubmit } = useForm<AdminLoginFormData>();
   const onSubmit = ({ password }: AdminLoginFormData) => {
     if (loginAdmin(password)) {
       doLogin();
@@ -77,6 +95,11 @@ const AdminLoginForm = ({ doLogin }: AdminLoginFormProps) => {
 
 const AdminLoginedPage = ({ doLogout }: AdminLoginedPageProps) => {
   const subPages: string[] = ["version", "link"];
+  const router = useRouter();
+  const handleLogout = () => {
+    doLogout();
+    router.refresh();
+  };
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -98,7 +121,7 @@ const AdminLoginedPage = ({ doLogout }: AdminLoginedPageProps) => {
 
         <div className="flex justify-center pt-4">
           <div className="w-32">
-            <SubmitButton type="button" classType="red" onClick={doLogout}>
+            <SubmitButton type="button" classType="red" onClick={handleLogout}>
               로그아웃
             </SubmitButton>
           </div>
