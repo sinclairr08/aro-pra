@@ -20,4 +20,13 @@ class AdminController {
     fun login(
         @RequestBody request: LoginRequest,
     ): LoginResponse = LoginResponse(success = adminPassword == request.password)
+
+    @GetMapping("/verify")
+    fun verify(
+        @RequestHeader("Authorization") authorization: String?,
+    ): LoginResponse {
+        val token = authorization?.removePrefix("Bearer ")
+
+        return LoginResponse(success = token != null)
+    }
 }
