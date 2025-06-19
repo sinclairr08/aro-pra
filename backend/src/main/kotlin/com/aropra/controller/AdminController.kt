@@ -37,25 +37,32 @@ data class LoginRequest(
 
 data class LoginResponse(
     val success: Boolean,
+    val data: TokenData? = null,
+)
+
+data class TokenData(
+    val token: String,
+    val type: String = "Bearer",
 )
 
 @RestController
 @RequestMapping("/api/v1/admin")
 @CrossOrigin(origins = ["*"])
-class AdminController {
-    private val adminPassword = "test123"
+class AdminController(
+    private val jwtUtils: JwtUtils,
+) {
+    @Value("\${app.admin.password}")
+    private lateinit var adminPassword: String
 
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
-    ): LoginResponse = LoginResponse(success = adminPassword == request.password)
-
-    @GetMapping("/verify")
-    fun verify(
-        @RequestHeader("Authorization") authorization: String?,
     ): LoginResponse {
-        val token = authorization?.removePrefix("Bearer ")
+        if (adminPassword == request.password) {
+            val token = jwtUtils.generateToken()
+            return LoginResponse(success = true, data = TokenData(token = token))
+        }
 
-        return LoginResponse(success = token != null)
+        return LoginResponse(success = false)
     }
 }
