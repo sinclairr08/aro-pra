@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const TMP_ADMIN_PASSWORD = "test123";
 
@@ -32,21 +33,81 @@ const deleteCookie = (name: string) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 };
 
-const checkAdmin = () => {
-  return getCookie("isAdmin") === "true";
+const getJwtToken = (): string | null => {
+  return getCookie("adminToken");
 };
 
-const loginAdmin = (password: string) => {
-  if (password === TMP_ADMIN_PASSWORD) {
-    setCookie("isAdmin", "true", 1);
-    return true;
+const setJwtToken = (token: string) => {
+  setCookie("adminToken", token);
+};
+
+const removeJwtToken = () => {
+  deleteCookie("adminToken");
+};
+
+const isValidToken = (): boolean => {
+  const token = getJwtToken();
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return payload.exp > currentTime;
+  } catch (error) {
+    return false;
   }
-
-  return false;
 };
 
-const logoutAdmin = () => {
-  deleteCookie("isAdmin");
+interface useLoginApiReturn {
+  success: boolean;
+  token?: string;
+}
+
+const useLoginApi = async (password: string): Promise<useLoginApiReturn> => {
+  try {
+    const { data } = await axios.post("/api/admin/login", { password });
+
+    if (data.success) {
+      return { success: true, token: data.data.token };
+    } else {
+      return { success: false };
+    }
+  } catch (error) {
+    return { success: false };
+  }
+};
+
+const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const validToken = isValidToken();
+      setIsAuthenticated(validToken);
+    };
+
+    if (!isValidToken() && getJwtToken()) {
+      removeJwtToken();
+    }
+
+    checkAuth();
+  }, []);
+
+  const login = async (password: string) => {
+    const result = await useLoginApi(password);
+    if (result.success && result.token) {
+      setJwtToken(result.token);
+      setIsAuthenticated(true);
+    }
+  };
+
+  const logout = () => {
+    removeJwtToken();
+    setIsAuthenticated(false);
+  };
+
+  return { isAuthenticated, login, logout };
 };
 
 interface AdminLoginFormData {
@@ -54,50 +115,50 @@ interface AdminLoginFormData {
 }
 
 interface AdminLoginFormProps {
-  doLogin: () => void;
+  onLogin: (password: string) => Promise<void>;
 }
 
 interface AdminLoginedPageProps {
-  doLogout: () => void;
+  onLogout: () => void;
 }
 
-const AdminLoginForm = ({ doLogin }: AdminLoginFormProps) => {
+const AdminLoginForm = ({ onLogin }: AdminLoginFormProps) => {
   const { register, handleSubmit } = useForm<AdminLoginFormData>();
-  const onSubmit = ({ password }: AdminLoginFormData) => {
-    if (loginAdmin(password)) {
-      doLogin();
-    }
+  const onSubmit = async ({ password }: AdminLoginFormData) => {
+    await onLogin(password);
   };
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold text-center mb-6">관리자 로그인</h1>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <input
+              type="password"
+              {...register("password")}
+              placeholder="비밀번호"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <div className="mb-4">
-          <input
-            type="password"
-            {...register("password")}
-            placeholder="비밀번호"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <button
-          onClick={handleSubmit(onSubmit)}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-        >
-          로그인
-        </button>
+          <SubmitButton
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+            classType="blue"
+          >
+            로그인
+          </SubmitButton>
+        </form>
       </div>
     </div>
   );
 };
 
-const AdminLoginedPage = ({ doLogout }: AdminLoginedPageProps) => {
+const AdminLoginedPage = ({ onLogout }: AdminLoginedPageProps) => {
   const subPages: string[] = ["version", "link"];
   const router = useRouter();
   const handleLogout = () => {
-    doLogout();
+    onLogout();
     router.refresh();
   };
 
@@ -132,21 +193,11 @@ const AdminLoginedPage = ({ doLogout }: AdminLoginedPageProps) => {
 };
 
 export default function AdminPage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAuthenticated, login, logout } = useAuth();
 
-  useEffect(() => {
-    setIsAdmin(checkAdmin());
-  }, []);
-
-  const doLogin = () => setIsAdmin(true);
-  const doLogout = () => {
-    logoutAdmin();
-    setIsAdmin(false);
-  };
-
-  return isAdmin ? (
-    <AdminLoginedPage doLogout={doLogout} />
+  return isAuthenticated ? (
+    <AdminLoginedPage onLogout={logout} />
   ) : (
-    <AdminLoginForm doLogin={doLogin} />
+    <AdminLoginForm onLogin={login} />
   );
 }
