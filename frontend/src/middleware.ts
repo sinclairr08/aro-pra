@@ -6,10 +6,27 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const isAdmin = request.cookies.get("isAdmin")?.value === "true";
+    const adminToken = request.cookies.get("adminToken")?.value;
 
-    if (!isAdmin) {
+    if (!adminToken) {
       return NextResponse.redirect(new URL("/admin", request.url));
+    }
+
+    try {
+      const payload = JSON.parse(
+        Buffer.from(adminToken.split(".")[1], "base64").toString(),
+      );
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (payload.exp < currentTime) {
+        const response = NextResponse.redirect(new URL("/admin", request.url));
+        response.cookies.delete("adminToken");
+        return response;
+      }
+    } catch (error) {
+      const response = NextResponse.redirect(new URL("/admin", request.url));
+      response.cookies.delete("adminToken");
+      return response;
     }
   }
 

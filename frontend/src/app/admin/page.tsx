@@ -66,7 +66,7 @@ interface useLoginApiReturn {
 
 const useLoginApi = async (password: string): Promise<useLoginApiReturn> => {
   try {
-    const { data } = await axios.post("/api/admin/login", { password });
+    const { data } = await axios.post("/api/v1/admin/login", { password });
 
     if (data.success) {
       return { success: true, token: data.data.token };
@@ -96,6 +96,7 @@ const useAuth = () => {
 
   const login = async (password: string) => {
     const result = await useLoginApi(password);
+    console.log(result);
     if (result.success && result.token) {
       setJwtToken(result.token);
       setIsAuthenticated(true);
