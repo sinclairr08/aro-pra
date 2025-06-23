@@ -1,19 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const Custom403Page = () => {
+const Custom401Page = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4">
       <div className="text-center">
         <Image
-          src="/imgs/403.png"
-          alt="403"
+          src="/imgs/401.png"
+          alt="401"
           width={128}
           height={128}
           className="mx-auto mb-6"
         />
-        <h1 className="text-2xl font-semibold text-red-600 mb-6">
-          403 Forbidden
+        <h1 className="text-xl font-semibold text-red-700 mb-6">
+          401 Unauthorized
         </h1>
       </div>
       <Link
@@ -31,4 +31,4 @@ const Custom403Page = () => {
   );
 };
 
-export default Custom403Page;
+export default Custom401Page;
