@@ -5,7 +5,7 @@ import { SimpleLinkCard } from "@/components/link/SimpleLinkCard";
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/useAuth";
+import { useAdminAuth } from "@/lib/useAdminAuth";
 
 interface AdminLoginFormData {
   password: string;
@@ -90,7 +90,7 @@ const AdminLoginedPage = ({ onLogout }: AdminLoginedPageProps) => {
 };
 
 export default function AdminPage() {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, login, logout } = useAdminAuth();
 
   return isAuthenticated ? (
     <AdminLoginedPage onLogout={logout} />
