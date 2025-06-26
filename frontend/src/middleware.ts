@@ -1,32 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 
-export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (request.nextUrl.pathname === "/admin") {
-      return NextResponse.next();
-    }
-
-    const adminToken = request.cookies.get("adminToken")?.value;
-
-    if (!adminToken) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-
+export async function middleware(request: NextRequest) {
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    !(request.nextUrl.pathname === "/admin/login")
+  ) {
     try {
-      const payload = JSON.parse(
-        Buffer.from(adminToken.split(".")[1], "base64").toString(),
+      const response = await axios.get(
+        `${request.nextUrl.origin}/api/v1/admin/profile`,
+        {
+          headers: {
+            Cookie: request.headers.get("cookie") || "",
+          },
+        },
       );
-      const currentTime = Math.floor(Date.now() / 1000);
 
-      if (payload.exp < currentTime) {
-        const response = NextResponse.redirect(new URL("/admin", request.url));
-        response.cookies.delete("adminToken");
-        return response;
+      if (!response.data.success) {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
       }
     } catch (error) {
-      const response = NextResponse.redirect(new URL("/admin", request.url));
-      response.cookies.delete("adminToken");
-      return response;
+      return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
 
