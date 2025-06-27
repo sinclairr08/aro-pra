@@ -1,5 +1,6 @@
+"use client";
+
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface useLoginApiReturn {
@@ -37,48 +38,24 @@ const useAdminLogoutApi = async (): Promise<void> => {
   }
 };
 
-const checkAdminAuthStatus = async (): Promise<boolean> => {
-  try {
-    const { data } = await axios.get("api/v1/admin/profile", {
-      withCredentials: true,
-    });
-    return data.success;
-  } catch (error) {
-    return false;
-  }
-};
-
 export const useAdminAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const authStatus = await checkAdminAuthStatus();
-      setIsAuthenticated(authStatus);
-    };
-
-    checkAuth();
-  }, []);
 
   const login = async (password: string) => {
     const result = await useAdminLoginApi(password);
 
     if (result.success) {
-      setIsAuthenticated(true);
       router.push("/admin");
       return;
     }
 
-    console.error(result.message);
     router.push(`/http/${result.status}`);
   };
 
   const logout = async () => {
     await useAdminLogoutApi();
-    setIsAuthenticated(false);
-    router.push("/admin");
+    router.push("/admin/login");
   };
 
-  return { isAuthenticated, login, logout };
+  return { login, logout };
 };

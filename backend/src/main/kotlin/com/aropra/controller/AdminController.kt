@@ -84,9 +84,11 @@ class AdminController(
                     maxAge = 24 * 60 * 60
                 }
             response.addCookie(cookie)
+            response.status = HttpServletResponse.SC_OK
             return LoginResponse(success = true, data = TokenData(token = token))
         }
 
+        response.status = HttpServletResponse.SC_UNAUTHORIZED
         return LoginResponse(success = false)
     }
 

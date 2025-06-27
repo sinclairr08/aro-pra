@@ -1,3 +1,5 @@
+"use client";
+
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useAdminAuth } from "@/lib/useAdminAuth";
