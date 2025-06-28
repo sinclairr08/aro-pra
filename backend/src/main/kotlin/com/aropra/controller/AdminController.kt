@@ -52,12 +52,6 @@ data class LoginRequest(
 
 data class LoginResponse(
     val success: Boolean,
-    val data: TokenData? = null,
-)
-
-data class TokenData(
-    val token: String,
-    val type: String = "Bearer",
 )
 
 @RestController
@@ -85,7 +79,7 @@ class AdminController(
                 }
             response.addCookie(cookie)
             response.status = HttpServletResponse.SC_OK
-            return LoginResponse(success = true, data = TokenData(token = token))
+            return LoginResponse(success = true)
         }
 
         response.status = HttpServletResponse.SC_UNAUTHORIZED
