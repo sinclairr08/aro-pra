@@ -2,7 +2,7 @@ import { UseFormRegister } from "react-hook-form";
 
 interface BaseInputProps {
   name: string;
-  type: "text" | "number";
+  type: "text" | "number" | "password";
   placeholder?: string;
   register: UseFormRegister<any>;
 }
