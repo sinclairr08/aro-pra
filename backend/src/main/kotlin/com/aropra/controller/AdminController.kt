@@ -3,13 +3,15 @@ package com.aropra.controller
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import jakarta.servlet.http.Cookie
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
 import java.security.Key
+import java.time.Duration
 import java.util.*
 
 @Component
@@ -66,48 +68,45 @@ class AdminController(
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
-        response: HttpServletResponse,
-    ): LoginResponse {
+    ): ResponseEntity<LoginResponse> {
         if (adminPassword == request.password) {
             val token = jwtUtils.generateToken()
             val cookie =
-                Cookie("adminToken", token).apply {
-                    isHttpOnly = true
-                    secure = false
-                    path = "/admin"
-                    maxAge = 24 * 60 * 60
-                }
-            response.addCookie(cookie)
-            response.status = HttpServletResponse.SC_OK
-            return LoginResponse(success = true)
+                ResponseCookie
+                    .from("adminToken", token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/admin")
+                    .maxAge(Duration.ofDays(1))
+                    .build()
+
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(LoginResponse(true))
         }
 
-        response.status = HttpServletResponse.SC_UNAUTHORIZED
-        return LoginResponse(success = false)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false))
     }
 
     @PostMapping("/logout")
-    fun logout(response: HttpServletResponse): LoginResponse {
+    fun logout(): ResponseEntity<LoginResponse> {
         val cookie =
-            Cookie("adminToken", "").apply {
-                isHttpOnly = true
-                secure = false
-                path = "/admin"
-                maxAge = 0
-            }
-        response.addCookie(cookie)
+            ResponseCookie
+                .from("adminToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/admin")
+                .maxAge(Duration.ZERO)
+                .build()
 
-        return LoginResponse(success = true)
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(LoginResponse(true))
     }
 
     @GetMapping("/profile")
-    fun getProfile(request: HttpServletRequest): LoginResponse {
-        val cookies = request.cookies
-        val token = cookies?.find { it.name == "adminToken" }?.value
-
+    fun getProfile(
+        @CookieValue(name = "adminToken", required = false) token: String?,
+    ): ResponseEntity<LoginResponse> {
         if (token != null && jwtUtils.validateToken(token)) {
-            return LoginResponse(success = true)
+            return ResponseEntity.ok(LoginResponse(success = true))
         }
-        return LoginResponse(success = false)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false))
     }
 }
