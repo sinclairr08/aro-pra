@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/links")
-@CrossOrigin(origins = ["*"])
 class LinkController(
     private val linkService: LinkService,
 ) {

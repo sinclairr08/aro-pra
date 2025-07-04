@@ -58,7 +58,6 @@ data class LoginResponse(
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@CrossOrigin(origins = ["*"])
 class AdminController(
     private val jwtUtils: JwtUtils,
 ) {
