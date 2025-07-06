@@ -1,19 +1,51 @@
 #!/usr/bin/env bash
 
-# 0. sudo 권한 체크
-if [[ $EUID -ne 0 ]]; then
-  echo "You have to start with root"
-  exit 1
-fi
+FRONTEND_PORT=3000
+BACKEND_PORT=8080
 
-# 1. node 20 체크 하고 설치 하기
-echo "[1] Check node 20"
-NODE_VER=$(node -v 2>/dev/null | cut -dv -f2 | cut -d. -f1)
-if [[ -z "$NODE_VER" || $NODE_VER -lt 20 ]];  then
-  echo "Node version: $NODE_VER, Install node 20 start"
-  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-  apt-get install -y nodejs
-  echo "$(node -v) is installed"
-else
-  echo "$(node -v) is already installed"
-fi
+deploy_frontend() {
+  (
+    cd frontend || { echo "No frontend folder"; return 1; }
+
+    npm ci
+    npm run build
+    nohup npm start > ../frontend.log 2>&1 &
+  )
+
+  sleep 3
+
+  if curl -f http://localhost:$FRONTEND_PORT > /dev/null 2>&1; then
+    echo "frontend STARTED"
+  else
+    echo "frontend FAILED"
+    exit 1
+  fi
+
+}
+
+deploy_backend() {
+    (
+      cd backend || { echo "No backend folder"; return 1; }
+
+      ./gradlew clean build -x test
+      nohup ./gradlew bootRun > ../bakcend.log 2>&1 &
+    )
+
+    sleep 3
+
+      if curl -f http://localhost:$BACKEND_PORT > /dev/null 2>&1; then
+        echo "backend STARTED"
+      else
+        echo "backend FAILED"
+        exit 1
+      fi
+}
+
+main() {
+  deploy_frontend
+  deploy_backend
+
+  echo "SUCCESS!"
+}
+
+main "$@"
