@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
       if (!response.data.success) {
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
-    } catch (error) {
+    } catch {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
