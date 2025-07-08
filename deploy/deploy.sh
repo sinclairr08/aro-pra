@@ -28,17 +28,17 @@ deploy_backend() {
       cd backend || { echo "No backend folder"; return 1; }
 
       ./gradlew clean build -x test
-      nohup ./gradlew bootRun > ../bakcend.log 2>&1 &
+      nohup ./gradlew bootRun > ../backend.log 2>&1 &
     )
 
     sleep 3
 
-      if curl -f http://localhost:$BACKEND_PORT > /dev/null 2>&1; then
-        echo "backend STARTED"
-      else
-        echo "backend FAILED"
-        exit 1
-      fi
+    if curl -f http://localhost:$BACKEND_PORT/api/v1/links > /dev/null 2>&1; then
+      echo "backend STARTED"
+    else
+      echo "backend FAILED"
+      exit 1
+    fi
 }
 
 main() {
