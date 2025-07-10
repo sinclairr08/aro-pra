@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NODE_VERSION=20.19.1
-ENV JAVA_HOME=/opt/microsoft/jdk-21.0.7+7
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 RUN apt-get update && apt-get install -y \
@@ -16,14 +16,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && node --version \
     && npm --version
 
-RUN mkdir -p /opt/microsoft \
-    && cd /tmp \
-    && wget -O microsoft-jdk-21.0.7.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-21.0.7-linux-x64.tar.gz" \
-    && tar -xzf microsoft-jdk-21.0.7.tar.gz -C /opt/microsoft \
-    && rm microsoft-jdk-21.0.7.tar.gz \
-    && ln -sf /opt/microsoft/jdk-21.0.7+7 /opt/microsoft/java-21-microsoft
+RUN apt-get update && apt-get install -y openjdk-21-jdk \
+   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+COPY ./backend ./backend
+COPY ./frontend ./frontend
+COPY ./deploy/deploy.sh .
+COPY ./deploy/stop.sh .
 
 EXPOSE 3000 8080
 
