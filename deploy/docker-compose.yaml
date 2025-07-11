@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  aro-pra-fe:
+    build:
+      context: ../frontend
+      dockerfile: ../deploy/frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - aro-pra-be
+    networks:
+      - aro-pra-network
+
+  aro-pra-be:
+    build:
+      context: ../backend
+      dockerfile: ../deploy/backend/Dockerfile
+    ports:
+      - "8080:8080" # 닫기
+    #environment      # application.yaml과의 충돌 해결하기
+    depends_on:
+      - aro-pra-data
+    networks:
+      - aro-pra-network
+
+  aro-pra-data:
+    image: mongo:7.0
+    container_name: aro-pra-data
+    restart: unless-stopped
+    environment:
+      - MONGODB_INITDB_DATABASE=test_db
+    volumes:
+      - aro-pra-data-storage:/data/aro-pra-db
+    networks:
+      - aro-pra-network
+
+volumes:
+  aro-pra-data-storage:
+    driver: local
+
+networks:
+  aro-pra-network:
+    driver: bridge
