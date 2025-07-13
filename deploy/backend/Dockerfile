@@ -17,11 +17,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN if [ -f "./gradlew" ]; then \
-    chmod +x ./gradlew && \
-    ./gradlew clean build -x test; \
-    fi
-
 EXPOSE 8080
 
-CMD ["java", "-jar", "./build/libs/*.jar"]
+RUN chmod +x ./gradlew
+RUN ./gradlew clean build -x test
+RUN cp $(ls ./build/libs/*.jar | grep -v plain | head -1) ./app.jar
+
+CMD java -jar ./app.jar
