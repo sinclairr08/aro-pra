@@ -22,6 +22,7 @@ services:
       - "8080:8080" # 닫기
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://aro-pra-data:27017/test_db
+      - SPRING_PROFILES_ACTIVE=${ENV:-dev},secret
     depends_on:
       - aro-pra-data
     networks:
