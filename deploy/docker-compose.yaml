@@ -4,11 +4,11 @@ services:
       context: ../frontend
       dockerfile: ../deploy/frontend/Dockerfile
       args:
-        NEXT_PUBLIC_BACKEND_URL: http://aro-pra-be:8080
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://aro-pra-be:8080
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
     depends_on:
       - aro-pra-be
     networks:
@@ -21,8 +21,8 @@ services:
     ports:
       - "8080:8080" # 닫기
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://aro-pra-data:27017/test_db
-      - SPRING_PROFILES_ACTIVE=${ENV:-dev},secret
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
     depends_on:
       - aro-pra-data
     networks:
@@ -33,7 +33,7 @@ services:
     container_name: aro-pra-data
     restart: unless-stopped
     environment:
-      - MONGODB_INITDB_DATABASE=test_db
+      - MONGODB_INITDB_DATABASE=${MONGODB_INITDB_DATABASE}
     volumes:
       - aro-pra-data-storage:/data/aro-pra-db
     networks:
