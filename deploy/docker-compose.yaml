@@ -6,7 +6,7 @@ services:
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
     depends_on:
@@ -19,7 +19,7 @@ services:
       context: ../backend
       dockerfile: ../deploy/backend/Dockerfile
     ports:
-      - "8080:8080" # 닫기
+      - "${BACKEND_PORT:-8080}:8080" # 닫기
     environment:
       - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
