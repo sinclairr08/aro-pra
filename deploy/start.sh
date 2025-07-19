@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker compose --env-file .env.${ENV} --build -d
+docker compose --env-file .env.${ENV} up --build -d
