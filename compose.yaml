@@ -1,8 +1,8 @@
 services:
   aro-pra-fe:
     build:
-      context: ../frontend
-      dockerfile: ../deploy/frontend/Dockerfile
+      context: ./frontend
+      dockerfile: ./deploy/frontend/Dockerfile
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
     ports:
@@ -16,10 +16,10 @@ services:
 
   aro-pra-be:
     build:
-      context: ../backend
-      dockerfile: ../deploy/backend/Dockerfile
+      context: ./backend
+      dockerfile: ./deploy/backend/Dockerfile
     ports:
-      - "${BACKEND_PORT:-8080}:8080" # 닫기
+      - "${BACKEND_PORT:-8080}:8080"
     environment:
       - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
@@ -33,9 +33,9 @@ services:
     container_name: aro-pra-data
     restart: unless-stopped
     environment:
-      - MONGODB_INITDB_DATABASE=${MONGODB_INITDB_DATABASE}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
     volumes:
-      - aro-pra-data-storage:/data/aro-pra-db
+      - aro-pra-data-storage:/data/db
     networks:
       - aro-pra-network
 
