@@ -64,6 +64,9 @@ class AdminController(
     @Value("\${app.admin.password}")
     private lateinit var adminPassword: String
 
+    @Value("\${app.cookie.secure:false}")
+    private var cookieSecure: Boolean = false
+
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
@@ -74,7 +77,7 @@ class AdminController(
                 ResponseCookie
                     .from("adminToken", token)
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(cookieSecure)
                     .path("/admin")
                     .maxAge(Duration.ofDays(1))
                     .build()
@@ -91,7 +94,7 @@ class AdminController(
             ResponseCookie
                 .from("adminToken", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/admin")
                 .maxAge(Duration.ZERO)
                 .build()
