@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   ) {
     try {
       const response = await fetch(
-        `${request.nextUrl.origin}/api/v1/admin/profile`,
+        `${process.env.BACKEND_INTERNAL_URL}/api/v1/admin/profile`,
         {
           headers: {
             Cookie: request.headers.get("cookie") ?? "",
