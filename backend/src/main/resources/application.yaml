@@ -9,3 +9,5 @@ cors:
 app:
   cookie:
     secure: ${COOKIE_SECURE:false}
+server:
+  port: ${SERVER_PORT:8080}

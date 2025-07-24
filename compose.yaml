@@ -5,46 +5,21 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+    network_mode: "host"
     environment:
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
       - BACKEND_INTERNAL_URL=${BACKEND_INTERNAL_URL}
+    command: ["npm", "start", "--", "-p", "${FRONTEND_PORT:-3000}"]
     depends_on:
       - aro-pra-be
-    networks:
-      - aro-pra-network
 
   aro-pra-be:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
+    network_mode: "host"
     environment:
       - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
       - COOKIE_SECURE=${COOKIE_SECURE:-false}
-    depends_on:
-      - aro-pra-data
-    networks:
-      - aro-pra-network
-
-  aro-pra-data:
-    image: mongo:7.0
-    container_name: aro-pra-data
-    restart: unless-stopped
-    environment:
-      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-    volumes:
-      - aro-pra-data-storage:/data/db
-    networks:
-      - aro-pra-network
-
-volumes:
-  aro-pra-data-storage:
-    driver: local
-
-networks:
-  aro-pra-network:
-    driver: bridge
+      - SERVER_PORT=${BACKEND_PORT:-8080}
