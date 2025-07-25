@@ -10,7 +10,6 @@ interface useLoginApiReturn {
 }
 
 const adminLoginApi = async (password: string): Promise<useLoginApiReturn> => {
-  console.info("[AdminAuth] started");
   try {
     const { data, status } = await axios.post(
       "/api/v1/admin/login",
@@ -25,7 +24,6 @@ const adminLoginApi = async (password: string): Promise<useLoginApiReturn> => {
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error(`[AdminAuth] ${message}`);
     return { success: false, message, status: 401 };
   }
 };
