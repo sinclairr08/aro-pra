@@ -17,8 +17,6 @@ WORKDIR /app
 
 COPY . .
 
-EXPOSE 8080
-
 RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
 RUN cp $(ls ./build/libs/*.jar | grep -v plain | head -1) ./app.jar
