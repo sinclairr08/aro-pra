@@ -3,13 +3,15 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-interface useLoginApiReturn {
+interface adminLoginApiReturn {
   success: boolean;
   message?: string;
   status: number;
 }
 
-const adminLoginApi = async (password: string): Promise<useLoginApiReturn> => {
+const adminLoginApi = async (
+  password: string,
+): Promise<adminLoginApiReturn> => {
   try {
     const { data, status } = await axios.post(
       "/api/v1/admin/login",
