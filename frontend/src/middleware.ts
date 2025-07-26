@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  console.info(`[Middleware] cookie=${request.headers.get("cookie")}`);
-
   if (
     request.nextUrl.pathname.startsWith("/admin") &&
     !(request.nextUrl.pathname === "/admin/login")
@@ -20,11 +18,10 @@ export async function middleware(request: NextRequest) {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        console.info(`[Middleware] authentication error, data=${data}`);
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
-    } catch (e) {
-      console.error(`[Middleware] error: ${e}`);
+    } catch (error) {
+      console.error(`[Middleware] error: ${error}`);
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
