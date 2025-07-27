@@ -3,15 +3,15 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-interface useLoginApiReturn {
+interface adminLoginApiReturn {
   success: boolean;
   message?: string;
   status: number;
 }
 
-const useAdminLoginApi = async (
+const adminLoginApi = async (
   password: string,
-): Promise<useLoginApiReturn> => {
+): Promise<adminLoginApiReturn> => {
   try {
     const { data, status } = await axios.post(
       "/api/v1/admin/login",
@@ -30,7 +30,7 @@ const useAdminLoginApi = async (
   }
 };
 
-const useAdminLogoutApi = async (): Promise<void> => {
+const adminLogoutApi = async (): Promise<void> => {
   try {
     await axios.post("/api/v1/admin/logout", {}, { withCredentials: true });
   } catch (error) {
@@ -42,7 +42,7 @@ export const useAdminAuth = () => {
   const router = useRouter();
 
   const login = async (password: string) => {
-    const result = await useAdminLoginApi(password);
+    const result = await adminLoginApi(password);
 
     if (result.success) {
       router.push("/admin");
@@ -53,7 +53,7 @@ export const useAdminAuth = () => {
   };
 
   const logout = async () => {
-    await useAdminLogoutApi();
+    await adminLogoutApi();
     router.push("/admin/login");
   };
 

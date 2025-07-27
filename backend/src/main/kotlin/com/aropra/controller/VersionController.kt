@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/versions")
-@CrossOrigin(origins = ["*"])
 class VersionController(
     private val versionService: VersionService,
 ) {

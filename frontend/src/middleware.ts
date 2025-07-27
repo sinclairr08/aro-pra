@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 
 export async function middleware(request: NextRequest) {
   if (
@@ -7,19 +6,22 @@ export async function middleware(request: NextRequest) {
     !(request.nextUrl.pathname === "/admin/login")
   ) {
     try {
-      const response = await axios.get(
-        `${request.nextUrl.origin}/api/v1/admin/profile`,
+      const response = await fetch(
+        `${process.env.BACKEND_INTERNAL_URL}/api/v1/admin/profile`,
         {
           headers: {
-            Cookie: request.headers.get("cookie") || "",
+            Cookie: request.headers.get("cookie") ?? "",
           },
         },
       );
 
-      if (!response.data.success) {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
     } catch (error) {
+      console.error(`[Middleware] error: ${error}`);
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }

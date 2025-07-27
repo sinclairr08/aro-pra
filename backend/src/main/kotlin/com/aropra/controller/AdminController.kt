@@ -3,6 +3,7 @@ package com.aropra.controller
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -58,41 +59,50 @@ data class LoginResponse(
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@CrossOrigin(origins = ["*"])
 class AdminController(
     private val jwtUtils: JwtUtils,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @Value("\${app.admin.password}")
     private lateinit var adminPassword: String
+
+    @Value("\${app.cookie.secure:false}")
+    private var cookieSecure: Boolean = false
 
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
     ): ResponseEntity<LoginResponse> {
+        log.info("[/api/v1/admin/login] login request arrived")
+
         if (adminPassword == request.password) {
             val token = jwtUtils.generateToken()
             val cookie =
                 ResponseCookie
                     .from("adminToken", token)
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(cookieSecure)
                     .path("/admin")
                     .maxAge(Duration.ofDays(1))
                     .build()
 
+            log.info("[/api/v1/admin/login] login success")
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(LoginResponse(true))
         }
 
+        log.info("[/api/v1/admin/login] login request failed, returns 401")
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false))
     }
 
     @PostMapping("/logout")
     fun logout(): ResponseEntity<LoginResponse> {
+        log.info("[/api/v1/admin/logout] logout request arrived")
         val cookie =
             ResponseCookie
                 .from("adminToken", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/admin")
                 .maxAge(Duration.ZERO)
                 .build()
@@ -104,9 +114,18 @@ class AdminController(
     fun getProfile(
         @CookieValue(name = "adminToken", required = false) token: String?,
     ): ResponseEntity<LoginResponse> {
+        log.info("[/api/v1/admin/profile] profile request arrived with $token")
+
+        if (token != null) {
+            log.info("[/api/v1/admin/profile] token is not null, validating result: ${jwtUtils.validateToken(token)}")
+        }
+
         if (token != null && jwtUtils.validateToken(token)) {
+            log.info("[/api/v1/admin/profile] token is valid")
             return ResponseEntity.ok(LoginResponse(success = true))
         }
+
+        log.info("[/api/v1/admin/profile] token is invalid")
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false))
     }
 }
