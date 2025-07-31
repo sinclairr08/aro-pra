@@ -1,4 +1,11 @@
+"""
+Source
+------
+Based on https://github.com/sehnauoi/blue-archive-jp-assets-downloader
+"""
+
 import os
+from typing import Tuple
 
 import UnityPy
 import requests
@@ -6,6 +13,12 @@ import requests
 print(UnityPy.__version__)
 
 session = requests.Session()
+
+BA_JP_BUNDLES_DIR = './ba_jp_bundles'
+BA_JP_MEDIA_DIR = './ba_jp_media'
+
+os.makedirs(BA_JP_BUNDLES_DIR, exist_ok=True)
+os.makedirs(BA_JP_MEDIA_DIR, exist_ok=True)
 
 current_version = 'r52_uulekwyjhzir122lpbrw'
 BA_JP_VERSION_METADATA = f"https://yostar-serverinfo.bluearchiveyostar.com/{current_version}.json"
@@ -85,8 +98,6 @@ def download_ba_jp_media(media_base_url: str, media_list: dict, output_dir: str)
 
 
 BA_JP_ANDROID_BUNDLE = f"{current_version_assets_base_url}/Android/"
-BA_JP_BUNDLES_DIR = './ba_jp_bundles'
-BA_JP_MEDIA_DIR = './ba_jp_media'
 
 total_bundle_count, downloaded_bundle_count, skipped_bundle_count = download_ba_jp_bundle(
     BA_JP_ANDROID_BUNDLE, bundles_to_download, BA_JP_BUNDLES_DIR)
