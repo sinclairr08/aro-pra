@@ -5,6 +5,7 @@ Based on https://github.com/sehnauoi/blue-archive-jp-assets-downloader
 """
 import logging
 import os
+from abc import ABC, abstractmethod
 
 import requests
 
@@ -13,16 +14,38 @@ def is_file_exist_and_valid(local_path: str, size: int) -> bool:
     return os.path.exists(local_path) and os.path.getsize(local_path) == size
 
 
-class BundleDownloader:
+class BaseDownloader(ABC):
     def __init__(self, asset_base_url: str, dst_dir: str):
         self.asset_base_url = asset_base_url
-        self.bundle_base_url = f"{self.asset_base_url}/Android"
-        self.bundle_info_url = f"{self.asset_base_url}/Android/bundleDownloadInfo.json"
         self.dst_dir = dst_dir
         self.session = requests.Session()
         self.logger = logging.getLogger(__name__)
 
         os.makedirs(self.dst_dir, exist_ok=True)
+
+    @abstractmethod
+    def download(self):
+        pass
+
+    def download_file(self, url: str, local_path: str, size: int):
+        data = self.session.get(url).content
+
+        if len(data) != size:
+            self.logger.warning(f"No file matched {len(data)=}, {size=}, skip saving")
+            return
+
+        with open(local_path, "wb") as f:
+            f.write(data)
+
+        self.logger.info(f"Downloaded {local_path} successfully")
+
+
+class BundleDownloader(BaseDownloader):
+    def __init__(self, asset_base_url: str, dst_dir: str):
+        super().__init__(asset_base_url=asset_base_url, dst_dir=dst_dir)
+
+        self.bundle_base_url = f"{self.asset_base_url}/Android"
+        self.bundle_info_url = f"{self.asset_base_url}/Android/bundleDownloadInfo.json"
 
     def download(self):
         response = requests.get(self.bundle_info_url)
@@ -45,14 +68,33 @@ class BundleDownloader:
 
         self.download_file(url=bundle_url, local_path=local_path, size=bundle_info["Size"])
 
-    def download_file(self, url: str, local_path: str, size: int):
-        data = self.session.get(url).content
 
-        if len(data) != size:
-            self.logger.warning(f"No file matched {len(data)=}, {size=}, skip saving")
+class MediaDownloader(BaseDownloader):
+    def __init__(self, asset_base_url: str, dst_dir: str):
+        super().__init__(asset_base_url=asset_base_url, dst_dir=dst_dir)
+
+        self.media_base_url = f"{self.asset_base_url}/MediaResources"
+        self.media_info_url = f"{self.asset_base_url}/MediaResources/MediaCatalog.json"
+
+    def download(self):
+        response = requests.get(self.media_info_url)
+        media_infos = response.json()["Table"]
+
+        for media_info in media_infos.values():
+            self.download_media(media_info)
+
+    def download_media(self, media_info):
+        print(media_info)  # For test
+
+        media_name = media_info["fileName"]
+        media_path = media_info["path"]
+        media_size = media_info["bytes"]
+
+        media_url = f"{self.media_base_url}/{media_path}"
+        local_path = os.path.join(self.dst_dir, media_path)
+
+        if is_file_exist_and_valid(local_path=local_path, size=media_size):
+            self.logger.info(f"Already exist, skip {media_name=}")
             return
 
-        with open(local_path, "wb") as f:
-            f.write(data)
-
-        self.logger.info(f"Downloaded {local_path} successfully")
+        self.download_file(url=media_url, local_path=local_path, size=media_size)
