@@ -1,2 +1,4 @@
 requests
 UnityPy
+pydantic
+pydantic-settings
