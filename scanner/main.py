@@ -23,8 +23,12 @@ def get_asset_base_url():
 
 def main():
     asset_base_url = get_asset_base_url()
-    BundleDownloader(asset_base_url=asset_base_url, dst_dir="./bundles")
-    MediaDownloader(asset_base_url=asset_base_url, dst_dir="./medias")
+
+    bundle_downloader = BundleDownloader(asset_base_url=asset_base_url, dst_dir="./bundles")
+    media_downloader = MediaDownloader(asset_base_url=asset_base_url, dst_dir="./medias")
+
+    bundle_downloader.download()
+    media_downloader.download()
 
 
 if __name__ == "__main__":

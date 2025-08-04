@@ -55,9 +55,7 @@ class BundleDownloader(BaseDownloader):
             self.download_bundle(bundle_info)
 
     def download_bundle(self, bundle_info):
-        print(bundle_info)  # For test
-
-        bundle_name = bundle_info["name"]
+        bundle_name = bundle_info["Name"]
         bundle_url = f"{self.bundle_base_url}/{bundle_name}"
 
         local_path = os.path.join(self.dst_dir, bundle_name)
@@ -84,14 +82,14 @@ class MediaDownloader(BaseDownloader):
             self.download_media(media_info)
 
     def download_media(self, media_info):
-        print(media_info)  # For test
-
         media_name = media_info["fileName"]
         media_path = media_info["path"]
         media_size = media_info["bytes"]
 
         media_url = f"{self.media_base_url}/{media_path}"
         local_path = os.path.join(self.dst_dir, media_path)
+
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
         if is_file_exist_and_valid(local_path=local_path, size=media_size):
             self.logger.info(f"Already exist, skip {media_name=}")
