@@ -24,9 +24,13 @@ class Extractor:
             print(f"Failed to load {file_path}, {e=}")
             return
 
-        for path, obj in env.container.items():
-            asset_path = Path(*path.split("/"))
+        for obj in env.objects:
             obj_type_name = obj.type.name
+
+            if obj.container:
+                asset_path = Path(*obj.container.split("/"))
+            else:
+                asset_path = Path(f"{obj_type_name}_{obj.path_id}")
 
             if obj_type_name in ["Texture2D", "Sprite"]:
                 data = obj.read()
@@ -42,11 +46,14 @@ class Extractor:
                 dst_file = self.dst_dir / asset_path
                 dst_file.parent.mkdir(parents=True, exist_ok=True)
 
-                with open(dst_file, "wb") as f:
-                    f.write(bytes(data.script))
-
-            else:
-                print(f"{obj_type_name=} does not supported")
+                try:
+                    with open(dst_file, "wb") as f:
+                        if isinstance(data.m_Script, bytes):
+                            f.write(data.m_Script)
+                        else:
+                            f.write(bytes(data.m_Script.encode("utf-8")))
+                except Exception as e:
+                    print(f"{asset_path} : {e}")
 
 
 if __name__ == "__main__":
