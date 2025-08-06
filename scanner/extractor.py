@@ -46,12 +46,18 @@ class Extractor:
                 dst_file = self.dst_dir / asset_path
                 dst_file.parent.mkdir(parents=True, exist_ok=True)
 
+                script_data = data.m_Script
+
+                if dst_file.suffix.lower() == ".bytes":
+                    continue
+
+                if not isinstance(script_data, str):
+                    continue
+
                 try:
+                    content = script_data.encode("utf-8")
                     with open(dst_file, "wb") as f:
-                        if isinstance(data.m_Script, bytes):
-                            f.write(data.m_Script)
-                        else:
-                            f.write(bytes(data.m_Script.encode("utf-8")))
+                        f.write(content)
                 except Exception as e:
                     print(f"{asset_path} : {e}")
 
