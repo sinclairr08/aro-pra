@@ -1,14 +1,16 @@
 from pathlib import Path
 
 import UnityPy
+from UnityPy.files import ObjectReader
 
 
 class Extractor:
-    def __init__(self, src_dir: str, dst_dir: str):
+    def __init__(self, src_dir: str, dst_dir: str, target_dir: str):
         self.src_dir = Path(src_dir)
         self.dst_dir = Path(dst_dir)
+        self.target_dir = Path(target_dir)
 
-        self.dst_dir.mkdir(parents=True, exist_ok=True)
+        self.target_dir.mkdir(parents=True, exist_ok=True)
 
     def extract(self):
         for file_path in self.src_dir.rglob("*"):
@@ -25,43 +27,37 @@ class Extractor:
             return
 
         for obj in env.objects:
-            obj_type_name = obj.type.name
+            self.extract_obj(obj)
 
-            if obj.container:
-                asset_path = Path(*obj.container.split("/"))
-            else:
-                asset_path = Path(f"{obj_type_name}_{obj.path_id}")
+    def extract_obj(self, obj: ObjectReader):
+        obj_type_name = obj.type.name
 
-            if obj_type_name in ["Texture2D", "Sprite"]:
-                data = obj.read()
+        if obj_type_name != "Texture2D":
+            return
 
-                dst_file = self.dst_dir / asset_path.with_suffix(".png")
-                dst_file.parent.mkdir(parents=True, exist_ok=True)
+        if not obj.container:
+            return
 
-                data.image.save(dst_file)
+        asset_path = Path(*obj.container.split("/"))
 
-            elif obj_type_name == "TextAsset":
-                data = obj.read()
+        if "small" in str(asset_path) or "Small" in str(asset_path):
+            return
 
-                dst_file = self.dst_dir / asset_path
-                dst_file.parent.mkdir(parents=True, exist_ok=True)
+        if not asset_path.is_relative_to(self.target_dir):
+            return
 
-                script_data = data.m_Script
+        dst_file = self.dst_dir / asset_path.with_suffix(".png").name
 
-                if dst_file.suffix.lower() == ".bytes":
-                    continue
+        if dst_file.exists():
+            return
 
-                if not isinstance(script_data, str):
-                    continue
+        data = obj.read()
+        data.image.save(dst_file)
 
-                try:
-                    content = script_data.encode("utf-8")
-                    with open(dst_file, "wb") as f:
-                        f.write(content)
-                except Exception as e:
-                    print(f"{asset_path} : {e}")
+        print(f"{str(dst_file)} extracted")
 
 
 if __name__ == "__main__":
-    extractor = Extractor(src_dir="./bundles", dst_dir="./extracted")
+    extractor = Extractor(src_dir="./bundles", dst_dir="./extracted",
+                          target_dir="Assets/_MX/AddressableAsset/UIs/01_Common/01_Character")
     extractor.extract()
