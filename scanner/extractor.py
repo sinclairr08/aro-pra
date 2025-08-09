@@ -5,12 +5,12 @@ from UnityPy.files import ObjectReader
 
 
 class Extractor:
-    def __init__(self, src_dir: str, dst_dir: str, target_dir: str):
+    def __init__(self, src_dir: str, dst_dir: str, target_dirs: list[str]):
         self.src_dir = Path(src_dir)
         self.dst_dir = Path(dst_dir)
-        self.target_dir = Path(target_dir)
+        self.target_dirs = [Path(target_dir) for target_dir in target_dirs]
 
-        self.target_dir.mkdir(parents=True, exist_ok=True)
+        self.dst_dir.mkdir(parents=True, exist_ok=True)
 
     def extract(self):
         for file_path in self.src_dir.rglob("*"):
@@ -29,6 +29,13 @@ class Extractor:
         for obj in env.objects:
             self.extract_obj(obj)
 
+    def is_target(self, asset_path: Path) -> bool:
+        for target_dir in self.target_dirs:
+            if asset_path.is_relative_to(target_dir):
+                return True
+
+        return False
+
     def extract_obj(self, obj: ObjectReader):
         obj_type_name = obj.type.name
 
@@ -43,7 +50,7 @@ class Extractor:
         if "small" in str(asset_path) or "Small" in str(asset_path):
             return
 
-        if not asset_path.is_relative_to(self.target_dir):
+        if self.is_target(asset_path=asset_path):
             return
 
         dst_file = self.dst_dir / asset_path.with_suffix(".png").name
@@ -58,6 +65,11 @@ class Extractor:
 
 
 if __name__ == "__main__":
+    target_dirs = [
+        "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
+        "Assets/_MX/AddressableAsset/UIs/01_Common/20_Operator"
+    ]
     extractor = Extractor(src_dir="./bundles", dst_dir="./extracted",
-                          target_dir="Assets/_MX/AddressableAsset/UIs/01_Common/01_Character")
+                          target_dirs=target_dirs)
+
     extractor.extract()
