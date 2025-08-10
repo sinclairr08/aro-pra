@@ -6,6 +6,7 @@ Based on https://github.com/sehnauoi/blue-archive-jp-assets-downloader
 import logging
 import os
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import requests
 
@@ -15,13 +16,13 @@ def is_file_exist_and_valid(local_path: str, size: int) -> bool:
 
 
 class BaseDownloader(ABC):
-    def __init__(self, asset_base_url: str, dst_dir: str):
+    def __init__(self, asset_base_url: str, dst_dir: Path):
         self.asset_base_url = asset_base_url
         self.dst_dir = dst_dir
         self.session = requests.Session()
         self.logger = logging.getLogger(__name__)
 
-        os.makedirs(self.dst_dir, exist_ok=True)
+        self.dst_dir.mkdir(parents=True, exist_ok=True)
 
     @abstractmethod
     def download(self):
@@ -41,7 +42,7 @@ class BaseDownloader(ABC):
 
 
 class BundleDownloader(BaseDownloader):
-    def __init__(self, asset_base_url: str, dst_dir: str):
+    def __init__(self, asset_base_url: str, dst_dir: Path):
         super().__init__(asset_base_url=asset_base_url, dst_dir=dst_dir)
 
         self.bundle_base_url = f"{self.asset_base_url}/Android"
@@ -58,7 +59,7 @@ class BundleDownloader(BaseDownloader):
         bundle_name = bundle_info["Name"]
         bundle_url = f"{self.bundle_base_url}/{bundle_name}"
 
-        local_path = os.path.join(self.dst_dir, bundle_name)
+        local_path = self.dst_dir / bundle_name
 
         if is_file_exist_and_valid(local_path=local_path, size=bundle_info["Size"]):
             self.logger.info(f"Already exist, skip {bundle_name=}")
@@ -68,7 +69,7 @@ class BundleDownloader(BaseDownloader):
 
 
 class MediaDownloader(BaseDownloader):
-    def __init__(self, asset_base_url: str, dst_dir: str):
+    def __init__(self, asset_base_url: str, dst_dir: Path):
         super().__init__(asset_base_url=asset_base_url, dst_dir=dst_dir)
 
         self.media_base_url = f"{self.asset_base_url}/MediaResources"
@@ -87,7 +88,7 @@ class MediaDownloader(BaseDownloader):
         media_size = media_info["bytes"]
 
         media_url = f"{self.media_base_url}/{media_path}"
-        local_path = os.path.join(self.dst_dir, media_path)
+        local_path = self.dst_dir / media_path
 
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
 

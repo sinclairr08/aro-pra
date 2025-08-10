@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class ScannerConfig(BaseSettings):
+    version: str
     request_url: str
     model_config = {"env_file": ".env.scanner"}
 

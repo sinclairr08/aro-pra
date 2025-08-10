@@ -5,9 +5,9 @@ from UnityPy.files import ObjectReader
 
 
 class Extractor:
-    def __init__(self, src_dir: str, dst_dir: str, target_dirs: list[str]):
-        self.src_dir = Path(src_dir)
-        self.dst_dir = Path(dst_dir)
+    def __init__(self, src_dir: Path, dst_dir: Path, target_dirs: list[str]):
+        self.src_dir = src_dir
+        self.dst_dir = dst_dir
         self.target_dirs = [Path(target_dir) for target_dir in target_dirs]
 
         self.dst_dir.mkdir(parents=True, exist_ok=True)
@@ -62,14 +62,3 @@ class Extractor:
         data.image.save(dst_file)
 
         print(f"{str(dst_file)} extracted")
-
-
-if __name__ == "__main__":
-    target_dirs = [
-        "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
-        "Assets/_MX/AddressableAsset/UIs/01_Common/20_Operator"
-    ]
-    extractor = Extractor(src_dir="./bundles", dst_dir="./extracted",
-                          target_dirs=target_dirs)
-
-    extractor.extract()
