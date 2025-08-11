@@ -13,15 +13,13 @@ from download import BundleDownloader
 from extractor import Extractor
 
 
-def get_asset_base_url():
+def get_asset_base_url() -> str:
     response = requests.get(CONFIG.request_url)
     data = response.json()
 
     connection_group = data["ConnectionGroups"][0]
     override_group = connection_group['OverrideConnectionGroups'][-1]
-    addressable_root = override_group['AddressablesCatalogUrlRoot']
-
-    return addressable_root
+    return override_group['AddressablesCatalogUrlRoot']
 
 
 def main():

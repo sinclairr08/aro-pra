@@ -50,7 +50,7 @@ class Extractor:
         if "small" in str(asset_path) or "Small" in str(asset_path):
             return
 
-        if self.is_target(asset_path=asset_path):
+        if not self.is_target(asset_path=asset_path):
             return
 
         dst_file = self.dst_dir / asset_path.with_suffix(".png").name
