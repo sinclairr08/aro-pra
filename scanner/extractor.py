@@ -30,11 +30,7 @@ class Extractor:
             self.extract_obj(obj)
 
     def is_target(self, asset_path: Path) -> bool:
-        for target_dir in self.target_dirs:
-            if asset_path.is_relative_to(target_dir):
-                return True
-
-        return False
+        return any(asset_path.is_relative_to(d) for d in self.target_dirs)
 
     def extract_obj(self, obj: ObjectReader):
         obj_type_name = obj.type.name

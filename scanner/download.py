@@ -47,6 +47,7 @@ class BundleDownloader(BaseDownloader):
 
         self.bundle_base_url = f"{self.asset_base_url}/Android"
         self.bundle_info_url = f"{self.asset_base_url}/Android/bundleDownloadInfo.json"
+        self.target_bundle_names = ["01_common-20_operator", "01_common-01_character"]
 
     def download(self):
         response = requests.get(self.bundle_info_url)
@@ -55,8 +56,14 @@ class BundleDownloader(BaseDownloader):
         for bundle_info in bundle_infos:
             self.download_bundle(bundle_info)
 
+    def is_target_bundle_name(self, bundle_name: str) -> bool:
+        return any(t in bundle_name for t in self.target_bundle_names)
+
     def download_bundle(self, bundle_info):
         bundle_name = bundle_info["Name"]
+        if not self.is_target_bundle_name(bundle_name):
+            return
+
         bundle_url = f"{self.bundle_base_url}/{bundle_name}"
 
         local_path = self.dst_dir / bundle_name
