@@ -42,12 +42,12 @@ class BaseDownloader(ABC):
 
 
 class BundleDownloader(BaseDownloader):
-    def __init__(self, asset_base_url: str, dst_dir: Path):
+    def __init__(self, asset_base_url: str, dst_dir: Path, target_bundle_names: list[str]):
         super().__init__(asset_base_url=asset_base_url, dst_dir=dst_dir)
 
         self.bundle_base_url = f"{self.asset_base_url}/Android"
         self.bundle_info_url = f"{self.asset_base_url}/Android/bundleDownloadInfo.json"
-        self.target_bundle_names = ["01_common-20_operator", "01_common-01_character"]
+        self.target_bundle_names = target_bundle_names
 
     def download(self):
         response = requests.get(self.bundle_info_url)
