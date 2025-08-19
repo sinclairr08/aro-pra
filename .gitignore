@@ -125,3 +125,4 @@ backend/**/application-secret.yaml
 ### Python ##
 
 **/__pycache__/
+scanner.yaml
