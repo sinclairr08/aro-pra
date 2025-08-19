@@ -121,3 +121,7 @@ bin/
 
 # Secrets
 backend/**/application-secret.yaml
+
+### Python ##
+
+**/__pycache__/
