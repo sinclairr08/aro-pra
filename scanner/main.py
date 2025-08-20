@@ -23,20 +23,19 @@ def get_asset_base_url() -> str:
 
 
 def main():
-    asset_base_url = get_asset_base_url()
+    url = CONFIG.url
 
-    bundle_path = Path(CONFIG.version) / "bundles"
-    extracted_path = Path(CONFIG.version) / "extracted"
+    bundle_path = Path("local") / "bundles"
+    extracted_path = Path("local") / "extracted"
 
-    target_bundle_names = ["01_common-20_operator", "01_common-01_character"]
+    target_bundle_names = ["01_common-01_character"]
 
     target_dirs = [
         "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
-        "Assets/_MX/AddressableAsset/UIs/01_Common/20_Operator"
     ]
 
     bundle_downloader = BundleDownloader(
-        asset_base_url=asset_base_url,
+        url=url,
         dst_dir=bundle_path,
         target_bundle_names=target_bundle_names
     )
