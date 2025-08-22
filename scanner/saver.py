@@ -1,15 +1,19 @@
+import shutil
 from pathlib import Path
 
+import pymongo.collection
 from pymongo import MongoClient
+
+from config import CONFIG
 
 
 class Saver:
     INVALID_NAMES = ["operator", "npc"]
 
-    def __init__(self, src_dir: str, dst_dir: str):
+    def __init__(self, src_dir: str, dst_dir: str, collection: pymongo.collection.Collection):
         self.src_dir = Path(src_dir)
         self.dst_dir = Path(dst_dir)
-        self.collection = MongoClient("mongodb://localhost:27017")["test_db"]["students"]
+        self.collection = collection
 
         if not self.dst_dir.exists():
             raise Exception(f"{self.dst_dir} does not exist")
@@ -22,12 +26,11 @@ class Saver:
             self.save_file(file)
 
     def save_file(self, file: Path):
-        # shutil.copy(str(file), str(self.dst_dir / file.name))
-
         name = file.name
         code = name.split("Portrait_")[1].split(".png")[0]
 
         self.collection.update_one(filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True)
+        shutil.copy(str(file), str(self.dst_dir / f"{code}.png"))
 
     def is_invalid_file(self, file: Path) -> bool:
         filename = str(file).lower()
@@ -39,6 +42,11 @@ class Saver:
 
 
 if __name__ == "__main__":
-    saver = Saver(src_dir="local/extracted", dst_dir="../frontend/public/imgs")
+    student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
+    saver = Saver(
+        src_dir="local/extracted",
+        dst_dir="../frontend/public/imgs",
+        collection=student_collection
+    )
     saver.save()
     print(saver.results())
