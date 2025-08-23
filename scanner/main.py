@@ -7,10 +7,12 @@ Based on https://github.com/sehnauoi/blue-archive-jp-assets-downloader
 from pathlib import Path
 
 import requests
+from pymongo import MongoClient
 
 from config import CONFIG
 from download import BundleDownloader
 from extractor import Extractor
+from saver import Saver
 
 
 def get_asset_base_url() -> str:
@@ -27,6 +29,7 @@ def main():
 
     bundle_path = Path("local") / "bundles"
     extracted_path = Path("local") / "extracted"
+    public_img_path = Path("../frontend/public/imgs")
 
     target_bundle_names = ["01_common-01_character"]
 
@@ -43,6 +46,14 @@ def main():
 
     extractor = Extractor(src_dir=bundle_path, dst_dir=extracted_path, target_dirs=target_dirs)
     extractor.extract()
+
+    student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
+    saver = Saver(
+        src_dir=extracted_path,
+        dst_dir=public_img_path,
+        collection=student_collection
+    )
+    saver.save()
 
 
 if __name__ == "__main__":
