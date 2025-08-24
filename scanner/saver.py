@@ -5,6 +5,7 @@ import pymongo.collection
 from pymongo import MongoClient
 
 from config import CONFIG
+from mapper import Mapper
 
 
 class Saver:
@@ -14,6 +15,7 @@ class Saver:
         self.src_dir = src_dir
         self.dst_dir = dst_dir
         self.collection = collection
+        self.mapper = Mapper()
 
         if not self.dst_dir.exists():
             raise Exception(f"{self.dst_dir} does not exist")
@@ -25,14 +27,27 @@ class Saver:
 
             self.save_file(file)
 
+    @staticmethod
+    def get_code(name):
+        return name.split("Portrait_")[1].split(".png")[0]
+
     def save_file(self, file: Path):
         name = file.name
-        code = name.split("Portrait_")[1].split(".png")[0]
+        code = self.get_code(name)
 
-        result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True)
+        student_info = self.mapper.map(code)
+        if student_info is None:
+            return
+
+        code = student_info["code"]
+
+        result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)
 
         if result.upserted_id:
-            shutil.copy(str(file), str(self.dst_dir / f"{code}.png"))
+            src = str(file)
+            dst = str(self.dst_dir / f"{code}.png")
+            shutil.copy(src, dst)
+            print(f"{src} is moved to f{dst}")
 
     def is_invalid_file(self, file: Path) -> bool:
         filename = str(file).lower()
@@ -40,7 +55,7 @@ class Saver:
         return any(invalid_name in filename for invalid_name in self.INVALID_NAMES)
 
     def results(self) -> list:
-        return list(self.collection.find({}, {"code": 1, "_id": 0}))
+        return list(self.collection.find({}, {"code": 1, "en_name": 1, "_id": 0}))
 
 
 if __name__ == "__main__":
