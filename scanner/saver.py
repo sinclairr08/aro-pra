@@ -54,9 +54,6 @@ class Saver:
 
         return any(invalid_name in filename for invalid_name in self.INVALID_NAMES)
 
-    def results(self) -> list:
-        return list(self.collection.find({}, {"code": 1, "en_name": 1, "_id": 0}))
-
 
 if __name__ == "__main__":
     student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
@@ -66,4 +63,3 @@ if __name__ == "__main__":
         collection=student_collection
     )
     saver.save()
-    print(saver.results())

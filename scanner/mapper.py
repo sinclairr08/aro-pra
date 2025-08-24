@@ -18,9 +18,10 @@ class Mapper:
         students = requests.get(url, timeout=30).json()
 
         return pd.DataFrame(
-            data=[[student.get("Name"), student.get("Id"), student.get("DevName"), student.get("PathName")] for student
+            data=[[student.get("Name"), student.get("Id"), student.get("DevName"), student.get("PathName"),
+                   student.get("PersonalName")] for student
                   in students.values()],
-            columns=[f"{lang}_name", "id", "code", "sub_code"]
+            columns=[f"{lang}_name", "id", "code", "sub_code", f"{lang}_base_name"]
         )
 
     def make_name_table(self):
