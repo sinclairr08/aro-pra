@@ -1,7 +1,11 @@
 """
 Source
 ------
-Based on https://github.com/sehnauoi/blue-archive-jp-assets-downloader
+Based on following projects
+  - https://github.com/sehnauoi/blue-archive-jp-assets-downloader
+  - https://github.com/fiseleo/BlueArchiveDownloaderJP
+  - https://github.com/Sunset-Edu-Tech-Group/BA-AD
+  - https://github.com/K0lb3s-Datamines/Blue-Archive---Asset-Downloader
 """
 import logging
 import os
