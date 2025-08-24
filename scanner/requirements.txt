@@ -3,3 +3,4 @@ UnityPy
 pydantic
 pydantic-settings
 pymongo
+pandas
