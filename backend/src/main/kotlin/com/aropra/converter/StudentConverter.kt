@@ -1,12 +1,16 @@
 package com.aropra.converter
 
 import com.aropra.domain.Student
-import com.aropra.dto.StudentData
+import com.aropra.dto.BasicStudentResponse
+import com.aropra.enum.Language
 
-fun Student.toStudentData(): StudentData =
-    StudentData(
+fun Student.toBasicStudentResponse(language: Language): BasicStudentResponse =
+    BasicStudentResponse(
         code = this.code,
-        krName = this.krName,
-        jpName = this.jpName,
-        enName = this.enName,
+        name =
+            when (language) {
+                Language.KR -> this.krName
+                Language.EN -> this.enName
+                Language.JP -> this.jpName
+            },
     )
