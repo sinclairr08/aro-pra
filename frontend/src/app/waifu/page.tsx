@@ -3,8 +3,30 @@
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
 import { useEffect, useState } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import {
+  closestCenter,
+  CollisionDetection,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  pointerWithin,
+  rectIntersection,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Image from "next/image";
 
 interface StudentInfo {
@@ -84,12 +106,7 @@ interface DraggableStudentProps {
 interface DropStudentZoneProps {
   zoneName: keyof StudentRankingZones;
   title: string;
-  items: StudentRankingItemProps[];
-  onItemMove: (
-    student: StudentRankingItemProps,
-    fromZone: keyof StudentRankingZones,
-    toZone: keyof StudentRankingZones,
-  ) => void;
+  students: StudentRankingItemProps[];
   isGrid?: boolean;
   onStudentUpdate: (groupName: string, newIdx: number) => void;
 }
@@ -100,17 +117,29 @@ interface ContextMenuProps {
   y: number;
 }
 
-const DraggableStudent: React.FC<DraggableStudentProps> = ({
+const DraggableStudent = ({
   student,
-  rank,
   zone,
+  rank,
   onStudentUpdate,
-}) => {
-  const [{ isDragging }, drag] = useDrag({
-    type: "STUDENT",
-    item: { student, sourceZone: zone },
-    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+}: DraggableStudentProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: `${zone}-${student.groupName}`,
+    data: { student, zone },
   });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
     visible: false,
@@ -152,8 +181,11 @@ const DraggableStudent: React.FC<DraggableStudentProps> = ({
   return (
     <>
       <div
-        ref={drag as any}
-        className={`rounded p-2 cursor-move ${isDragging ? "opacity-50" : ""} ${zone === "rankZone" ? "mb-2" : ""}`}
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className={`rounded p-2 ${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
         onContextMenu={handleRightClick}
       >
         {zone === "rankZone" ? (
@@ -166,9 +198,11 @@ const DraggableStudent: React.FC<DraggableStudentProps> = ({
               alt={displayStudent.name}
               width={64}
               height={64}
-              className="mx-auto mb-6"
+              className="w-16 h-16 object-contain"
             />
-            <span className="text-lg mr-2">{student.groupName}</span>
+            <span className="min-w-0 truncate text-base leading-tight">
+              {student.groupName}
+            </span>
           </div>
         ) : (
           <div className="text-center">
@@ -205,51 +239,48 @@ const DraggableStudent: React.FC<DraggableStudentProps> = ({
 const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneName,
   title,
-  items,
-  onItemMove,
+  students,
   isGrid,
   onStudentUpdate,
 }) => {
-  const [{ isOver }, drop] = useDrop({
-    accept: "STUDENT",
-    drop: (dragStudent: {
-      student: StudentRankingItemProps;
-      sourceZone: keyof StudentRankingZones;
-    }) => {
-      if (dragStudent.sourceZone !== zoneName) {
-        onItemMove(dragStudent.student, dragStudent.sourceZone, zoneName);
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
+  const sortableStudents = students.map(
+    (student) => `${zoneName}-${student.groupName}`,
+  );
+
+  const { setNodeRef } = useDroppable({ id: zoneName });
 
   return (
     <div
-      ref={drop as any} // 🔧 타입 에러 해결
-      className={`bg-white rounded-lg shadow p-4 min-h-64 border-2 border-dashed ${
-        isOver ? "border-blue-500 bg-blue-50" : "border-gray-300"
-      }`}
+      ref={setNodeRef}
+      className={`bg-white rounded-lg shadow p-4 min-h-64 border-2 border-dashed border-gray-300`}
     >
       <h3 className="font-bold text-center mb-4">{title}</h3>
-      <div className={isGrid ? "grid grid-cols-4 gap-1" : "space-y-2"}>
-        {items.length === 0 ? (
-          <div className="text-gray-400 text-center py-8 text-sm">
-            드래그하세요
-          </div>
-        ) : (
-          items.map((item, index) => (
-            <DraggableStudent
-              key={item.groupName}
-              student={item}
-              zone={zoneName}
-              rank={zoneName === "rankZone" ? index + 1 : undefined}
-              onStudentUpdate={onStudentUpdate}
-            />
-          ))
-        )}
-      </div>
+      <SortableContext
+        items={sortableStudents}
+        strategy={
+          zoneName === "rankZone"
+            ? verticalListSortingStrategy
+            : rectSortingStrategy
+        }
+      >
+        <div className={isGrid ? "grid grid-cols-4 gap-1" : "space-y-2"}>
+          {students.length === 0 ? (
+            <div className="text-gray-400 text-center py-8 text-sm">
+              드래그하세요
+            </div>
+          ) : (
+            students.map((item, index) => (
+              <DraggableStudent
+                key={`${zoneName}-${item.groupName}`}
+                student={item}
+                zone={zoneName}
+                rank={zoneName === "rankZone" ? index + 1 : undefined}
+                onStudentUpdate={onStudentUpdate}
+              />
+            ))
+          )}
+        </div>
+      </SortableContext>
     </div>
   );
 };
@@ -275,17 +306,12 @@ export default function WaifuPage() {
     }
   }, [groupedStudents]);
 
-  const moveItem = (
-    item: StudentRankingItemProps,
-    fromZone: keyof StudentRankingZones,
-    toZone: keyof StudentRankingZones,
-  ) => {
-    setZones((prev) => ({
-      ...prev,
-      [fromZone]: prev[fromZone].filter((i) => i.groupName !== item.groupName),
-      [toZone]: [...prev[toZone], item],
-    }));
-  };
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const handleStudentUpdate = (groupName: string, newIdx: number): void => {
     setZones((prev) => {
@@ -304,36 +330,164 @@ export default function WaifuPage() {
     });
   };
 
+  const [activePreview, setActivePreview] = useState<StudentInfo | null>(null);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeData = active.data.current;
+    if (!activeData) return;
+
+    let targetZone: keyof StudentRankingZones;
+    let isDropOnZone = false;
+
+    if (["rankZone", "holdZone", "excludeZone"].includes(over.id as string)) {
+      targetZone = over.id as keyof StudentRankingZones;
+      isDropOnZone = true;
+    } else {
+      const overData = over.data.current;
+      if (!overData) return;
+
+      targetZone = overData.zone as keyof StudentRankingZones;
+      isDropOnZone = false;
+    }
+
+    const activeZone = activeData.zone as keyof StudentRankingZones;
+
+    if (activeZone !== targetZone) {
+      setZones((prev) => {
+        const activeItems = [...prev[activeZone]];
+        const targetItems = [...prev[targetZone]];
+
+        const activeIdx = activeItems.findIndex(
+          (item) => item.groupName === activeData.student.groupName,
+        );
+
+        if (activeIdx === -1) return prev;
+
+        const [movedItem] = activeItems.splice(activeIdx, 1);
+
+        if (isDropOnZone) {
+          targetItems.push(movedItem);
+        } else {
+          const overIdx = targetItems.findIndex(
+            (item) => `${targetZone}-${item.groupName}` === over.id,
+          );
+
+          if (overIdx === -1) {
+            targetItems.push(movedItem);
+          } else {
+            targetItems.splice(overIdx, 0, movedItem);
+          }
+        }
+
+        return {
+          ...prev,
+          [activeZone]: activeItems,
+          [targetZone]: targetItems,
+        };
+      });
+    } else if (!isDropOnZone && active.id !== over.id) {
+      setZones((prev) => {
+        const items = [...prev[activeZone as keyof StudentRankingZones]];
+
+        const activeIdx = items.findIndex(
+          (item) => `${activeZone}-${item.groupName}` === active.id,
+        );
+
+        const overIdx = items.findIndex(
+          (item) => `${activeZone}-${item.groupName}` === over.id,
+        );
+
+        if (activeIdx !== -1 && overIdx !== -1) {
+          const reorderItems = arrayMove(items, activeIdx, overIdx);
+          return {
+            ...prev,
+            [activeZone]: reorderItems,
+          };
+        }
+        return prev;
+      });
+    }
+  };
+
+  const customCollisionDetection: CollisionDetection = (args) => {
+    const byPointer = pointerWithin(args);
+    if (byPointer.length) return byPointer;
+
+    const byRect = rectIntersection(args);
+    if (byRect.length) return byRect;
+
+    return closestCenter(args);
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const data = active.data.current as {
+      student?: StudentRankingItemProps;
+    } | null;
+
+    if (data?.student) {
+      const idx = data.student.currentIdx ?? 0;
+      const disp = data.student.value[idx];
+
+      setActivePreview({ code: disp.code, name: disp.name });
+    }
+  };
+
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={customCollisionDetection}
+      onDragStart={handleDragStart}
+      onDragCancel={() => setActivePreview(null)}
+      onDragEnd={(e) => {
+        handleDragEnd(e);
+        setActivePreview(null);
+      }}
+    >
       <div className="bg-gray-100 min-h-screen p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">드래그 앤 드롭</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Blue Archive 학생 애정도 순위
+        </h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           <DropZone
             zoneName="rankZone"
             title="랭킹"
-            items={zones.rankZone}
-            onItemMove={moveItem}
+            students={zones.rankZone}
             onStudentUpdate={handleStudentUpdate}
           />
           <DropZone
             zoneName="holdZone"
             title="대기"
-            items={zones.holdZone}
-            onItemMove={moveItem}
+            students={zones.holdZone}
             onStudentUpdate={handleStudentUpdate}
             isGrid
           />
           <DropZone
             zoneName="excludeZone"
             title="제외"
-            items={zones.excludeZone}
-            onItemMove={moveItem}
+            students={zones.excludeZone}
             onStudentUpdate={handleStudentUpdate}
             isGrid
           />
         </div>
+        <div>tip: 우클릭으로 학생 일러 변경 가능</div>
       </div>
-    </DndProvider>
+      <DragOverlay dropAnimation={null}>
+        {activePreview ? (
+          <Image
+            src={`/imgs/${activePreview.code}.png`}
+            alt={activePreview.name}
+            width={48}
+            height={48}
+            className="mx-auto mb-6"
+            draggable={false}
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
