@@ -107,7 +107,6 @@ interface DropStudentZoneProps {
   zoneName: keyof StudentRankingZones;
   title: string;
   students: StudentRankingItemProps[];
-  isGrid?: boolean;
   onStudentUpdate: (groupName: string, newIdx: number) => void;
 }
 
@@ -138,7 +137,6 @@ const DraggableStudent = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
   };
 
   const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
@@ -185,7 +183,7 @@ const DraggableStudent = ({
         style={style}
         {...attributes}
         {...listeners}
-        className={`rounded p-2 ${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
+        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
         onContextMenu={handleRightClick}
       >
         {zone === "rankZone" ? (
@@ -209,16 +207,16 @@ const DraggableStudent = ({
             <Image
               src={`/imgs/${displayStudent.code}.png`}
               alt={displayStudent.name}
-              width={48}
-              height={48}
-              className="mx-auto mb-6"
+              width={80}
+              height={80}
+              className={`mx-auto ${zone === "excludeZone" ? "grayscale" : ""}`}
             />
           </div>
         )}
       </div>
       {contextMenu.visible && (
         <div
-          className="fixed bg-white border border-gray-300 rounded shadow-lg z-50 py-1"
+          className="fixed bg-white border border-gray-300 rounded shadow-lg z-5 py-1"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
           {student.value.map((value, index) => (
@@ -240,7 +238,6 @@ const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneName,
   title,
   students,
-  isGrid,
   onStudentUpdate,
 }) => {
   const sortableStudents = students.map(
@@ -248,28 +245,40 @@ const DropZone: React.FC<DropStudentZoneProps> = ({
   );
 
   const { setNodeRef } = useDroppable({ id: zoneName });
+  const zoneConfig = {
+    rankZone: {
+      css: "space-y-2",
+      strategy: verticalListSortingStrategy,
+    },
+    holdZone: {
+      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
+      strategy: rectSortingStrategy,
+    },
+    excludeZone: {
+      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
+      strategy: rectSortingStrategy,
+    },
+  };
+
+  const currentZoneConfig = zoneConfig[zoneName];
 
   return (
     <div
       ref={setNodeRef}
-      className={`bg-white rounded-lg shadow p-4 min-h-64 border-2 border-dashed border-gray-300`}
+      className="bg-white rounded-lg shadow py-4 px-2 min-h-64 border-2 border-dashed border-gray-300"
     >
-      <h3 className="font-bold text-center mb-4">{title}</h3>
+      <h3 className="font-bold text-center mb-1">{title}</h3>
       <SortableContext
         items={sortableStudents}
-        strategy={
-          zoneName === "rankZone"
-            ? verticalListSortingStrategy
-            : rectSortingStrategy
-        }
+        strategy={currentZoneConfig.strategy}
       >
-        <div className={isGrid ? "grid grid-cols-4 gap-1" : "space-y-2"}>
-          {students.length === 0 ? (
-            <div className="text-gray-400 text-center py-8 text-sm">
-              드래그하세요
-            </div>
-          ) : (
-            students.map((item, index) => (
+        {students.length === 0 ? (
+          <div className="text-gray-400 text-center py-4 text-sm">
+            드래그하세요
+          </div>
+        ) : (
+          <div className={currentZoneConfig.css}>
+            {students.map((item, index) => (
               <DraggableStudent
                 key={`${zoneName}-${item.groupName}`}
                 student={item}
@@ -277,9 +286,9 @@ const DropZone: React.FC<DropStudentZoneProps> = ({
                 rank={zoneName === "rankZone" ? index + 1 : undefined}
                 onStudentUpdate={onStudentUpdate}
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </SortableContext>
     </div>
   );
@@ -301,7 +310,7 @@ export default function WaifuPage() {
     if (groupedStudents && groupedStudents.length > 0) {
       setZones((prev) => ({
         ...prev,
-        excludeZone: groupedStudents,
+        holdZone: groupedStudents,
       }));
     }
   }, [groupedStudents]);
@@ -448,11 +457,9 @@ export default function WaifuPage() {
         setActivePreview(null);
       }}
     >
-      <div className="bg-gray-100 min-h-screen p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Blue Archive 학생 애정도 순위
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+      <div className="pt-20 pb-20 px-2">
+        <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-2 gap-y-4 max-w-6xl mx-auto">
           <DropZone
             zoneName="rankZone"
             title="랭킹"
@@ -464,17 +471,17 @@ export default function WaifuPage() {
             title="대기"
             students={zones.holdZone}
             onStudentUpdate={handleStudentUpdate}
-            isGrid
           />
           <DropZone
             zoneName="excludeZone"
             title="제외"
             students={zones.excludeZone}
             onStudentUpdate={handleStudentUpdate}
-            isGrid
           />
         </div>
-        <div>tip: 우클릭으로 학생 일러 변경 가능</div>
+        <div className="text-center text-sm text-gray-600 mt-6">
+          tip: 우클릭으로 학생 일러 변경 가능
+        </div>
       </div>
       <DragOverlay dropAnimation={null}>
         {activePreview ? (
