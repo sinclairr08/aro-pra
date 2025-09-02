@@ -2,7 +2,7 @@
 
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   closestCenter,
   CollisionDetection,
@@ -306,6 +306,8 @@ export default function WaifuPage() {
     excludeZone: [],
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (groupedStudents && groupedStudents.length > 0) {
       setZones((prev) => ({
@@ -446,6 +448,38 @@ export default function WaifuPage() {
     }
   };
 
+  const downloadZones = () => {
+    const dataStr = JSON.stringify(zones, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "my-data.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const uploadZones = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const result = e.target?.result as string;
+        const uploadedZones = JSON.parse(result) as StudentRankingZones;
+        setZones(uploadedZones);
+      } catch (error) {
+        alert("파일 형식이 올바르지 않습니다.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -481,6 +515,27 @@ export default function WaifuPage() {
         </div>
         <div className="text-center text-sm text-gray-600 mt-6">
           tip: 우클릭으로 학생 일러 변경 가능
+        </div>
+        <div className="flex justify-center gap-4 mt-6">
+          <button
+            onClick={downloadZones}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            다운로드
+          </button>
+          <button
+            onClick={handleUploadClick}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            업로드
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={uploadZones}
+            className="hidden"
+          />
         </div>
       </div>
       <DragOverlay dropAnimation={null}>
