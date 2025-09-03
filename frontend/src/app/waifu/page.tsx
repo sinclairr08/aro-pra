@@ -147,6 +147,11 @@ const DraggableStudent = ({
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
+
+    document.querySelectorAll(".context-menu").forEach((menu) => {
+      (menu as HTMLElement).style.display = "none";
+    });
+
     setContextMenu({
       visible: true,
       x: e.clientX,
@@ -216,16 +221,22 @@ const DraggableStudent = ({
       </div>
       {contextMenu.visible && (
         <div
-          className="fixed bg-white border border-gray-300 rounded shadow-lg z-5 py-1"
+          className="fixed bg-white border border-gray-300 rounded shadow-lg z-50 context-menu"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
           {student.value.map((value, index) => (
             <button
               key={value.code}
-              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              className="block w-full hover:bg-gray-100"
               onClick={() => handleContextMenuSelect(index)}
             >
-              {value.name}
+              <Image
+                src={`/imgs/${value.code}.png`}
+                alt={`context-${value.name}`}
+                width={48}
+                height={48}
+                className="w-16 h-16 object-contain"
+              />
             </button>
           ))}
         </div>

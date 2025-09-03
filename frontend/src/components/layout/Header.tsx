@@ -13,7 +13,7 @@ const Header: React.FC = () => {
         />
       </Link>
       <Link href="/waifu">
-        <Image src="/icons/momo-icon.png" alt="Logo" width={48} height={48} />
+        <Image src="/icons/momo-icon.png" alt="Logo" width={40} height={40} />
       </Link>
     </header>
   );
