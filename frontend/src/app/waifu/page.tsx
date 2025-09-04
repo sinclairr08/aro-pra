@@ -14,33 +14,15 @@ import {
   PointerSensor,
   pointerWithin,
   rectIntersection,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  rectSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Image from "next/image";
+import { Student, StudentOutfit, StudentZones } from "@/types/waifu";
+import { DropZone } from "@/components/waifu/DropZone";
 
-interface StudentInfo {
-  code: string;
-  name: string;
-}
-
-interface StudentRankingItemProps {
-  groupName: string;
-  value: StudentInfo[];
-  currentIdx?: number;
-}
-
-const defaultItems: StudentRankingItemProps[] = [
+const defaultStudents: Student[] = [
   {
     groupName: "요시미",
     value: [
@@ -90,228 +72,13 @@ const defaultItems: StudentRankingItemProps[] = [
   },
 ];
 
-interface StudentRankingZones {
-  rankZone: StudentRankingItemProps[];
-  holdZone: StudentRankingItemProps[];
-  excludeZone: StudentRankingItemProps[];
-}
-
-interface DraggableStudentProps {
-  student: StudentRankingItemProps;
-  zone: keyof StudentRankingZones;
-  rank?: number;
-  onStudentUpdate: (groupName: string, newIdx: number) => void;
-}
-
-interface DropStudentZoneProps {
-  zoneName: keyof StudentRankingZones;
-  title: string;
-  students: StudentRankingItemProps[];
-  onStudentUpdate: (groupName: string, newIdx: number) => void;
-}
-
-interface ContextMenuProps {
-  visible: boolean;
-  x: number;
-  y: number;
-}
-
-const DraggableStudent = ({
-  student,
-  zone,
-  rank,
-  onStudentUpdate,
-}: DraggableStudentProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: `${zone}-${student.groupName}`,
-    data: { student, zone },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
-    visible: false,
-    x: 0,
-    y: 0,
-  });
-
-  const handleRightClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    document.querySelectorAll(".context-menu").forEach((menu) => {
-      (menu as HTMLElement).style.display = "none";
-    });
-
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-    });
-  };
-
-  const handleContextMenuClose = () => {
-    setContextMenu({ visible: false, x: 0, y: 0 });
-  };
-
-  const handleContextMenuSelect = (index: number) => {
-    onStudentUpdate(student.groupName, index);
-    handleContextMenuClose();
-  };
-
-  useEffect(() => {
-    const handleGlobalClick = () => {
-      if (contextMenu.visible) {
-        handleContextMenuClose();
-      }
-    };
-
-    document.addEventListener("click", handleGlobalClick);
-    return () => document.removeEventListener("click", handleGlobalClick);
-  }, [contextMenu.visible]);
-
-  const displayStudent = student.value[student.currentIdx || 0];
-
-  return (
-    <>
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
-        onContextMenu={handleRightClick}
-      >
-        {zone === "rankZone" ? (
-          <div className="flex items-center">
-            <span className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs mr-2">
-              {rank}
-            </span>
-            <Image
-              src={`/imgs/${displayStudent.code}.png`}
-              alt={displayStudent.name}
-              width={64}
-              height={64}
-              className="w-16 h-16 object-contain"
-            />
-            <span className="min-w-0 truncate text-base leading-tight">
-              {student.groupName}
-            </span>
-          </div>
-        ) : (
-          <div className="text-center">
-            <Image
-              src={`/imgs/${displayStudent.code}.png`}
-              alt={displayStudent.name}
-              width={80}
-              height={80}
-              className={`mx-auto ${zone === "excludeZone" ? "grayscale" : ""}`}
-            />
-          </div>
-        )}
-      </div>
-      {contextMenu.visible && (
-        <div
-          className="fixed bg-white border border-gray-300 rounded shadow-lg z-50 context-menu"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-        >
-          {student.value.map((value, index) => (
-            <button
-              key={value.code}
-              className="block w-full hover:bg-gray-100"
-              onClick={() => handleContextMenuSelect(index)}
-            >
-              <Image
-                src={`/imgs/${value.code}.png`}
-                alt={`context-${value.name}`}
-                width={48}
-                height={48}
-                className="w-16 h-16 object-contain"
-              />
-            </button>
-          ))}
-        </div>
-      )}
-    </>
-  );
-};
-
-const DropZone: React.FC<DropStudentZoneProps> = ({
-  zoneName,
-  title,
-  students,
-  onStudentUpdate,
-}) => {
-  const sortableStudents = students.map(
-    (student) => `${zoneName}-${student.groupName}`,
-  );
-
-  const { setNodeRef } = useDroppable({ id: zoneName });
-  const zoneConfig = {
-    rankZone: {
-      css: "space-y-2",
-      strategy: verticalListSortingStrategy,
-    },
-    holdZone: {
-      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-      strategy: rectSortingStrategy,
-    },
-    excludeZone: {
-      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-      strategy: rectSortingStrategy,
-    },
-  };
-
-  const currentZoneConfig = zoneConfig[zoneName];
-
-  return (
-    <div
-      ref={setNodeRef}
-      className="bg-white rounded-lg shadow py-4 px-2 min-h-64 border-2 border-dashed border-gray-300"
-    >
-      <h3 className="font-bold text-center mb-1">{title}</h3>
-      <SortableContext
-        items={sortableStudents}
-        strategy={currentZoneConfig.strategy}
-      >
-        {students.length === 0 ? (
-          <div className="text-gray-400 text-center py-4 text-sm">
-            드래그하세요
-          </div>
-        ) : (
-          <div className={currentZoneConfig.css}>
-            {students.map((item, index) => (
-              <DraggableStudent
-                key={`${zoneName}-${item.groupName}`}
-                student={item}
-                zone={zoneName}
-                rank={zoneName === "rankZone" ? index + 1 : undefined}
-                onStudentUpdate={onStudentUpdate}
-              />
-            ))}
-          </div>
-        )}
-      </SortableContext>
-    </div>
-  );
-};
-
 export default function WaifuPage() {
-  const { data: groupedStudents } = useApi<StudentRankingItemProps[]>({
+  const { data: groupedStudents } = useApi<Student[]>({
     apiUrl: "/api/v1/students/grouped/kr",
-    defaultValue: defaultItems,
+    defaultValue: defaultStudents,
   });
 
-  const [zones, setZones] = useState<StudentRankingZones>({
+  const [zones, setZones] = useState<StudentZones>({
     rankZone: [],
     holdZone: [],
     excludeZone: [],
@@ -340,7 +107,7 @@ export default function WaifuPage() {
       const newZones = { ...prev };
 
       Object.keys(newZones).forEach((zoneKey) => {
-        const zone = zoneKey as keyof StudentRankingZones;
+        const zone = zoneKey as keyof StudentZones;
         newZones[zone] = newZones[zone].map((student) =>
           student.groupName === groupName
             ? { ...student, currentIdx: newIdx }
@@ -352,7 +119,9 @@ export default function WaifuPage() {
     });
   };
 
-  const [activePreview, setActivePreview] = useState<StudentInfo | null>(null);
+  const [activePreview, setActivePreview] = useState<StudentOutfit | null>(
+    null,
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -362,21 +131,21 @@ export default function WaifuPage() {
     const activeData = active.data.current;
     if (!activeData) return;
 
-    let targetZone: keyof StudentRankingZones;
+    let targetZone: keyof StudentZones;
     let isDropOnZone = false;
 
     if (["rankZone", "holdZone", "excludeZone"].includes(over.id as string)) {
-      targetZone = over.id as keyof StudentRankingZones;
+      targetZone = over.id as keyof StudentZones;
       isDropOnZone = true;
     } else {
       const overData = over.data.current;
       if (!overData) return;
 
-      targetZone = overData.zone as keyof StudentRankingZones;
+      targetZone = overData.zone as keyof StudentZones;
       isDropOnZone = false;
     }
 
-    const activeZone = activeData.zone as keyof StudentRankingZones;
+    const activeZone = activeData.zone as keyof StudentZones;
 
     if (activeZone !== targetZone) {
       setZones((prev) => {
@@ -413,7 +182,7 @@ export default function WaifuPage() {
       });
     } else if (!isDropOnZone && active.id !== over.id) {
       setZones((prev) => {
-        const items = [...prev[activeZone as keyof StudentRankingZones]];
+        const items = [...prev[activeZone as keyof StudentZones]];
 
         const activeIdx = items.findIndex(
           (item) => `${activeZone}-${item.groupName}` === active.id,
@@ -448,7 +217,7 @@ export default function WaifuPage() {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const data = active.data.current as {
-      student?: StudentRankingItemProps;
+      student?: Student;
     } | null;
 
     if (data?.student) {
@@ -478,7 +247,7 @@ export default function WaifuPage() {
     reader.onload = (e) => {
       try {
         const result = e.target?.result as string;
-        const uploadedZones = JSON.parse(result) as StudentRankingZones;
+        const uploadedZones = JSON.parse(result) as StudentZones;
         setZones(uploadedZones);
       } catch (error) {
         alert("파일 형식이 올바르지 않습니다.");
