@@ -5,11 +5,7 @@ import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
 import { LinkCardProps } from "@/types/link";
 import { LinkCard } from "@/components/link/LinkCard";
-
-const defaultLinkCards: LinkCardProps[] = [
-  { id: "1", name: "일섭 공식", url: "https://bluearchive.jp" },
-  { id: "2", name: "한섭 공식", url: "https://forum.nexon.com/bluearchive" },
-];
+import { defaultLinkCards } from "@/constants/defaultValues";
 
 export default function HomePage() {
   const { data: linkCards, loading } = useApi<LinkCardProps[]>({

@@ -7,6 +7,21 @@ import {
 } from "@dnd-kit/sortable";
 import { DraggableStudent } from "@/components/waifu/DraggableStudent";
 
+const zoneConfig = {
+  rankZone: {
+    css: "space-y-2",
+    strategy: verticalListSortingStrategy,
+  },
+  holdZone: {
+    css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
+    strategy: rectSortingStrategy,
+  },
+  excludeZone: {
+    css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
+    strategy: rectSortingStrategy,
+  },
+};
+
 export const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneName,
   title,
@@ -18,20 +33,6 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
   );
 
   const { setNodeRef } = useDroppable({ id: zoneName });
-  const zoneConfig = {
-    rankZone: {
-      css: "space-y-2",
-      strategy: verticalListSortingStrategy,
-    },
-    holdZone: {
-      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-      strategy: rectSortingStrategy,
-    },
-    excludeZone: {
-      css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-      strategy: rectSortingStrategy,
-    },
-  };
 
   const currentZoneConfig = zoneConfig[zoneName];
 

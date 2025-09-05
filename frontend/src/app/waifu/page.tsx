@@ -2,75 +2,14 @@
 
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
-import { useEffect, useRef, useState } from "react";
-import {
-  closestCenter,
-  CollisionDetection,
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  KeyboardSensor,
-  PointerSensor,
-  pointerWithin,
-  rectIntersection,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import Image from "next/image";
-import { Student, StudentOutfit, StudentZones } from "@/types/waifu";
+import { Student } from "@/types/waifu";
 import { DropZone } from "@/components/waifu/DropZone";
-
-const defaultStudents: Student[] = [
-  {
-    groupName: "요시미",
-    value: [
-      {
-        code: "CH0220",
-        name: "요시미(밴드)",
-      },
-      {
-        code: "Yoshimi",
-        name: "요시미",
-      },
-    ],
-  },
-  {
-    groupName: "시로코",
-    value: [
-      {
-        code: "CH0263",
-        name: "시로코*테러",
-      },
-      {
-        code: "Shiroko",
-        name: "시로코",
-      },
-      {
-        code: "CH0188",
-        name: "시로코(수영복)",
-      },
-    ],
-  },
-  {
-    groupName: "아루",
-    value: [
-      {
-        code: "CH0240",
-        name: "아루(드레스)",
-      },
-      {
-        code: "Aru",
-        name: "아루",
-      },
-      {
-        code: "CH0084",
-        name: "아루(새해)",
-      },
-    ],
-  },
-];
+import { useDragAndDrop } from "@/lib/useDragAndDrop";
+import { useZoneManagement } from "@/lib/useZoneManagement";
+import { useFileOperations } from "@/lib/useFileOperations";
+import { defaultStudents } from "@/constants/defaultValues";
 
 export default function WaifuPage() {
   const { data: groupedStudents } = useApi<Student[]>({
@@ -78,198 +17,28 @@ export default function WaifuPage() {
     defaultValue: defaultStudents,
   });
 
-  const [zones, setZones] = useState<StudentZones>({
-    rankZone: [],
-    holdZone: [],
-    excludeZone: [],
+  const { zones, setZones, handleStudentUpdate } = useZoneManagement({
+    groupedStudents,
   });
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    sensors,
+    activePreview,
+    handleDragStart,
+    handleDragEnd,
+    handleDragCancel,
+  } = useDragAndDrop({ zones, setZones });
 
-  useEffect(() => {
-    if (groupedStudents && groupedStudents.length > 0) {
-      setZones((prev) => ({
-        ...prev,
-        holdZone: groupedStudents,
-      }));
-    }
-  }, [groupedStudents]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleStudentUpdate = (groupName: string, newIdx: number): void => {
-    setZones((prev) => {
-      const newZones = { ...prev };
-
-      Object.keys(newZones).forEach((zoneKey) => {
-        const zone = zoneKey as keyof StudentZones;
-        newZones[zone] = newZones[zone].map((student) =>
-          student.groupName === groupName
-            ? { ...student, currentIdx: newIdx }
-            : student,
-        );
-      });
-
-      return newZones;
-    });
-  };
-
-  const [activePreview, setActivePreview] = useState<StudentOutfit | null>(
-    null,
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const activeData = active.data.current;
-    if (!activeData) return;
-
-    let targetZone: keyof StudentZones;
-    let isDropOnZone = false;
-
-    if (["rankZone", "holdZone", "excludeZone"].includes(over.id as string)) {
-      targetZone = over.id as keyof StudentZones;
-      isDropOnZone = true;
-    } else {
-      const overData = over.data.current;
-      if (!overData) return;
-
-      targetZone = overData.zone as keyof StudentZones;
-      isDropOnZone = false;
-    }
-
-    const activeZone = activeData.zone as keyof StudentZones;
-
-    if (activeZone !== targetZone) {
-      setZones((prev) => {
-        const activeItems = [...prev[activeZone]];
-        const targetItems = [...prev[targetZone]];
-
-        const activeIdx = activeItems.findIndex(
-          (item) => item.groupName === activeData.student.groupName,
-        );
-
-        if (activeIdx === -1) return prev;
-
-        const [movedItem] = activeItems.splice(activeIdx, 1);
-
-        if (isDropOnZone) {
-          targetItems.push(movedItem);
-        } else {
-          const overIdx = targetItems.findIndex(
-            (item) => `${targetZone}-${item.groupName}` === over.id,
-          );
-
-          if (overIdx === -1) {
-            targetItems.push(movedItem);
-          } else {
-            targetItems.splice(overIdx, 0, movedItem);
-          }
-        }
-
-        return {
-          ...prev,
-          [activeZone]: activeItems,
-          [targetZone]: targetItems,
-        };
-      });
-    } else if (!isDropOnZone && active.id !== over.id) {
-      setZones((prev) => {
-        const items = [...prev[activeZone as keyof StudentZones]];
-
-        const activeIdx = items.findIndex(
-          (item) => `${activeZone}-${item.groupName}` === active.id,
-        );
-
-        const overIdx = items.findIndex(
-          (item) => `${activeZone}-${item.groupName}` === over.id,
-        );
-
-        if (activeIdx !== -1 && overIdx !== -1) {
-          const reorderItems = arrayMove(items, activeIdx, overIdx);
-          return {
-            ...prev,
-            [activeZone]: reorderItems,
-          };
-        }
-        return prev;
-      });
-    }
-  };
-
-  const customCollisionDetection: CollisionDetection = (args) => {
-    const byPointer = pointerWithin(args);
-    if (byPointer.length) return byPointer;
-
-    const byRect = rectIntersection(args);
-    if (byRect.length) return byRect;
-
-    return closestCenter(args);
-  };
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const data = active.data.current as {
-      student?: Student;
-    } | null;
-
-    if (data?.student) {
-      const idx = data.student.currentIdx ?? 0;
-      const disp = data.student.value[idx];
-
-      setActivePreview({ code: disp.code, name: disp.name });
-    }
-  };
-
-  const downloadZones = () => {
-    const dataStr = JSON.stringify(zones, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "my-data.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const uploadZones = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const result = e.target?.result as string;
-        const uploadedZones = JSON.parse(result) as StudentZones;
-        setZones(uploadedZones);
-      } catch (error) {
-        alert("파일 형식이 올바르지 않습니다.");
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const { fileInputRef, downloadZones, uploadZones, handleUploadClick } =
+    useFileOperations({ zones, setZones });
 
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={customCollisionDetection}
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragCancel={() => setActivePreview(null)}
-      onDragEnd={(e) => {
-        handleDragEnd(e);
-        setActivePreview(null);
-      }}
+      onDragCancel={handleDragCancel}
+      onDragEnd={handleDragEnd}
     >
       <div className="pt-20 pb-20 px-2">
         <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
