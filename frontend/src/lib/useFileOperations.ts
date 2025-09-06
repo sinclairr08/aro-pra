@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { StudentZones } from "@/types/waifu";
 
 interface UseFileOperationsProps {
@@ -6,7 +6,10 @@ interface UseFileOperationsProps {
   setZones: React.Dispatch<React.SetStateAction<StudentZones>>;
 }
 
-export const useFileOperations = ({ zones, setZones }: UseFileOperationsProps) => {
+export const useFileOperations = ({
+  zones,
+  setZones,
+}: UseFileOperationsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const downloadZones = useCallback(() => {
@@ -20,22 +23,25 @@ export const useFileOperations = ({ zones, setZones }: UseFileOperationsProps) =
     URL.revokeObjectURL(url);
   }, [zones]);
 
-  const uploadZones = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const uploadZones = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const result = e.target?.result as string;
-        const uploadedZones = JSON.parse(result) as StudentZones;
-        setZones(uploadedZones);
-      } catch (error) {
-        alert("파일 형식이 올바르지 않습니다.");
-      }
-    };
-    reader.readAsText(file);
-  }, [setZones]);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const result = e.target?.result as string;
+          const uploadedZones = JSON.parse(result) as StudentZones;
+          setZones(uploadedZones);
+        } catch (error) {
+          alert("파일 형식이 올바르지 않습니다.");
+        }
+      };
+      reader.readAsText(file);
+    },
+    [setZones],
+  );
 
   const handleUploadClick = useCallback(() => {
     fileInputRef.current?.click();

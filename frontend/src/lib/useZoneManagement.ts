@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Student, StudentZones } from "@/types/waifu";
 
 interface UseZoneManagementProps {
   groupedStudents?: Student[];
 }
 
-export const useZoneManagement = ({ groupedStudents }: UseZoneManagementProps) => {
+export const useZoneManagement = ({
+  groupedStudents,
+}: UseZoneManagementProps) => {
   const [zones, setZones] = useState<StudentZones>({
     rankZone: [],
     holdZone: [],
@@ -21,22 +23,25 @@ export const useZoneManagement = ({ groupedStudents }: UseZoneManagementProps) =
     }
   }, [groupedStudents]);
 
-  const handleStudentUpdate = useCallback((groupName: string, newIdx: number): void => {
-    setZones((prev) => {
-      const newZones = { ...prev };
+  const handleStudentUpdate = useCallback(
+    (groupName: string, newIdx: number): void => {
+      setZones((prev) => {
+        const newZones = { ...prev };
 
-      Object.keys(newZones).forEach((zoneKey) => {
-        const zone = zoneKey as keyof StudentZones;
-        newZones[zone] = newZones[zone].map((student) =>
-          student.groupName === groupName
-            ? { ...student, currentIdx: newIdx }
-            : student
-        );
+        Object.keys(newZones).forEach((zoneKey) => {
+          const zone = zoneKey as keyof StudentZones;
+          newZones[zone] = newZones[zone].map((student) =>
+            student.groupName === groupName
+              ? { ...student, currentIdx: newIdx }
+              : student,
+          );
+        });
+
+        return newZones;
       });
-
-      return newZones;
-    });
-  }, []);
+    },
+    [],
+  );
 
   return {
     zones,
