@@ -2,7 +2,7 @@
 
 import "@/app/globals.css";
 import { useApi } from "@/lib/useApi";
-import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import Image from "next/image";
 import { Student } from "@/types/waifu";
 import { DropZone } from "@/components/waifu/DropZone";
@@ -24,10 +24,11 @@ export default function WaifuPage() {
   const {
     sensors,
     activePreview,
+    customCollisionDetection,
     handleDragStart,
     handleDragEnd,
     handleDragCancel,
-  } = useDragAndDrop({ zones, setZones });
+  } = useDragAndDrop({ setZones });
 
   const { fileInputRef, downloadZones, uploadZones, handleUploadClick } =
     useFileOperations({ zones, setZones });
@@ -35,7 +36,7 @@ export default function WaifuPage() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={customCollisionDetection}
       onDragStart={handleDragStart}
       onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}

@@ -15,6 +15,8 @@ export interface StudentZones {
   excludeZone: Student[];
 }
 
+export type StudentZoneKeys = keyof StudentZones;
+
 export interface DraggableStudentProps {
   student: Student;
   zone: keyof StudentZones;

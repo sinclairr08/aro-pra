@@ -1,21 +1,29 @@
 import { useCallback, useState } from "react";
 import {
+  closestCenter,
+  CollisionDetection,
   DragEndEvent,
   DragStartEvent,
   KeyboardSensor,
   PointerSensor,
+  pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Student, StudentOutfit, StudentZones } from "@/types/waifu";
+import {
+  Student,
+  StudentOutfit,
+  StudentZoneKeys,
+  StudentZones,
+} from "@/types/waifu";
 
 interface UseDragAndDropProps {
-  zones: StudentZones;
   setZones: React.Dispatch<React.SetStateAction<StudentZones>>;
 }
 
-export const useDragAndDrop = ({ zones, setZones }: UseDragAndDropProps) => {
+export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
   const [activePreview, setActivePreview] = useState<StudentOutfit | null>(
     null,
   );
@@ -26,6 +34,16 @@ export const useDragAndDrop = ({ zones, setZones }: UseDragAndDropProps) => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const customCollisionDetection: CollisionDetection = (args) => {
+    const byPointer = pointerWithin(args);
+    if (byPointer.length) return byPointer;
+
+    const byRect = rectIntersection(args);
+    if (byRect.length) return byRect;
+
+    return closestCenter(args);
+  };
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
@@ -49,21 +67,21 @@ export const useDragAndDrop = ({ zones, setZones }: UseDragAndDropProps) => {
       const activeData = active.data.current;
       if (!activeData) return;
 
-      let targetZone: keyof StudentZones;
+      let targetZone: StudentZoneKeys;
       let isDropOnZone = false;
 
       if (["rankZone", "holdZone", "excludeZone"].includes(over.id as string)) {
-        targetZone = over.id as keyof StudentZones;
+        targetZone = over.id as StudentZoneKeys;
         isDropOnZone = true;
       } else {
         const overData = over.data.current;
         if (!overData) return;
 
-        targetZone = overData.zone as keyof StudentZones;
+        targetZone = overData.zone as StudentZoneKeys;
         isDropOnZone = false;
       }
 
-      const activeZone = activeData.zone as keyof StudentZones;
+      const activeZone = activeData.zone as StudentZoneKeys;
 
       if (activeZone !== targetZone) {
         setZones((prev) => {
@@ -100,7 +118,7 @@ export const useDragAndDrop = ({ zones, setZones }: UseDragAndDropProps) => {
         });
       } else if (!isDropOnZone && active.id !== over.id) {
         setZones((prev) => {
-          const items = [...prev[activeZone as keyof StudentZones]];
+          const items = [...prev[activeZone as StudentZoneKeys]];
 
           const activeIdx = items.findIndex(
             (item) => `${activeZone}-${item.groupName}` === active.id,
@@ -132,6 +150,7 @@ export const useDragAndDrop = ({ zones, setZones }: UseDragAndDropProps) => {
 
   return {
     sensors,
+    customCollisionDetection,
     activePreview,
     handleDragStart,
     handleDragEnd,

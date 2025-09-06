@@ -34,7 +34,7 @@ export const useFileOperations = ({
           const result = e.target?.result as string;
           const uploadedZones = JSON.parse(result) as StudentZones;
           setZones(uploadedZones);
-        } catch (error) {
+        } catch {
           alert("파일 형식이 올바르지 않습니다.");
         }
       };
