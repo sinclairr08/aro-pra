@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Student, StudentZones } from "@/types/waifu";
+import { Student, StudentZoneKeys, StudentZones } from "@/types/waifu";
 
 interface UseZoneManagementProps {
   groupedStudents?: Student[];
@@ -16,24 +16,58 @@ export const useZoneManagement = ({
     excludeZone: [],
   });
 
-  useEffect(() => {
+  const syncZone = (studentData: Student[], currentZones: StudentZones) => {
+    const studentDataMap = new Map(
+      studentData.map((student) => [student.groupName, student]),
+    );
+
+    const existingGroupNames = new Set<string>();
+    const newZones: StudentZones = {
+      rankZone: [],
+      holdZone: [],
+      excludeZone: [],
+    };
+
+    Object.entries(currentZones).forEach(([zoneKey, students]) => {
+      const zone = zoneKey as StudentZoneKeys;
+      newZones[zone] = students.map((oldStudent: Student) => {
+        existingGroupNames.add(oldStudent.groupName);
+        const updatedStudent = studentDataMap.get(oldStudent.groupName);
+        return updatedStudent
+          ? { ...oldStudent, value: updatedStudent.value }
+          : oldStudent;
+      });
+    });
+
+    const newStudents = studentData.filter(
+      (student) => !existingGroupNames.has(student.groupName),
+    );
+
+    newZones.holdZone.push(...newStudents);
+    setZones(newZones);
+  };
+
+  const initializeZones = () => {
     const savedZones = localStorage.getItem(STORAGE_KEY);
+    let currentZones: StudentZones = zones;
+
     if (savedZones) {
       try {
         const parsedZones = JSON.parse(savedZones);
         setZones(parsedZones);
-        return;
+        currentZones = parsedZones;
       } catch (error) {
         console.error("Failed to parse saved zones:", error);
       }
     }
 
     if (groupedStudents && groupedStudents.length > 0) {
-      setZones((prev) => ({
-        ...prev,
-        holdZone: groupedStudents,
-      }));
+      syncZone(groupedStudents, currentZones);
     }
+  };
+
+  useEffect(() => {
+    initializeZones();
   }, [groupedStudents]);
 
   useEffect(() => {
