@@ -5,6 +5,8 @@ interface UseZoneManagementProps {
   groupedStudents?: Student[];
 }
 
+const STORAGE_KEY = "waifu-zones";
+
 export const useZoneManagement = ({
   groupedStudents,
 }: UseZoneManagementProps) => {
@@ -15,6 +17,17 @@ export const useZoneManagement = ({
   });
 
   useEffect(() => {
+    const savedZones = localStorage.getItem(STORAGE_KEY);
+    if (savedZones) {
+      try {
+        const parsedZones = JSON.parse(savedZones);
+        setZones(parsedZones);
+        return;
+      } catch (error) {
+        console.error("Failed to parse saved zones:", error);
+      }
+    }
+
     if (groupedStudents && groupedStudents.length > 0) {
       setZones((prev) => ({
         ...prev,
@@ -22,6 +35,10 @@ export const useZoneManagement = ({
       }));
     }
   }, [groupedStudents]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(zones));
+  }, [zones]);
 
   const handleStudentUpdate = useCallback(
     (groupName: string, newIdx: number): void => {
