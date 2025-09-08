@@ -20,10 +20,6 @@ export const defaultStudents: Student[] = [
     groupName: "시로코",
     value: [
       {
-        code: "CH0263",
-        name: "시로코*테러",
-      },
-      {
         code: "Shiroko",
         name: "시로코",
       },
