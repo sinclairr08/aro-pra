@@ -1,4 +1,4 @@
-import { DraggableStudentProps } from "@/types/waifu";
+import { DraggableStudentProps, StudentOutfit } from "@/types/waifu";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
@@ -9,6 +9,30 @@ interface StudentContextMenuProps {
   x: number;
   y: number;
 }
+
+interface StudentImageProps {
+  outfit: StudentOutfit;
+  size: number;
+  gray?: boolean;
+  additionalStyle?: string;
+}
+
+const StudentImage = ({
+  outfit,
+  size,
+  gray,
+  additionalStyle,
+}: StudentImageProps) => {
+  return (
+    <Image
+      src={`/imgs/${outfit.code}.png`}
+      alt={outfit.name}
+      width={size}
+      height={size}
+      className={`${gray ? "grayscale" : ""} ${additionalStyle || ""}`}
+    />
+  );
+};
 
 export const DraggableStudent = ({
   student,
@@ -90,12 +114,10 @@ export const DraggableStudent = ({
             <span className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs mr-2">
               {rank}
             </span>
-            <Image
-              src={`/imgs/${displayStudent.code}.png`}
-              alt={displayStudent.name}
-              width={64}
-              height={64}
-              className="w-16 h-16 object-contain"
+            <StudentImage
+              outfit={displayStudent}
+              size={64}
+              additionalStyle="w-16 h-16 object-contain"
             />
             <span className="min-w-0 truncate text-base leading-tight">
               {student.groupName}
@@ -103,12 +125,11 @@ export const DraggableStudent = ({
           </div>
         ) : (
           <div className="text-center">
-            <Image
-              src={`/imgs/${displayStudent.code}.png`}
-              alt={displayStudent.name}
-              width={80}
-              height={80}
-              className={`mx-auto ${zone === "excludeZone" ? "grayscale" : ""}`}
+            <StudentImage
+              outfit={displayStudent}
+              size={80}
+              gray={zone === "excludeZone"}
+              additionalStyle="mx-auto"
             />
           </div>
         )}
@@ -124,12 +145,10 @@ export const DraggableStudent = ({
               className="block w-full hover:bg-gray-100"
               onClick={() => handleContextMenuSelect(index)}
             >
-              <Image
-                src={`/imgs/${value.code}.png`}
-                alt={`context-${value.name}`}
-                width={48}
-                height={48}
-                className="w-16 h-16 object-contain"
+              <StudentImage
+                outfit={value}
+                size={48}
+                additionalStyle="w-16 h-16 object-contain"
               />
             </button>
           ))}
