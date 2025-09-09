@@ -52,9 +52,9 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
     } | null;
 
     if (data?.student) {
-      const idx = data.student.currentIdx ?? 0;
-      const disp = data.student.value[idx];
-      setActivePreview({ code: disp.code, name: disp.name });
+      const idx = data.student.currentOutfitIdx ?? 0;
+      const disp = data.student.outfits[idx];
+      setActivePreview({ code: disp.code, outfitName: disp.outfitName });
     }
   }, []);
 
@@ -89,7 +89,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           const targetItems = [...prev[targetZone]];
 
           const activeIdx = activeItems.findIndex(
-            (item) => item.groupName === activeData.student.groupName,
+            (item) => item.name === activeData.student.name,
           );
 
           if (activeIdx === -1) return prev;
@@ -100,7 +100,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
             targetItems.push(movedItem);
           } else {
             const overIdx = targetItems.findIndex(
-              (item) => `${targetZone}-${item.groupName}` === over.id,
+              (item) => `${targetZone}-${item.name}` === over.id,
             );
 
             if (overIdx === -1) {
@@ -121,11 +121,11 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           const items = [...prev[activeZone as StudentZoneKeys]];
 
           const activeIdx = items.findIndex(
-            (item) => `${activeZone}-${item.groupName}` === active.id,
+            (item) => `${activeZone}-${item.name}` === active.id,
           );
 
           const overIdx = items.findIndex(
-            (item) => `${activeZone}-${item.groupName}` === over.id,
+            (item) => `${activeZone}-${item.name}` === over.id,
           );
 
           if (activeIdx !== -1 && overIdx !== -1) {

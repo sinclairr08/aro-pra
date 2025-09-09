@@ -26,7 +26,7 @@ const StudentImage = ({
   return (
     <Image
       src={`/imgs/${outfit.code}.png`}
-      alt={outfit.name}
+      alt={outfit.outfitName}
       width={size}
       height={size}
       className={`${gray ? "grayscale" : ""} ${additionalStyle || ""}`}
@@ -48,7 +48,7 @@ export const DraggableStudent = ({
     transition,
     isDragging,
   } = useSortable({
-    id: `${zone}-${student.groupName}`,
+    id: `${zone}-${student.name}`,
     data: { student, zone },
   });
 
@@ -82,7 +82,7 @@ export const DraggableStudent = ({
   };
 
   const handleContextMenuSelect = (index: number) => {
-    onStudentUpdate(student.groupName, index);
+    onStudentUpdate(student.name, index);
     handleContextMenuClose();
   };
 
@@ -97,7 +97,7 @@ export const DraggableStudent = ({
     return () => document.removeEventListener("click", handleGlobalClick);
   }, [contextMenu.visible]);
 
-  const displayStudent = student.value[student.currentIdx || 0];
+  const displayOutfit = student.outfits[student.currentOutfitIdx || 0];
 
   return (
     <>
@@ -115,18 +115,18 @@ export const DraggableStudent = ({
               {rank}
             </span>
             <StudentImage
-              outfit={displayStudent}
+              outfit={displayOutfit}
               size={64}
               additionalStyle="w-16 h-16 object-contain"
             />
             <span className="min-w-0 truncate text-base leading-tight">
-              {student.groupName}
+              {student.name}
             </span>
           </div>
         ) : (
           <div className="text-center">
             <StudentImage
-              outfit={displayStudent}
+              outfit={displayOutfit}
               size={80}
               gray={zone === "excludeZone"}
               additionalStyle="mx-auto"
@@ -139,14 +139,14 @@ export const DraggableStudent = ({
           className="fixed bg-white border border-gray-300 rounded shadow-lg z-50 context-menu"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
-          {student.value.map((value, index) => (
+          {student.outfits.map((outfit, index) => (
             <button
-              key={value.code}
+              key={outfit.code}
               className="block w-full hover:bg-gray-100"
               onClick={() => handleContextMenuSelect(index)}
             >
               <StudentImage
-                outfit={value}
+                outfit={outfit}
                 size={48}
                 additionalStyle="w-16 h-16 object-contain"
               />

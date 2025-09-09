@@ -1,6 +1,6 @@
 package com.aropra.controller
 
-import com.aropra.dto.GroupedStudentResponse
+import com.aropra.dto.StudentResponse
 import com.aropra.enum.Language
 import com.aropra.service.StudentService
 import org.springframework.http.ResponseEntity
@@ -17,7 +17,7 @@ class StudentController(
     @GetMapping("/grouped/{lang}")
     fun getGroupedStudents(
         @PathVariable lang: String,
-    ): ResponseEntity<List<GroupedStudentResponse>> {
+    ): ResponseEntity<List<StudentResponse>> {
         val language = Language.fromstring(lang) ?: return ResponseEntity.notFound().build()
         val groupedStudents = studentService.getGroupedByBaseName(language)
         return ResponseEntity.ok(groupedStudents)

@@ -4,45 +4,45 @@ import { VersionCardProps } from "@/types/version";
 
 export const defaultStudents: Student[] = [
   {
-    groupName: "요시미",
-    value: [
+    name: "요시미",
+    outfits: [
       {
         code: "CH0220",
-        name: "요시미(밴드)",
+        outfitName: "요시미(밴드)",
       },
       {
         code: "Yoshimi",
-        name: "요시미",
+        outfitName: "요시미",
       },
     ],
   },
   {
-    groupName: "시로코",
-    value: [
+    name: "시로코",
+    outfits: [
       {
         code: "Shiroko",
-        name: "시로코",
+        outfitName: "시로코",
       },
       {
         code: "CH0188",
-        name: "시로코(수영복)",
+        outfitName: "시로코(수영복)",
       },
     ],
   },
   {
-    groupName: "아루",
-    value: [
+    name: "아루",
+    outfits: [
       {
         code: "CH0240",
-        name: "아루(드레스)",
+        outfitName: "아루(드레스)",
       },
       {
         code: "Aru",
-        name: "아루",
+        outfitName: "아루",
       },
       {
         code: "CH0084",
-        name: "아루(새해)",
+        outfitName: "아루(새해)",
       },
     ],
   },

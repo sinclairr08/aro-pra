@@ -1,12 +1,12 @@
 export interface StudentOutfit {
   code: string;
-  name: string;
+  outfitName: string;
 }
 
 export interface Student {
-  groupName: string;
-  value: StudentOutfit[];
-  currentIdx?: number;
+  name: string;
+  outfits: StudentOutfit[];
+  currentOutfitIdx?: number;
 }
 
 export interface StudentZones {

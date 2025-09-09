@@ -92,7 +92,7 @@ export default function WaifuPage() {
         {activePreview ? (
           <Image
             src={`/imgs/${activePreview.code}.png`}
-            alt={activePreview.name}
+            alt={activePreview.outfitName}
             width={48}
             height={48}
             className="mx-auto mb-6"

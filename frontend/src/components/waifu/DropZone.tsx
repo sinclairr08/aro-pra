@@ -29,7 +29,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
   onStudentUpdate,
 }) => {
   const sortableStudents = students.map(
-    (student) => `${zoneName}-${student.groupName}`,
+    (student) => `${zoneName}-${student.name}`,
   );
 
   const { setNodeRef } = useDroppable({ id: zoneName });
@@ -54,7 +54,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           <div className={currentZoneConfig.css}>
             {students.map((item, index) => (
               <DraggableStudent
-                key={`${zoneName}-${item.groupName}`}
+                key={`${zoneName}-${item.name}`}
                 student={item}
                 zone={zoneName}
                 rank={zoneName === "rankZone" ? index + 1 : undefined}
