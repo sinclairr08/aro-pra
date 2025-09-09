@@ -21,12 +21,12 @@ export interface DraggableStudentProps {
   student: Student;
   zone: keyof StudentZones;
   rank?: number;
-  onStudentUpdate: (groupName: string, newIdx: number) => void;
+  onStudentUpdate: (name: string, newIdx: number) => void;
 }
 
 export interface DropStudentZoneProps {
   zoneName: keyof StudentZones;
   title: string;
   students: Student[];
-  onStudentUpdate: (groupName: string, newIdx: number) => void;
+  onStudentUpdate: (name: string, newIdx: number) => void;
 }

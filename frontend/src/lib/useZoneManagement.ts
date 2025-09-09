@@ -22,13 +22,13 @@ export const useZoneManagement = ({
       studentData.map((student) => [student.name, student]),
     );
 
-    const existingGroupNames = new Set<string>();
+    const existingNames = new Set<string>();
     const newZones: StudentZones = initialZoneState;
 
     Object.entries(currentZones).forEach(([zoneKey, students]) => {
       const zone = zoneKey as StudentZoneKeys;
       newZones[zone] = students.map((oldStudent: Student) => {
-        existingGroupNames.add(oldStudent.name);
+        existingNames.add(oldStudent.name);
         const updatedStudent = studentDataMap.get(oldStudent.name);
         return updatedStudent
           ? { ...oldStudent, outfits: updatedStudent.outfits }
@@ -37,7 +37,7 @@ export const useZoneManagement = ({
     });
 
     const newStudents = studentData.filter(
-      (student) => !existingGroupNames.has(student.name),
+      (student) => !existingNames.has(student.name),
     );
 
     newZones.holdZone.push(...newStudents);
@@ -72,14 +72,14 @@ export const useZoneManagement = ({
   }, [zones]);
 
   const handleStudentUpdate = useCallback(
-    (groupName: string, newIdx: number): void => {
+    (name: string, newIdx: number): void => {
       setZones((prev) => {
         const newZones = { ...prev };
 
         Object.keys(newZones).forEach((zoneKey) => {
           const zone = zoneKey as keyof StudentZones;
           newZones[zone] = newZones[zone].map((student) =>
-            student.name === groupName
+            student.name === name
               ? { ...student, currentOutfitIdx: newIdx }
               : student,
           );
