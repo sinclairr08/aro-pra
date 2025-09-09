@@ -6,16 +6,15 @@ interface UseZoneManagementProps {
 }
 
 const STORAGE_KEY = "waifu-zones";
-const initialZoneState: StudentZones = {
-  rankZone: [],
-  holdZone: [],
-  excludeZone: [],
-};
 
 export const useZoneManagement = ({
   groupedStudents,
 }: UseZoneManagementProps) => {
-  const [zones, setZones] = useState<StudentZones>(initialZoneState);
+  const [zones, setZones] = useState<StudentZones>({
+    rankZone: [],
+    holdZone: [],
+    excludeZone: [],
+  });
 
   const syncZone = (studentData: Student[], currentZones: StudentZones) => {
     const studentDataMap = new Map(
@@ -23,7 +22,11 @@ export const useZoneManagement = ({
     );
 
     const existingNames = new Set<string>();
-    const newZones: StudentZones = initialZoneState;
+    const newZones: StudentZones = {
+      rankZone: [],
+      holdZone: [],
+      excludeZone: [],
+    };
 
     Object.entries(currentZones).forEach(([zoneKey, students]) => {
       const zone = zoneKey as StudentZoneKeys;
