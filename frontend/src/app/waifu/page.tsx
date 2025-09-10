@@ -79,6 +79,15 @@ export default function WaifuPage() {
           >
             업로드
           </button>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          >
+            초기화
+          </button>
           <input
             ref={fileInputRef}
             type="file"
