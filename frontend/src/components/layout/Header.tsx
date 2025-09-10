@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const Header: React.FC = () => {
   return (
-    <header className="w-full fixed top-0 p-3 flex items-center text-center bg-gradient-to-r from-cyan-400/90 from-10% via-pink-200/30 via-50% to-[#332c30] text-gray-800 font-bold z-10">
+    <header className="w-full fixed top-0 p-3 flex items-center gap-12 text-center bg-gradient-to-r from-cyan-400 from-10% via-pink-200 via-50% to-[#332c30] text-gray-800 font-bold z-10">
       <Link href="/">
         <Image
           src="/icons/aro-pra-icon.png"
@@ -11,6 +11,9 @@ const Header: React.FC = () => {
           width={64}
           height={64}
         />
+      </Link>
+      <Link href="/waifu">
+        <Image src="/icons/momo-icon.png" alt="Logo" width={40} height={40} />
       </Link>
     </header>
   );

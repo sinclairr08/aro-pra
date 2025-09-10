@@ -1,7 +1,7 @@
 package com.aropra.service
 
-import com.aropra.converter.toBasicStudentResponse
-import com.aropra.dto.GroupedStudentResponse
+import com.aropra.converter.toStudentOutfit
+import com.aropra.dto.StudentResponse
 import com.aropra.enum.Language
 import com.aropra.repository.StudentRepository
 import org.springframework.stereotype.Service
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service
 class StudentService(
     private val studentRepository: StudentRepository,
 ) {
-    fun getGroupedByBaseName(language: Language): List<GroupedStudentResponse> =
+    fun getGroupedByBaseName(language: Language): List<StudentResponse> =
         studentRepository
             .findAll()
             .groupBy { it.krBaseName }
             .map { (name, students) ->
-                GroupedStudentResponse(
-                    groupName = name,
-                    value = students.map { it.toBasicStudentResponse(language) },
+                StudentResponse(
+                    name = name,
+                    outfits = students.map { it.toStudentOutfit(language) },
                 )
             }
 }

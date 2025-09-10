@@ -5,15 +5,7 @@ import { useApi } from "@/lib/useApi";
 import { Loading } from "@/components/common/Loading";
 import { VersionCardProps } from "@/types/version";
 import { VersionCard } from "@/components/version/VersionCard";
-
-const defaultVersionCards: VersionCardProps[] = [
-  {
-    id: "0",
-    version: "v0.0.0",
-    updatedDate: "2025-05-04",
-    description: ["프로젝트 설정"],
-  },
-];
+import { defaultVersionCards } from "@/constants/defaultValues";
 
 export default function HomePage() {
   const { data: versionCards, loading } = useApi<VersionCardProps[]>({
