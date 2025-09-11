@@ -17,12 +17,17 @@ class Mapper:
         url = self.SCHALE_URL.format(lang=lang)
         students = requests.get(url, timeout=30).json()
 
-        return pd.DataFrame(
+        df = pd.DataFrame(
             data=[[student.get("Name"), student.get("Id"), student.get("DevName"), student.get("PathName"),
                    student.get("PersonalName")] for student
                   in students.values()],
             columns=[f"{lang}_name", "id", "code", "sub_code", f"{lang}_base_name"]
         )
+
+        mask = df[f"{lang}_name"].str.contains('*', na=False)
+        df.loc[mask, f"{lang}_name"] = df.loc[mask, f"{lang}_base_name"]
+
+        return df
 
     def make_name_table(self):
         if self.BASE_LOCATION.exists():
@@ -55,6 +60,7 @@ class Mapper:
             if len(new_row) == 1:
                 return new_row.drop(columns="sub_code").iloc[0].to_dict()
             else:
+                print(f"Not matched for {sub_code=}")
                 return
 
         if len(row) > 1:
