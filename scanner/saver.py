@@ -33,7 +33,15 @@ class Saver:
 
     def save_file(self, file: Path):
         name = file.name
-        code = self.get_code(name)
+        old_code = self.get_code(name)
+
+        code = self.mapper.convert_old_code(old_code)
+        if code is None:
+            # print(f"{old_code} is not done")
+            return
+        else:
+            if "reiz" in old_code.lower() or "shiroko" in old_code.lower():
+                print(f"{old_code} is converted to the {code}")
 
         student_info = self.mapper.map(code)
         if student_info is None:

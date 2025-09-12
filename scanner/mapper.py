@@ -1,5 +1,6 @@
 from functools import reduce
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import requests
@@ -9,6 +10,7 @@ class Mapper:
     BASE_CODE = "CH"
     SCHALE_URL = "https://schaledb.com/data/{lang}/students.min.json"
     BASE_LOCATION = Path("local/table_data.csv")
+    SPECIAL_MAPPING = {"reizyo": "CH0134", "shiroko_ridingsuit": "CH0065"}
 
     def __init__(self):
         self.name_table = self.make_name_table()
@@ -46,25 +48,23 @@ class Mapper:
 
         return df
 
+    def convert_old_code(self, old_code: str) -> Optional[str]:
+        if old_code in self.name_table["code"].values:
+            return old_code
+
+        sub_code = old_code.lower()
+        if self.name_table["sub_code"].isin([sub_code]).any():
+            return self.name_table.loc[self.name_table["sub_code"] == sub_code, "code"].iloc[0]
+
+        return self.SPECIAL_MAPPING.get(sub_code, None)
+
     def map(self, code: str):
         row = self.name_table[self.name_table["code"] == code]
 
-        if len(row) == 0:
-            if self.BASE_CODE in code:
-                print(f"Not matched for {code=}")
-                return
-
-            sub_code = code.lower()
-            new_row = self.name_table[self.name_table["sub_code"] == sub_code]
-
-            if len(new_row) == 1:
-                return new_row.drop(columns="sub_code").iloc[0].to_dict()
-            else:
-                print(f"Not matched for {sub_code=}")
-                return
-
         if len(row) > 1:
-            print(f"Ambiguous {code=}")
-            return
+            raise ValueError(f"{code} is not unique")
+
+        if len(row) < 1:
+            raise ValueError(f"{code} does not exist")
 
         return row.drop(columns="sub_code").iloc[0].to_dict()
