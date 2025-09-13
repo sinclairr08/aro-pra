@@ -37,16 +37,10 @@ class Saver:
 
         code = self.mapper.convert_old_code(old_code)
         if code is None:
-            # print(f"{old_code} is not done")
+            print(f"{old_code} is not done")
             return
-        else:
-            if "reiz" in old_code.lower() or "shiroko" in old_code.lower():
-                print(f"{old_code} is converted to the {code}")
 
         student_info = self.mapper.map(code)
-        if student_info is None:
-            return
-
         code = student_info["code"]
 
         result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)

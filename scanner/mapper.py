@@ -58,7 +58,7 @@ class Mapper:
 
         return self.SPECIAL_MAPPING.get(sub_code, None)
 
-    def map(self, code: str):
+    def map(self, code: str) -> dict:
         row = self.name_table[self.name_table["code"] == code]
 
         if len(row) > 1:
