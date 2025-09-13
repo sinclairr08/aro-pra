@@ -43,13 +43,16 @@ class Saver:
         student_info = self.mapper.map(code)
         code = student_info["code"]
 
-        result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)
+        self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)
 
-        if result.upserted_id:
-            src = str(file)
-            dst = str(self.dst_dir / f"{code}.png")
-            shutil.copy(src, dst)
-            print(f"{src} is moved to f{dst}")
+        src = file
+        dst = self.dst_dir / f"{code}.png"
+
+        if dst.exists():
+            return
+
+        shutil.copy(src, dst)
+        print(f"{src} is moved to f{dst}")
 
     def is_invalid_file(self, file: Path) -> bool:
         filename = str(file).lower()
