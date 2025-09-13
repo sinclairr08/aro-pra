@@ -67,7 +67,7 @@ if __name__ == "__main__":
     student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
     saver = Saver(
         src_dir=Path("local/extracted"),
-        dst_dir=Path("../frontend/public/imgs"),
+        dst_dir=Path("../frontend/public/imgs/students"),
         collection=student_collection
     )
     saver.save()
