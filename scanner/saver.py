@@ -18,7 +18,7 @@ class Saver:
         self.mapper = Mapper()
 
         if not self.dst_dir.exists():
-            raise Exception(f"{self.dst_dir} does not exist")
+            self.dst_dir.mkdir(exist_ok=True, parents=True)
 
     def save(self):
         for file in self.src_dir.rglob("*.png"):
