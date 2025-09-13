@@ -26,8 +26,13 @@ class Mapper:
             columns=[f"{lang}_name", "id", "code", "sub_code", f"{lang}_base_name"]
         )
 
-        mask = df[f"{lang}_name"].str.contains('*', na=False)
-        df.loc[mask, f"{lang}_name"] = df.loc[mask, f"{lang}_base_name"]
+        col = f"{lang}_name"
+        mask = (
+                (df[col].str.contains(' ', na=False, regex=False) |
+                 df[col].str.contains('*', na=False, regex=False)) &
+                ~df[col].str.contains(' (', na=False, regex=False)
+        )
+        df.loc[mask, f"{lang}_base_name"] = df.loc[mask, f"{lang}_name"]
 
         return df
 
