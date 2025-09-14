@@ -18,7 +18,7 @@ class Saver:
         self.mapper = Mapper()
 
         if not self.dst_dir.exists():
-            raise Exception(f"{self.dst_dir} does not exist")
+            self.dst_dir.mkdir(exist_ok=True, parents=True)
 
     def save(self):
         for file in self.src_dir.rglob("*.png"):
@@ -33,21 +33,26 @@ class Saver:
 
     def save_file(self, file: Path):
         name = file.name
-        code = self.get_code(name)
+        old_code = self.get_code(name)
 
-        student_info = self.mapper.map(code)
-        if student_info is None:
+        code = self.mapper.convert_old_code(old_code)
+        if code is None:
+            print(f"{old_code} is not done")
             return
 
+        student_info = self.mapper.map(code)
         code = student_info["code"]
 
-        result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)
+        self.collection.update_one(filter={"code": code}, update={"$set": student_info}, upsert=True)
 
-        if result.upserted_id:
-            src = str(file)
-            dst = str(self.dst_dir / f"{code}.png")
-            shutil.copy(src, dst)
-            print(f"{src} is moved to f{dst}")
+        src = file
+        dst = self.dst_dir / f"{code}.png"
+
+        if dst.exists():
+            return
+
+        shutil.copy(src, dst)
+        print(f"{src} is moved to f{dst}")
 
     def is_invalid_file(self, file: Path) -> bool:
         filename = str(file).lower()
@@ -59,7 +64,7 @@ if __name__ == "__main__":
     student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
     saver = Saver(
         src_dir=Path("local/extracted"),
-        dst_dir=Path("../frontend/public/imgs"),
+        dst_dir=Path("../frontend/public/imgs/students"),
         collection=student_collection
     )
     saver.save()

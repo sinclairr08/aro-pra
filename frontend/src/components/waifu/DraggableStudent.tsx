@@ -25,7 +25,7 @@ const StudentImage = ({
 }: StudentImageProps) => {
   return (
     <Image
-      src={`/imgs/${outfit.code}.png`}
+      src={`/imgs/students/${outfit.code}.png`}
       alt={outfit.outfitName}
       width={size}
       height={size}

@@ -100,7 +100,7 @@ export default function WaifuPage() {
       <DragOverlay dropAnimation={null}>
         {activePreview ? (
           <Image
-            src={`/imgs/${activePreview.code}.png`}
+            src={`/imgs/students/${activePreview.code}.png`}
             alt={activePreview.outfitName}
             width={48}
             height={48}
