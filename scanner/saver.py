@@ -43,7 +43,7 @@ class Saver:
         student_info = self.mapper.map(code)
         code = student_info["code"]
 
-        self.collection.update_one(filter={"code": code}, update={"$setOnInsert": student_info}, upsert=True)
+        self.collection.update_one(filter={"code": code}, update={"$set": student_info}, upsert=True)
 
         src = file
         dst = self.dst_dir / f"{code}.png"
