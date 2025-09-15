@@ -40,7 +40,8 @@ def main():
     bundle_downloader = BundleDownloader(
         url=url,
         dst_dir=bundle_path,
-        target_bundle_names=target_bundle_names
+        target_bundle_names=target_bundle_names,
+        use_update=True
     )
     bundle_downloader.download()
 

@@ -47,9 +47,9 @@ class BaseDownloader(ABC):
 
 
 class BundleDownloader(BaseDownloader):
-    def __init__(self, url: str, dst_dir: Path, target_bundle_names: list[str]):
+    def __init__(self, url: str, dst_dir: Path, target_bundle_names: list[str], use_update: bool = True):
         super().__init__(url=url, dst_dir=dst_dir)
-
+        self.use_update = use_update
         self.target_bundle_names = target_bundle_names
 
     def is_target_bundle_name(self, bundle_name: str) -> bool:
@@ -85,9 +85,12 @@ class BundleDownloader(BaseDownloader):
             return
 
         data = requests.get(self.url).json()
-        full_packs = data["FullPatchPacks"]
+        if self.use_update:
+            packs = data["UpdatePacks"]
+        else:
+            packs = data["FullPatchPacks"]
 
-        for pack in full_packs:
+        for pack in packs:
             if self.is_target_pack(pack):
                 self.download_pack(pack)
 
