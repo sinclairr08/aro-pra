@@ -10,6 +10,7 @@ import shutil
 from base64 import b64encode
 from datetime import date
 from pathlib import Path
+from typing import Callable
 from zipfile import ZipFile
 
 import cloudscraper
@@ -197,15 +198,16 @@ def decrypt_game_config(data: bytes) -> str:
     return convert_string(decrypted_value, server_data)
 
 
-def catalog_url():
-    catalog_url = decrypt_game_config(find_game_config(cache_dir=Path("local")))
+def _get_server_url_from_game():
+    return decrypt_game_config(find_game_config(cache_dir=Path("local")))
 
-    today = date.today().strftime("%Y%m%d")
-    txt = f"[{today}] {catalog_url}"
-    with open("local/catalogs.txt", "a") as f:
-        f.write(txt)
 
-    return catalog_url
+def get_server_url():
+    server_url = get_today_value(
+        file_path=Path("local/server_url.json"),
+        fn=_get_server_url_from_game
+    )
+    return server_url
 
 
 def fetch_data(url: str, cache_name: str) -> dict:
@@ -218,17 +220,41 @@ def fetch_data(url: str, cache_name: str) -> dict:
             raise SystemExit(1) from e
 
 
-def fetch_catalog_url() -> str:
-    server_api = catalog_url()
-    server_data = fetch_data(server_api, 'serverapi')
-    patch_catalog_url = server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1]['AddressablesCatalogUrlRoot']
+def _get_catalog_url_from_server(server_url):
+    server_data = fetch_data(server_url, 'serverapi')
+    return server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1]['AddressablesCatalogUrlRoot']
 
-    today = date.today().strftime("%Y%m%d")
-    txt = f"[{today}] {patch_catalog_url}"
-    with open("local/patch_catalogs.txt", "a") as f:
-        f.write(txt)
 
-    return patch_catalog_url
+def get_catalog_url() -> str:
+    server_url = get_server_url()
+    catalog_url = get_today_value(
+        file_path=Path("local/catalog_url.json"),
+        fn=lambda: _get_catalog_url_from_server(server_url)
+    )
+    return catalog_url
+
+
+def get_today():
+    return date.today().strftime("%Y%m%d")
+
+
+def get_today_value(file_path: Path, fn: Callable):
+    today = get_today()
+    data = {}
+
+    if file_path.exists():
+        data = json.loads(file_path.read_text())
+
+    if today in data and data[today] is not None:
+        return data[today]
+
+    result = fn()
+    data[today] = result
+
+    with open(file_path, 'w') as f:
+        json.dump(data, f, indent=4)
+
+    return result
 
 
 if __name__ == "__main__":
@@ -243,4 +269,4 @@ if __name__ == "__main__":
         print("[green]APK is up to date.[/green]")
         apk.extract_apk()
 
-    print(fetch_catalog_url())
+    print(get_catalog_url())
