@@ -5,18 +5,23 @@ Based on following project
   - https://github.com/Sunset-Edu-Tech-Group/BA-AD/tree/main/baad/utils
 """
 
+import datetime
 import json
 import shutil
 from base64 import b64encode
-from datetime import date
 from pathlib import Path
 from typing import Callable
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 import cloudscraper
 import requests
 from bacy import convert_string, new_encrypt_string, create_key
 from requests_cache import CachedSession
+
+MAGIC_PATTERN = [0x47, 0x61, 0x6D, 0x65, 0x4D, 0x61, 0x69, 0x6E, 0x43, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x00, 0x00, 0x92,
+                 0x03, 0x00, 0x00]
+APK_URL = "https://d.apkpure.com/b/XAPK/com.YostarJP.BlueArchive?version=latest"
 
 
 def delete_directory(directory: Path) -> bool:
@@ -53,12 +58,38 @@ def extract_files_from_zip(zip_file: Path, extract_path: Path, file_infos: list 
             zip.extract(file_info, extract_path)
 
 
+def get_today():
+    return datetime.datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
+
+
+def get_today_value(file_path: Path, fn: Callable):
+    today = get_today()
+    data = {}
+
+    if file_path.exists():
+        data = json.loads(file_path.read_text())
+
+    if today in data and data[today] is not None:
+        return data[today]
+
+    result = fn()
+    data[today] = result
+
+    with open(file_path, 'w') as f:
+        json.dump(data, f, indent=4)
+
+    return result
+
+
 class Apk:
-    def __init__(self, cache_dir: str, apk_url: str | None = None, apk_path: str | None = None) -> None:
-        self.apk_url = apk_url or 'https://d.apkpure.com/b/XAPK/com.YostarJP.BlueArchive?version=latest'
+    def __init__(self, cache_dir: Path, apk_url: str | None = None, apk_path: str | None = None) -> None:
+        if not cache_dir.exists():
+            cache_dir.mkdir(parents=True, exist_ok=True)
+
+        self.apk_url = apk_url or APK_URL
 
         self.root = Path(__file__).parent.parent
-        self.cache_dir = Path(cache_dir)
+        self.cache_dir = cache_dir
         self.apk_path = apk_path or self.cache_dir / 'BlueArchive.xapk'
 
         self.scraper = cloudscraper.create_scraper()
@@ -148,125 +179,79 @@ class Apk:
         self._parse_zipfile(unity_apk, data_path, 'assets/bin/Data')
 
 
-def find_game_config(cache_dir: Path) -> None | bytes:
-    pattern = bytes([
-        0x47,
-        0x61,
-        0x6D,
-        0x65,
-        0x4D,
-        0x61,
-        0x69,
-        0x6E,
-        0x43,
-        0x6F,
-        0x6E,
-        0x66,
-        0x69,
-        0x67,
-        0x00,
-        0x00,
-        0x92,
-        0x03,
-        0x00,
-        0x00,
-    ])
-    game_path = cache_dir / 'data' / 'assets' / 'bin' / 'Data'
+class ApkExtractor:
+    def __init__(self, cache_dir: Path):
+        self.cache_dir = cache_dir
+        self.apk = Apk(cache_dir=cache_dir)
 
-    for config_file in game_path.rglob('*'):
-        if config_file.is_file():
-            content = config_file.read_bytes()
+    def download_and_extract_apk(self):
+        if not self.apk.apk_exists():
+            print("APK doesn't exist. Downloading...")
+            self.apk.download_apk()
+        elif self.apk.is_outdated():
+            print("APK is outdated. Updating...")
+            self.apk.download_apk()
+        else:
+            print("APK is up to date")
+            self.apk.extract_apk()
 
-            if pattern in content:
-                start_index = content.index(pattern)
-                data = content[start_index + len(pattern):]
-                return data[:-2]
-    return None
+    def find_game_config(self) -> None | bytes:
+        pattern = bytes(MAGIC_PATTERN)
+        game_path = self.cache_dir / 'data' / 'assets' / 'bin' / 'Data'
 
+        for config_file in game_path.rglob('*'):
+            if config_file.is_file():
+                content = config_file.read_bytes()
 
-def decrypt_game_config(data: bytes) -> str:
-    encoded_data = b64encode(data).decode()
+                if pattern in content:
+                    start_index = content.index(pattern)
+                    data = content[start_index + len(pattern):]
+                    return data[:-2]
+        return None
 
-    game_config = create_key(b'GameMainConfig')
-    server_data = create_key(b'ServerInfoDataUrl')
+    def decrypt_game_config(self, data) -> str:
+        encoded_data = b64encode(data).decode()
 
-    decrypted_data = convert_string(encoded_data, game_config)
-    loaded_data = json.loads(decrypted_data)
+        game_config = create_key(b'GameMainConfig')
+        server_data = create_key(b'ServerInfoDataUrl')
 
-    decrypted_key = new_encrypt_string('ServerInfoDataUrl', server_data)
-    decrypted_value = loaded_data[decrypted_key]
-    return convert_string(decrypted_value, server_data)
+        decrypted_data = convert_string(encoded_data, game_config)
+        loaded_data = json.loads(decrypted_data)
 
+        decrypted_key = new_encrypt_string('ServerInfoDataUrl', server_data)
+        decrypted_value = loaded_data[decrypted_key]
+        return convert_string(decrypted_value, server_data)
 
-def _get_server_url_from_game():
-    return decrypt_game_config(find_game_config(cache_dir=Path("local")))
+    def _get_server_url_from_game(self):
+        return self.decrypt_game_config(self.find_game_config())
 
+    def get_server_url(self):
+        server_url = get_today_value(
+            file_path=Path("local/server_url.json"),
+            fn=self._get_server_url_from_game
+        )
 
-def get_server_url():
-    server_url = get_today_value(
-        file_path=Path("local/server_url.json"),
-        fn=_get_server_url_from_game
-    )
-    return server_url
+        return server_url
 
+    def fetch_data(self, url: str, cache_name: str) -> dict:
+        with CachedSession(cache_name=cache_name, use_temp=True) as session:
+            try:
+                return session.get(url).json()
 
-def fetch_data(url: str, cache_name: str) -> dict:
-    with CachedSession(cache_name=cache_name, use_temp=True) as session:
-        try:
-            return session.get(url).json()
+            except (ConnectionError, TimeoutError) as e:
+                print("Connection failed")
+                raise SystemExit(1) from e
 
-        except (ConnectionError, TimeoutError) as e:
-            print("Connection failed")
-            raise SystemExit(1) from e
+    def _get_catalog_url_from_server(self, server_url):
+        server_data = self.fetch_data(server_url, 'serverapi')
+        return server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1]['AddressablesCatalogUrlRoot']
 
+    def get_catalog_url(self) -> str:
+        self.download_and_extract_apk()
 
-def _get_catalog_url_from_server(server_url):
-    server_data = fetch_data(server_url, 'serverapi')
-    return server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1]['AddressablesCatalogUrlRoot']
-
-
-def get_catalog_url() -> str:
-    server_url = get_server_url()
-    catalog_url = get_today_value(
-        file_path=Path("local/catalog_url.json"),
-        fn=lambda: _get_catalog_url_from_server(server_url)
-    )
-    return catalog_url
-
-
-def get_today():
-    return date.today().strftime("%Y%m%d")
-
-
-def get_today_value(file_path: Path, fn: Callable):
-    today = get_today()
-    data = {}
-
-    if file_path.exists():
-        data = json.loads(file_path.read_text())
-
-    if today in data and data[today] is not None:
-        return data[today]
-
-    result = fn()
-    data[today] = result
-
-    with open(file_path, 'w') as f:
-        json.dump(data, f, indent=4)
-
-    return result
-
-
-if __name__ == "__main__":
-    apk = Apk(cache_dir="local")
-    if not apk.apk_exists():
-        print("APK doesn't exist. Downloading...")
-        apk.download_apk()
-    elif apk.is_outdated():
-        print("APK is outdated. Updating...")
-        apk.download_apk()
-    else:
-        print("[green]APK is up to date.[/green]")
-        apk.extract_apk()
-
-    print(get_catalog_url())
+        server_url = self.get_server_url()
+        catalog_url = get_today_value(
+            file_path=Path("local/catalog_url.json"),
+            fn=lambda: self._get_catalog_url_from_server(server_url)
+        )
+        return catalog_url

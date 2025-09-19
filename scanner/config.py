@@ -5,7 +5,6 @@ from pydantic_settings import BaseSettings
 
 
 class ScannerConfig(BaseSettings):
-    url: str = Field(alias="PATCH_URL")
     mongodb_uri: str = Field(alias="SPRING_DATA_MONGODB_URI")
 
     model_config = {

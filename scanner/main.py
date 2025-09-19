@@ -9,6 +9,7 @@ from pathlib import Path
 import requests
 from pymongo import MongoClient
 
+from apk_extractor import ApkExtractor
 from config import CONFIG
 from download import BundleDownloader
 from extractor import Extractor
@@ -25,8 +26,7 @@ def get_asset_base_url() -> str:
 
 
 def main():
-    url = CONFIG.url
-
+    apk_path = Path("local") / "apks"
     bundle_path = Path("local") / "bundles"
     extracted_path = Path("local") / "extracted"
     public_img_path = Path("frontend/public/imgs/students")
@@ -37,8 +37,15 @@ def main():
         "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
     ]
 
+    apk_extractor = ApkExtractor(
+        cache_dir=apk_path
+    )
+
+    catalog_url = apk_extractor.get_catalog_url()
+    patch_url = f"{catalog_url}/Android_PatchPack/BundlePackingInfo.json"
+
     bundle_downloader = BundleDownloader(
-        url=url,
+        url=patch_url,
         dst_dir=bundle_path,
         target_bundle_names=target_bundle_names,
         use_update=True
