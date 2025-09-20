@@ -9,11 +9,11 @@ from pathlib import Path
 import requests
 from pymongo import MongoClient
 
-from apk_extractor import ApkExtractor
 from config import CONFIG
 from download import BundleDownloader
 from extractor import Extractor
 from saver import Saver
+from url_fetcher import UrlFetcher
 
 
 def get_asset_base_url() -> str:
@@ -37,13 +37,22 @@ def main():
         "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
     ]
 
-    apk_extractor = ApkExtractor(
-        cache_dir=apk_path
-    )
+    db = MongoClient(CONFIG.mongodb_uri).get_default_database()
+    collections = ["urls", "students"]
 
-    catalog_url = apk_extractor.get_catalog_url()
-    patch_url = f"{catalog_url}/Android_PatchPack/BundlePackingInfo.json"
+    for collection in collections:
+        if collection not in db.list_collection_names():
+            db.create_collection(collection)
 
+    url_collection = db["urls"]
+    url_fetcher = UrlFetcher(cache_dir=apk_path, collection=url_collection)
+    is_updated = url_fetcher.is_updated
+
+    if not is_updated:
+        print("url is up to date")
+        return
+
+    patch_url = url_fetcher.patch_url
     bundle_downloader = BundleDownloader(
         url=patch_url,
         dst_dir=bundle_path,
@@ -55,7 +64,7 @@ def main():
     extractor = Extractor(src_dir=bundle_path, dst_dir=extracted_path, target_dirs=target_dirs)
     extractor.extract()
 
-    student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
+    student_collection = db["students"]
     saver = Saver(
         src_dir=extracted_path,
         dst_dir=public_img_path,
