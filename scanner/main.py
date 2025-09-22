@@ -46,11 +46,6 @@ def main():
 
     url_collection = db["urls"]
     url_fetcher = UrlFetcher(cache_dir=apk_path, collection=url_collection)
-    is_updated = url_fetcher.is_updated
-
-    if not is_updated:
-        print("url is up to date")
-        return
 
     patch_url = url_fetcher.patch_url
     bundle_downloader = BundleDownloader(

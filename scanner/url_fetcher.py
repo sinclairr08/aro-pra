@@ -18,8 +18,14 @@ def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
 
 
-def get_yesterday():
-    return (datetime.datetime.now(ZoneInfo("Asia/Seoul")) - datetime.timedelta(days=1)).strftime("%Y%m%d")
+def fetch_data(url: str, cache_name: str) -> dict:
+    with CachedSession(cache_name=cache_name, use_temp=True) as session:
+        try:
+            return session.get(url).json()
+
+        except (ConnectionError, TimeoutError) as e:
+            print("Connection failed")
+            raise SystemExit(1) from e
 
 
 class UrlFetcher:
@@ -31,10 +37,32 @@ class UrlFetcher:
         self.apk = Apk(cache_dir=cache_dir)
         self.collection = collection
 
-        self.server_url = None
-        self.catalog_url = None
+        today = get_today()
 
-        self.is_updated = self._get_is_updated()
+        self.download_and_extract_apk()
+        self.server_url = self.decrypt_game_config(self.find_game_config())
+
+        if self.server_url is None:
+            raise ValueError("server url does not exist")
+
+        server_data = fetch_data(url=self.server_url, cache_name='serverapi')
+        self.catalog_url = server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1][
+            'AddressablesCatalogUrlRoot']
+
+        if self.catalog_url is None:
+            raise ValueError("catalog url does not exist")
+
+        url_datas = [
+            {"kind": "server", "date": today, "url": self.server_url},
+            {"kind": "catalog", "date": today, "url": self.catalog_url},
+        ]
+
+        for url_data in url_datas:
+            self.collection.update_one(
+                {"kind": url_data["kind"], "date": url_data["date"]},
+                {"$set": url_data},
+                upsert=True
+            )
 
     def download_and_extract_apk(self):
         if not self.apk.apk_exists():
@@ -73,58 +101,6 @@ class UrlFetcher:
         decrypted_key = new_encrypt_string('ServerInfoDataUrl', server_data)
         decrypted_value = loaded_data[decrypted_key]
         return convert_string(decrypted_value, server_data)
-
-    def _get_is_updated(self) -> bool:
-        today = get_today()
-
-        has_both_url = all(
-            self.collection.find_one({"kind": k, "date": today}) is not None
-            for k in ["server", "catalog"]
-        )
-
-        if has_both_url:
-            return False
-
-        self.init_url()
-        url_datas = [
-            {"kind": "server", "date": today, "url": self.server_url},
-            {"kind": "catalog", "date": today, "url": self.catalog_url},
-        ]
-        for url_data in url_datas:
-            self.collection.update_one(
-                {"kind": url_data["kind"], "date": url_data["date"]},
-                {"$set": url_data},
-                upsert=True
-            )
-
-        yesterday = get_yesterday()
-        doc = self.collection.find_one({"kind": "catalog", "date": yesterday}, {"url": 1})
-        yesterday_catalog_url = doc["url"] if doc else None
-
-        if yesterday_catalog_url is None:
-            return True
-
-        return self.catalog_url != yesterday_catalog_url
-
-    def fetch_data(self, url: str, cache_name: str) -> dict:
-        with CachedSession(cache_name=cache_name, use_temp=True) as session:
-            try:
-                return session.get(url).json()
-
-            except (ConnectionError, TimeoutError) as e:
-                print("Connection failed")
-                raise SystemExit(1) from e
-
-    def init_url(self):
-        self.download_and_extract_apk()
-        self.server_url = self.decrypt_game_config(self.find_game_config())
-
-        server_data = self.fetch_data(self.server_url, 'serverapi')
-        self.catalog_url = server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1][
-            'AddressablesCatalogUrlRoot']
-
-        if self.server_url is None or self.catalog_url is None:
-            raise ValueError("server or catalog url is None")
 
     @property
     def patch_url(self):
