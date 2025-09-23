@@ -16,6 +16,9 @@ class Saver:
         self.dst_dir = dst_dir
         self.collection = collection
         self.mapper = Mapper()
+        self.data_update_cnt = 0
+        self.data_move_cnt = 0
+        self.data_valid_cnt = 0
 
         if not self.dst_dir.exists():
             self.dst_dir.mkdir(exist_ok=True, parents=True)
@@ -25,7 +28,11 @@ class Saver:
             if self.is_invalid_file(file):
                 continue
 
+            self.data_valid_cnt += 1
             self.save_file(file)
+
+        print(f"{self.data_update_cnt}/{self.data_valid_cnt} files are updated")
+        print(f"{self.data_move_cnt}/{self.data_valid_cnt} files are moved")
 
     @staticmethod
     def get_code(name):
@@ -37,13 +44,13 @@ class Saver:
 
         code = self.mapper.convert_old_code(old_code)
         if code is None:
-            print(f"{old_code} is not done")
             return
 
         student_info = self.mapper.map(code)
         code = student_info["code"]
 
-        self.collection.update_one(filter={"code": code}, update={"$set": student_info}, upsert=True)
+        result = self.collection.update_one(filter={"code": code}, update={"$set": student_info}, upsert=True)
+        self.data_update_cnt += result.modified_count
 
         src = file
         dst = self.dst_dir / f"{code}.png"
@@ -53,6 +60,7 @@ class Saver:
 
         shutil.copy(src, dst)
         print(f"{src} is moved to f{dst}")
+        self.data_move_cnt += 1
 
     def is_invalid_file(self, file: Path) -> bool:
         filename = str(file).lower()

@@ -37,9 +37,6 @@ class Mapper:
         return df
 
     def make_name_table(self):
-        if self.BASE_LOCATION.exists():
-            return pd.read_csv(self.BASE_LOCATION)
-
         dfs = []
 
         for lang in ["en", "jp", "kr"]:

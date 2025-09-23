@@ -13,6 +13,7 @@ from config import CONFIG
 from download import BundleDownloader
 from extractor import Extractor
 from saver import Saver
+from url_fetcher import UrlFetcher
 
 
 def get_asset_base_url() -> str:
@@ -25,11 +26,10 @@ def get_asset_base_url() -> str:
 
 
 def main():
-    url = CONFIG.url
-
+    apk_path = Path("local") / "apks"
     bundle_path = Path("local") / "bundles"
     extracted_path = Path("local") / "extracted"
-    public_img_path = Path("../frontend/public/imgs/students")
+    public_img_path = Path("frontend/public/imgs/students")
 
     target_bundle_names = ["01_common-01_character"]
 
@@ -37,17 +37,29 @@ def main():
         "Assets/_MX/AddressableAsset/UIs/01_Common/01_Character",
     ]
 
+    db = MongoClient(CONFIG.mongodb_uri).get_default_database()
+    collections = ["urls", "students"]
+
+    for collection in collections:
+        if collection not in db.list_collection_names():
+            db.create_collection(collection)
+
+    url_collection = db["urls"]
+    url_fetcher = UrlFetcher(cache_dir=apk_path, collection=url_collection)
+
+    patch_url = url_fetcher.patch_url
     bundle_downloader = BundleDownloader(
-        url=url,
+        url=patch_url,
         dst_dir=bundle_path,
-        target_bundle_names=target_bundle_names
+        target_bundle_names=target_bundle_names,
+        use_update=True
     )
     bundle_downloader.download()
 
     extractor = Extractor(src_dir=bundle_path, dst_dir=extracted_path, target_dirs=target_dirs)
     extractor.extract()
 
-    student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
+    student_collection = db["students"]
     saver = Saver(
         src_dir=extracted_path,
         dst_dir=public_img_path,
