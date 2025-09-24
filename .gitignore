@@ -128,4 +128,4 @@ backend/**/application-secret.yaml
 scanner.yaml
 
 # imgs
-frontend/public/imgs/students
+pages/public/imgs/students

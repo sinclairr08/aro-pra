@@ -16,7 +16,7 @@ if [ "$VERSION" = "$REMOTE_VERSION" ]; then
 fi
 
 (
-  cd frontend || exit 1
+  cd pages || exit 1
   npm version $VERSION --no-git-tag-version
 )
 

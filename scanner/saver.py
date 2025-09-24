@@ -2,9 +2,7 @@ import shutil
 from pathlib import Path
 
 import pymongo.collection
-from pymongo import MongoClient
 
-from config import CONFIG
 from mapper import Mapper
 
 
@@ -66,13 +64,3 @@ class Saver:
         filename = str(file).lower()
 
         return any(invalid_name in filename for invalid_name in self.INVALID_NAMES)
-
-
-if __name__ == "__main__":
-    student_collection = MongoClient(CONFIG.mongodb_uri).get_default_database()["students"]
-    saver = Saver(
-        src_dir=Path("local/extracted"),
-        dst_dir=Path("../frontend/public/imgs/students"),
-        collection=student_collection
-    )
-    saver.save()

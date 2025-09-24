@@ -1,7 +1,7 @@
 services:
   aro-pra-fe:
     build:
-      context: ./frontend
+      context: pages
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
@@ -9,7 +9,7 @@ services:
     environment:
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
       - BACKEND_INTERNAL_URL=${BACKEND_INTERNAL_URL}
-    command: ["npm", "start", "--", "-p", "${FRONTEND_PORT:-3000}"]
+    command: [ "npm", "start", "--", "-p", "${PAGES_PORT:-3000}" ]
     depends_on:
       - aro-pra-be
 
