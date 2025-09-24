@@ -15,7 +15,7 @@ exec 2>&1
 echo "[start] $(date '+%F %T %Z')"
 
 set +e
-python -u scanner/main.py
+"$(conda info --base)/bin/python" -u scanner/main.py
 EXIT_CODE=$?
 set -e
 
