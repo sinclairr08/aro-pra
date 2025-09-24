@@ -7,7 +7,7 @@ export TZ=Asia/Seoul
 
 LOG_DIR="$PWD/log"
 mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/$(date +%Y%m%d).log"
+LOG_FILE="$LOG_DIR/$(date +%Y%m%d_%H%M%S).log"
 
 exec 1>>"$LOG_FILE"
 exec 2>&1
@@ -15,7 +15,7 @@ exec 2>&1
 echo "[start] $(date '+%F %T %Z')"
 
 set +e
-python -u scanner/main.py
+"$HOME/miniforge3/bin/python" -u scanner/main.py
 EXIT_CODE=$?
 set -e
 
