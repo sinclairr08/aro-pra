@@ -7,7 +7,7 @@ export TZ=Asia/Seoul
 
 LOG_DIR="$PWD/log"
 mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/$(date +%Y%m%d).log"
+LOG_FILE="$LOG_DIR/$(date +%Y%m%d_%H%M%S).log"
 
 exec 1>>"$LOG_FILE"
 exec 2>&1
