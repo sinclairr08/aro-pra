@@ -120,7 +120,7 @@ bin/
 .kotlin/
 
 # Secrets
-backend/**/application-secret.yaml
+api/**/application-secret.yaml
 
 ### Python ##
 

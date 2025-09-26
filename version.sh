@@ -21,7 +21,7 @@ fi
 )
 
 (
-  cd backend || exit 1
+  cd api || exit 1
   sed -i "s/version = \"[^\"]*\"/version = \"$VERSION\"/" build.gradle.kts
 )
 
