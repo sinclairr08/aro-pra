@@ -75,7 +75,7 @@ export const useZoneManagement = ({
   }, [zones]);
 
   const handleStudentUpdate = useCallback(
-    (name: string, newIdx: number): void => {
+    (name: string, outfitCode: string): void => {
       setZones((prev) => {
         const newZones = { ...prev };
 
@@ -83,7 +83,7 @@ export const useZoneManagement = ({
           const zone = zoneKey as keyof StudentZones;
           newZones[zone] = newZones[zone].map((student) =>
             student.name === name
-              ? { ...student, currentOutfitIdx: newIdx }
+              ? { ...student, currentOutfitCode: outfitCode }
               : student,
           );
         });
