@@ -57,7 +57,7 @@ class Saver:
             return
 
         shutil.copy(src, dst)
-        print(f"{src} is moved to f{dst}")
+        print(f"{src} is moved to {dst}")
         self.data_move_cnt += 1
 
     def is_invalid_file(self, file: Path) -> bool:
