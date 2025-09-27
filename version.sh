@@ -16,12 +16,12 @@ if [ "$VERSION" = "$REMOTE_VERSION" ]; then
 fi
 
 (
-  cd frontend || exit 1
+  cd pages || exit 1
   npm version $VERSION --no-git-tag-version
 )
 
 (
-  cd backend || exit 1
+  cd api || exit 1
   sed -i "s/version = \"[^\"]*\"/version = \"$VERSION\"/" build.gradle.kts
 )
 

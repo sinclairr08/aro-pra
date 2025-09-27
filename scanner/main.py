@@ -29,7 +29,7 @@ def main():
     apk_path = Path("local") / "apks"
     bundle_path = Path("local") / "bundles"
     extracted_path = Path("local") / "extracted"
-    public_img_path = Path("frontend/public/imgs/students")
+    public_img_path = Path("pages/public/imgs/students")
 
     target_bundle_names = ["01_common-01_character"]
 
