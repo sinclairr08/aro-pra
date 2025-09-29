@@ -53,9 +53,12 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
     } | null;
 
     if (data?.student) {
-      const disp = getCurrentOutfit(data.student);
-      if (disp) {
-        setActivePreview({ code: disp.code, outfitName: disp.outfitName });
+      const displayOutfit = getCurrentOutfit(data.student);
+      if (displayOutfit) {
+        setActivePreview({
+          code: displayOutfit.code,
+          outfitName: displayOutfit.outfitName,
+        });
       }
     }
   }, []);
