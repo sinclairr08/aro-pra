@@ -6,7 +6,7 @@ export interface StudentOutfit {
 export interface Student {
   name: string;
   outfits: StudentOutfit[];
-  currentOutfitCode?: string;
+  currentOutfitCode: string;
 }
 
 export interface StudentZones {
