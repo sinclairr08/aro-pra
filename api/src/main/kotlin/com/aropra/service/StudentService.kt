@@ -17,7 +17,8 @@ class StudentService(
             .map { (name, students) ->
                 StudentResponse(
                     name = name,
-                    outfits = students.sortedBy { it.code }.map { it.toStudentOutfit(language) },
+                    outfits = students.map { it.toStudentOutfit(language) },
+                    currentOutfitCode = students.minBy { it.krName.length }.code,
                 )
             }
 }

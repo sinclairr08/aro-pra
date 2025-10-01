@@ -1,4 +1,5 @@
 import { DraggableStudentProps, StudentOutfit } from "@/types/waifu";
+import { getCurrentOutfit } from "@/lib/studentUtils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
@@ -82,7 +83,12 @@ export const DraggableStudent = ({
   };
 
   const handleContextMenuSelect = (index: number) => {
-    onStudentUpdate(student.name, index);
+    if (!student.outfits || student.outfits.length === 0) return;
+
+    const selectedOutfit = student.outfits[index];
+    if (selectedOutfit) {
+      onStudentUpdate(student.name, selectedOutfit.code);
+    }
     handleContextMenuClose();
   };
 
@@ -97,7 +103,15 @@ export const DraggableStudent = ({
     return () => document.removeEventListener("click", handleGlobalClick);
   }, [contextMenu.visible]);
 
-  const displayOutfit = student.outfits[student.currentOutfitIdx || 0];
+  const displayOutfit = getCurrentOutfit(student);
+
+  if (!displayOutfit) {
+    return (
+      <div className="relative w-20 h-28 bg-gray-200 rounded-lg flex items-center justify-center">
+        <span className="text-gray-500 text-xs">No outfit</span>
+      </div>
+    );
+  }
 
   return (
     <>

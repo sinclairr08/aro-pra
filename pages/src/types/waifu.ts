@@ -6,7 +6,7 @@ export interface StudentOutfit {
 export interface Student {
   name: string;
   outfits: StudentOutfit[];
-  currentOutfitIdx?: number;
+  currentOutfitCode: string;
 }
 
 export interface StudentZones {
@@ -21,12 +21,12 @@ export interface DraggableStudentProps {
   student: Student;
   zone: keyof StudentZones;
   rank?: number;
-  onStudentUpdate: (name: string, newIdx: number) => void;
+  onStudentUpdate: (name: string, outfitCode: string) => void;
 }
 
 export interface DropStudentZoneProps {
   zoneName: keyof StudentZones;
   title: string;
   students: Student[];
-  onStudentUpdate: (name: string, newIdx: number) => void;
+  onStudentUpdate: (name: string, outfitCode: string) => void;
 }

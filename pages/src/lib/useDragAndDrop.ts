@@ -18,6 +18,7 @@ import {
   StudentZoneKeys,
   StudentZones,
 } from "@/types/waifu";
+import { getCurrentOutfit } from "@/lib/studentUtils";
 
 interface UseDragAndDropProps {
   setZones: React.Dispatch<React.SetStateAction<StudentZones>>;
@@ -52,9 +53,13 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
     } | null;
 
     if (data?.student) {
-      const idx = data.student.currentOutfitIdx ?? 0;
-      const disp = data.student.outfits[idx];
-      setActivePreview({ code: disp.code, outfitName: disp.outfitName });
+      const displayOutfit = getCurrentOutfit(data.student);
+      if (displayOutfit) {
+        setActivePreview({
+          code: displayOutfit.code,
+          outfitName: displayOutfit.outfitName,
+        });
+      }
     }
   }, []);
 

@@ -15,6 +15,7 @@ export const defaultStudents: Student[] = [
         outfitName: "요시미",
       },
     ],
+    currentOutfitCode: "Yoshimi",
   },
   {
     name: "시로코",
@@ -28,6 +29,7 @@ export const defaultStudents: Student[] = [
         outfitName: "시로코(수영복)",
       },
     ],
+    currentOutfitCode: "Shiroko",
   },
   {
     name: "아루",
@@ -45,6 +47,7 @@ export const defaultStudents: Student[] = [
         outfitName: "아루(새해)",
       },
     ],
+    currentOutfitCode: "Aru",
   },
 ];
 
