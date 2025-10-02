@@ -10,6 +10,7 @@ import { useDragAndDrop } from "@/lib/useDragAndDrop";
 import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
 import { defaultStudents } from "@/constants/defaultValues";
+import { ContentLayout } from "@/components/layout/ContentLayout";
 
 export default function WaifuPage() {
   const { data: groupedStudents } = useApi<Student[]>({
@@ -34,15 +35,14 @@ export default function WaifuPage() {
     useFileOperations({ zones, setZones });
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={customCollisionDetection}
-      onDragStart={handleDragStart}
-      onDragCancel={handleDragCancel}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="pt-20 pb-20 px-2">
-        <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
+    <ContentLayout title="애정도 순위">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={customCollisionDetection}
+        onDragStart={handleDragStart}
+        onDragCancel={handleDragCancel}
+        onDragEnd={handleDragEnd}
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-2 gap-y-4 max-w-6xl mx-auto">
           <DropZone
             zoneName="rankZone"
@@ -96,19 +96,19 @@ export default function WaifuPage() {
             className="hidden"
           />
         </div>
-      </div>
-      <DragOverlay dropAnimation={null}>
-        {activePreview ? (
-          <Image
-            src={`/imgs/students/${activePreview.code}.png`}
-            alt={activePreview.outfitName}
-            width={48}
-            height={48}
-            className="mx-auto mb-6"
-            draggable={false}
-          />
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay dropAnimation={null}>
+          {activePreview ? (
+            <Image
+              src={`/imgs/students/${activePreview.code}.png`}
+              alt={activePreview.outfitName}
+              width={48}
+              height={48}
+              className="mx-auto mb-6"
+              draggable={false}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </ContentLayout>
   );
 }

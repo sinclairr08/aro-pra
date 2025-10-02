@@ -9,6 +9,7 @@ import { usePostApi } from "@/lib/usePostApi";
 import { Loading } from "@/components/common/Loading";
 import { LinkRequest } from "@/types/link";
 import { LinkSchema } from "@/schemas/link";
+import { FormLayout } from "@/components/layout/FormLayout";
 
 export default function AdminLinkPage() {
   const {
@@ -37,11 +38,7 @@ export default function AdminLinkPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
-        링크 추가용 관리자
-      </h1>
-
+    <FormLayout title="링크 추가용 관리자">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputField
           label="이름"
@@ -75,6 +72,6 @@ export default function AdminLinkPage() {
         </div>
       </form>
       {loading && <Loading />}
-    </div>
+    </FormLayout>
   );
 }

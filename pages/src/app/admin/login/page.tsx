@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import { BaseInput } from "@/components/form/BaseInput";
+import { ContentLayout } from "@/components/layout/ContentLayout";
 
 interface AdminLoginFormData {
   password: string;
@@ -19,7 +20,7 @@ const AdminLoginForm = ({ onLogin }: AdminLoginFormProps) => {
     await onLogin(password);
   };
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <ContentLayout className="bg-gray-100 min-h-screen flex items-center justify-center -mt-4 -mb-8 -mx-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
@@ -35,7 +36,7 @@ const AdminLoginForm = ({ onLogin }: AdminLoginFormProps) => {
           </SubmitButton>
         </form>
       </div>
-    </div>
+    </ContentLayout>
   );
 };
 
