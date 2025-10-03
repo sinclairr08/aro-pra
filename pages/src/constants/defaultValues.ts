@@ -52,8 +52,24 @@ export const defaultStudents: Student[] = [
 ];
 
 export const defaultLinkCards: LinkCardProps[] = [
-  { id: "1", name: "일섭 공식", url: "https://bluearchive.jp" },
-  { id: "2", name: "한섭 공식", url: "https://forum.nexon.com/bluearchive" },
+  {
+    id: "1",
+    name: "일섭 공식",
+    url: "https://bluearchive.jp",
+    section: "공식",
+  },
+  {
+    id: "2",
+    name: "한섭 공식",
+    url: "https://forum.nexon.com/bluearchive",
+    section: "공식",
+  },
+  {
+    id: "3",
+    name: "총력전 정보 및 영상 (일본어)",
+    url: "https://www.souriki-border.com",
+    section: "정보",
+  },
 ];
 
 export const defaultVersionCards: VersionCardProps[] = [

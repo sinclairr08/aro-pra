@@ -14,13 +14,25 @@ export default function HomePage() {
     defaultValue: defaultLinkCards,
   });
 
+  const groupedBySection = linkCards.reduce(
+    (acc, card) => {
+      (acc[card.section] ||= []).push(card);
+      return acc;
+    },
+    {} as Record<string, LinkCardProps[]>,
+  );
+
   return (
-    <ContentLayout
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-      title="링크 모음"
-    >
-      {linkCards.map((card: LinkCardProps) => (
-        <LinkCard key={card.id} {...card} />
+    <ContentLayout title="링크 모음">
+      {Object.entries(groupedBySection).map(([section, cards]) => (
+        <div key={section} className="mb-8">
+          <h2 className="text-lg font-bold mb-4 text-gray-700">{section}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {cards.map((card: LinkCardProps) => (
+              <LinkCard key={card.id} {...card} />
+            ))}
+          </div>
+        </div>
       ))}
       {loading && <Loading />}
     </ContentLayout>

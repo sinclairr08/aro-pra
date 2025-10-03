@@ -2,6 +2,7 @@ export interface LinkCardProps {
   id: string;
   name: string;
   url: string;
+  section: string;
 }
 
 export interface LinkRequest {
