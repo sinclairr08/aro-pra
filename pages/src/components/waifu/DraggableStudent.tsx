@@ -117,7 +117,7 @@ export const DraggableStudent = ({
     <>
       <div
         ref={setNodeRef}
-        style={style}
+        style={{ ...style, touchAction: "none" }}
         {...attributes}
         {...listeners}
         className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
