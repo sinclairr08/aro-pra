@@ -14,14 +14,12 @@ interface StudentContextMenuProps {
 interface StudentImageProps {
   outfit: StudentOutfit;
   size: number;
-  gray?: boolean;
   additionalStyle?: string;
 }
 
 const StudentImage = ({
   outfit,
   size,
-  gray,
   additionalStyle,
 }: StudentImageProps) => {
   return (
@@ -30,7 +28,7 @@ const StudentImage = ({
       alt={outfit.outfitName}
       width={size}
       height={size}
-      className={`${gray ? "grayscale" : ""} ${additionalStyle || ""}`}
+      className={additionalStyle || ""}
     />
   );
 };
@@ -142,7 +140,6 @@ export const DraggableStudent = ({
             <StudentImage
               outfit={displayOutfit}
               size={80}
-              gray={zone === "excludeZone"}
               additionalStyle="mx-auto"
             />
           </div>

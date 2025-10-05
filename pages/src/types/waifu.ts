@@ -12,7 +12,6 @@ export interface Student {
 export interface StudentZones {
   rankZone: Student[];
   holdZone: Student[];
-  excludeZone: Student[];
 }
 
 export type StudentZoneKeys = keyof StudentZones;

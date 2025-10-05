@@ -43,7 +43,7 @@ export default function WaifuPage() {
     >
       <div className="pt-20 pb-20 px-2">
         <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-2 gap-y-4 max-w-6xl mx-auto">
+        <div className="flex flex-col gap-4 max-w-6xl mx-auto">
           <DropZone
             zoneName="rankZone"
             title="랭킹"
@@ -54,12 +54,6 @@ export default function WaifuPage() {
             zoneName="holdZone"
             title="대기"
             students={zones.holdZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
-          <DropZone
-            zoneName="excludeZone"
-            title="제외"
-            students={zones.excludeZone}
             onStudentUpdate={handleStudentUpdate}
           />
         </div>
