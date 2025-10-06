@@ -36,7 +36,6 @@ const StudentImage = ({
 export const DraggableStudent = ({
   student,
   zone,
-  rank,
   onStudentUpdate,
 }: DraggableStudentProps) => {
   const {
@@ -118,32 +117,16 @@ export const DraggableStudent = ({
         style={{ ...style, touchAction: "none" }}
         {...attributes}
         {...listeners}
-        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
+        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"}`}
         onContextMenu={handleRightClick}
       >
-        {zone === "rankZone" ? (
-          <div className="flex items-center">
-            <span className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs mr-2">
-              {rank}
-            </span>
-            <StudentImage
-              outfit={displayOutfit}
-              size={64}
-              additionalStyle="w-16 h-16 object-contain"
-            />
-            <span className="min-w-0 truncate text-base leading-tight">
-              {student.name}
-            </span>
-          </div>
-        ) : (
-          <div className="text-center">
-            <StudentImage
-              outfit={displayOutfit}
-              size={80}
-              additionalStyle="mx-auto"
-            />
-          </div>
-        )}
+        <div className="text-center">
+          <StudentImage
+            outfit={displayOutfit}
+            size={80}
+            additionalStyle="mx-auto"
+          />
+        </div>
       </div>
       {contextMenu.visible && (
         <div

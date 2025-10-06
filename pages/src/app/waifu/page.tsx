@@ -52,7 +52,6 @@ export default function WaifuPage() {
           />
           <DropZone
             zoneName="holdZone"
-            title="대기"
             students={zones.holdZone}
             onStudentUpdate={handleStudentUpdate}
           />
