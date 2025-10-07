@@ -13,7 +13,6 @@ export const useZoneManagement = ({
   const [zones, setZones] = useState<StudentZones>({
     rankZone: [],
     holdZone: [],
-    excludeZone: [],
   });
 
   const syncZone = (studentData: Student[], currentZones: StudentZones) => {
@@ -25,7 +24,6 @@ export const useZoneManagement = ({
     const newZones: StudentZones = {
       rankZone: [],
       holdZone: [],
-      excludeZone: [],
     };
 
     Object.entries(currentZones).forEach(([zoneKey, students]) => {

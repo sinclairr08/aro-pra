@@ -12,7 +12,6 @@ export interface Student {
 export interface StudentZones {
   rankZone: Student[];
   holdZone: Student[];
-  excludeZone: Student[];
 }
 
 export type StudentZoneKeys = keyof StudentZones;
@@ -20,13 +19,12 @@ export type StudentZoneKeys = keyof StudentZones;
 export interface DraggableStudentProps {
   student: Student;
   zone: keyof StudentZones;
-  rank?: number;
   onStudentUpdate: (name: string, outfitCode: string) => void;
 }
 
 export interface DropStudentZoneProps {
   zoneName: keyof StudentZones;
-  title: string;
+  title?: string;
   students: Student[];
   onStudentUpdate: (name: string, outfitCode: string) => void;
 }

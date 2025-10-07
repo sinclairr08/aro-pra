@@ -3,24 +3,8 @@ import { useDroppable } from "@dnd-kit/core";
 import {
   rectSortingStrategy,
   SortableContext,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { DraggableStudent } from "@/components/waifu/DraggableStudent";
-
-const zoneConfig = {
-  rankZone: {
-    css: "space-y-2",
-    strategy: verticalListSortingStrategy,
-  },
-  holdZone: {
-    css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-    strategy: rectSortingStrategy,
-  },
-  excludeZone: {
-    css: "grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8",
-    strategy: rectSortingStrategy,
-  },
-};
 
 export const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneName,
@@ -34,36 +18,39 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
 
   const { setNodeRef } = useDroppable({ id: zoneName });
 
-  const currentZoneConfig = zoneConfig[zoneName];
-
   return (
     <div
       ref={setNodeRef}
-      className="bg-white rounded-lg shadow py-4 px-2 min-h-64 border-2 border-dashed border-gray-300"
+      className="bg-white shadow min-h-28 flex items-stretch gap-0"
     >
-      <h3 className="font-bold text-center mb-1">{title}</h3>
-      <SortableContext
-        items={sortableStudents}
-        strategy={currentZoneConfig.strategy}
-      >
-        {students.length === 0 ? (
-          <div className="text-gray-400 text-center py-4 text-sm">
-            드래그하세요
-          </div>
-        ) : (
-          <div className={currentZoneConfig.css}>
-            {students.map((item, index) => (
-              <DraggableStudent
-                key={`${zoneName}-${item.name}`}
-                student={item}
-                zone={zoneName}
-                rank={zoneName === "rankZone" ? index + 1 : undefined}
-                onStudentUpdate={onStudentUpdate}
-              />
-            ))}
-          </div>
-        )}
-      </SortableContext>
+      {title && (
+        <div className="bg-gray-100 px-3 flex items-center justify-center">
+          <h3 className="font-bold text-lg whitespace-nowrap">{title}</h3>
+        </div>
+      )}
+      <div className="flex-1 px-2 flex items-center">
+        <SortableContext
+          items={sortableStudents}
+          strategy={rectSortingStrategy}
+        >
+          {students.length === 0 ? (
+            <div className="text-gray-400 text-center py-4 text-sm w-full">
+              드래그하세요
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-0 justify-start">
+              {students.map((item) => (
+                <DraggableStudent
+                  key={`${zoneName}-${item.name}`}
+                  student={item}
+                  zone={zoneName}
+                  onStudentUpdate={onStudentUpdate}
+                />
+              ))}
+            </div>
+          )}
+        </SortableContext>
+      </div>
     </div>
   );
 };
