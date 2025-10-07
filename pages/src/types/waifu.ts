@@ -9,22 +9,31 @@ export interface Student {
   currentOutfitCode: string;
 }
 
+export interface RankZone {
+  id: string;
+  title: string;
+  students: Student[];
+}
+
 export interface StudentZones {
-  rankZone: Student[];
+  rankZones: RankZone[];
   holdZone: Student[];
 }
 
-export type StudentZoneKeys = keyof StudentZones;
-
 export interface DraggableStudentProps {
   student: Student;
-  zone: keyof StudentZones;
+  zoneId: string;
   onStudentUpdate: (name: string, outfitCode: string) => void;
 }
 
 export interface DropStudentZoneProps {
-  zoneName: keyof StudentZones;
+  zoneId: string;
   title?: string;
   students: Student[];
   onStudentUpdate: (name: string, outfitCode: string) => void;
+  onTitleChange?: (zoneId: string, newTitle: string) => void;
+  onDeleteZone?: (zoneId: string) => void;
+  onMoveZone?: (zoneId: string, direction: "up" | "down") => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }

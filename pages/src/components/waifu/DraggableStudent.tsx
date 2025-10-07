@@ -35,7 +35,7 @@ const StudentImage = ({
 
 export const DraggableStudent = ({
   student,
-  zone,
+  zoneId,
   onStudentUpdate,
 }: DraggableStudentProps) => {
   const {
@@ -46,8 +46,8 @@ export const DraggableStudent = ({
     transition,
     isDragging,
   } = useSortable({
-    id: `${zone}-${student.name}`,
-    data: { student, zone },
+    id: `${zoneId}-${student.name}`,
+    data: { student, zoneId },
   });
 
   const style = {

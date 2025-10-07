@@ -12,12 +12,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import {
-  Student,
-  StudentOutfit,
-  StudentZoneKeys,
-  StudentZones,
-} from "@/types/waifu";
+import { Student, StudentOutfit, StudentZones } from "@/types/waifu";
 import { getCurrentOutfit } from "@/lib/studentUtils";
 
 interface UseDragAndDropProps {
@@ -72,26 +67,51 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
       const activeData = active.data.current;
       if (!activeData) return;
 
-      let targetZone: StudentZoneKeys;
+      const activeZoneId = activeData.zoneId as string;
+      let targetZoneId: string;
       let isDropOnZone = false;
 
-      if (["rankZone", "holdZone", "excludeZone"].includes(over.id as string)) {
-        targetZone = over.id as StudentZoneKeys;
+      // Check if dropping on a zone container
+      const overIdStr = over.id as string;
+      if (overIdStr === "holdZone" || overIdStr.startsWith("rank-")) {
+        targetZoneId = overIdStr;
         isDropOnZone = true;
       } else {
         const overData = over.data.current;
         if (!overData) return;
 
-        targetZone = overData.zone as StudentZoneKeys;
+        targetZoneId = overData.zoneId as string;
         isDropOnZone = false;
       }
 
-      const activeZone = activeData.zone as StudentZoneKeys;
-
-      if (activeZone !== targetZone) {
+      if (activeZoneId !== targetZoneId) {
+        // Moving between zones
         setZones((prev) => {
-          const activeItems = [...prev[activeZone]];
-          const targetItems = [...prev[targetZone]];
+          const newZones = { ...prev };
+          let activeItems: Student[];
+          let targetItems: Student[];
+
+          // Get active zone items
+          if (activeZoneId === "holdZone") {
+            activeItems = [...prev.holdZone];
+          } else {
+            const activeRankZone = prev.rankZones.find(
+              (z) => z.id === activeZoneId,
+            );
+            if (!activeRankZone) return prev;
+            activeItems = [...activeRankZone.students];
+          }
+
+          // Get target zone items
+          if (targetZoneId === "holdZone") {
+            targetItems = [...prev.holdZone];
+          } else {
+            const targetRankZone = prev.rankZones.find(
+              (z) => z.id === targetZoneId,
+            );
+            if (!targetRankZone) return prev;
+            targetItems = [...targetRankZone.students];
+          }
 
           const activeIdx = activeItems.findIndex(
             (item) => item.name === activeData.student.name,
@@ -105,7 +125,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
             targetItems.push(movedItem);
           } else {
             const overIdx = targetItems.findIndex(
-              (item) => `${targetZone}-${item.name}` === over.id,
+              (item) => `${targetZoneId}-${item.name}` === over.id,
             );
 
             if (overIdx === -1) {
@@ -115,32 +135,60 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
             }
           }
 
-          return {
-            ...prev,
-            [activeZone]: activeItems,
-            [targetZone]: targetItems,
-          };
+          // Update zones
+          if (activeZoneId === "holdZone") {
+            newZones.holdZone = activeItems;
+          } else {
+            newZones.rankZones = newZones.rankZones.map((z) =>
+              z.id === activeZoneId ? { ...z, students: activeItems } : z,
+            );
+          }
+
+          if (targetZoneId === "holdZone") {
+            newZones.holdZone = targetItems;
+          } else {
+            newZones.rankZones = newZones.rankZones.map((z) =>
+              z.id === targetZoneId ? { ...z, students: targetItems } : z,
+            );
+          }
+
+          return newZones;
         });
       } else if (!isDropOnZone && active.id !== over.id) {
+        // Reordering within same zone
         setZones((prev) => {
-          const items = [...prev[activeZone as StudentZoneKeys]];
+          const newZones = { ...prev };
+          let items: Student[];
+
+          if (activeZoneId === "holdZone") {
+            items = [...prev.holdZone];
+          } else {
+            const rankZone = prev.rankZones.find((z) => z.id === activeZoneId);
+            if (!rankZone) return prev;
+            items = [...rankZone.students];
+          }
 
           const activeIdx = items.findIndex(
-            (item) => `${activeZone}-${item.name}` === active.id,
+            (item) => `${activeZoneId}-${item.name}` === active.id,
           );
 
           const overIdx = items.findIndex(
-            (item) => `${activeZone}-${item.name}` === over.id,
+            (item) => `${activeZoneId}-${item.name}` === over.id,
           );
 
           if (activeIdx !== -1 && overIdx !== -1) {
             const reorderItems = arrayMove(items, activeIdx, overIdx);
-            return {
-              ...prev,
-              [activeZone]: reorderItems,
-            };
+
+            if (activeZoneId === "holdZone") {
+              newZones.holdZone = reorderItems;
+            } else {
+              newZones.rankZones = newZones.rankZones.map((z) =>
+                z.id === activeZoneId ? { ...z, students: reorderItems } : z,
+              );
+            }
           }
-          return prev;
+
+          return newZones;
         });
       }
 
