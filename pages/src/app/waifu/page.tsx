@@ -10,8 +10,13 @@ import { useDragAndDrop } from "@/lib/useDragAndDrop";
 import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
 import { defaultStudents } from "@/constants/defaultValues";
+import { useState } from "react";
 
 export default function WaifuPage() {
+  const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
+    null,
+  );
+
   const { data: groupedStudents } = useApi<Student[]>({
     apiUrl: "/api/v1/students/grouped/kr",
     defaultValue: defaultStudents,
@@ -25,6 +30,7 @@ export default function WaifuPage() {
     handleDeleteZone,
     handleTitleChange,
     handleMoveZone,
+    handleBackgroundColorChange,
   } = useZoneManagement({
     groupedStudents,
   });
@@ -64,8 +70,12 @@ export default function WaifuPage() {
                 zones.rankZones.length > 1 ? handleDeleteZone : undefined
               }
               onMoveZone={handleMoveZone}
+              onBackgroundColorChange={handleBackgroundColorChange}
+              backgroundColor={rankZone.backgroundColor}
               canMoveUp={index > 0}
               canMoveDown={index < zones.rankZones.length - 1}
+              openColorPickerId={openColorPickerId}
+              setOpenColorPickerId={setOpenColorPickerId}
             />
           ))}
           <div className="flex justify-center">
@@ -82,9 +92,11 @@ export default function WaifuPage() {
             onStudentUpdate={handleStudentUpdate}
           />
         </div>
-        <div className="text-center text-sm text-gray-600 mt-6">
-          <div>tip: 우클릭으로 학생 의상 변경 가능</div>
-          <div>tip: 제목 더블클릭으로 수정 가능</div>
+        <div className="flex justify-center mt-6">
+          <div className="text-left text-sm text-gray-600">
+            <div>우클릭 : 학생 의상 변경</div>
+            <div>제목 더블클릭: 제목 수정</div>
+          </div>
         </div>
         <div className="flex justify-center gap-4 mt-6">
           <button

@@ -193,6 +193,18 @@ export const useZoneManagement = ({
     [],
   );
 
+  const handleBackgroundColorChange = useCallback(
+    (zoneId: string, newColor: string) => {
+      setZones((prev) => ({
+        ...prev,
+        rankZones: prev.rankZones.map((zone) =>
+          zone.id === zoneId ? { ...zone, backgroundColor: newColor } : zone,
+        ),
+      }));
+    },
+    [],
+  );
+
   return {
     zones,
     setZones,
@@ -201,5 +213,6 @@ export const useZoneManagement = ({
     handleDeleteZone,
     handleTitleChange,
     handleMoveZone,
+    handleBackgroundColorChange,
   };
 };

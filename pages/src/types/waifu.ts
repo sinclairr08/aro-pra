@@ -13,6 +13,7 @@ export interface RankZone {
   id: string;
   title: string;
   students: Student[];
+  backgroundColor?: string;
 }
 
 export interface StudentZones {
@@ -34,6 +35,10 @@ export interface DropStudentZoneProps {
   onTitleChange?: (zoneId: string, newTitle: string) => void;
   onDeleteZone?: (zoneId: string) => void;
   onMoveZone?: (zoneId: string, direction: "up" | "down") => void;
+  onBackgroundColorChange?: (zoneId: string, newColor: string) => void;
+  backgroundColor?: string;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
+  openColorPickerId?: string | null;
+  setOpenColorPickerId?: (id: string | null) => void;
 }

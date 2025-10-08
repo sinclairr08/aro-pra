@@ -12,11 +12,17 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
   onTitleChange,
   onDeleteZone,
   onMoveZone,
+  onBackgroundColorChange,
+  backgroundColor,
   canMoveUp,
   canMoveDown,
+  openColorPickerId,
+  setOpenColorPickerId,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title || "");
+
+  const showColorPicker = openColorPickerId === zoneId;
 
   const sortableStudents = students.map(
     (student) => `${zoneId}-${student.name}`,
@@ -61,13 +67,22 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
     }
   };
 
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onBackgroundColorChange) {
+      onBackgroundColorChange(zoneId, e.target.value);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
       className="bg-white shadow min-h-28 flex items-stretch gap-0"
     >
       {title !== undefined && (
-        <div className="bg-gray-100 w-32 px-3 flex items-center justify-center gap-2 relative flex-shrink-0">
+        <div
+          className="w-32 px-3 flex items-center justify-center gap-2 relative flex-shrink-0"
+          style={{ backgroundColor: backgroundColor || "#fce7f3" }}
+        >
           {onMoveZone && (
             <div className="flex flex-col gap-0.5">
               <button
@@ -107,6 +122,35 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
               >
                 {title}
               </h3>
+              {onBackgroundColorChange && setOpenColorPickerId && (
+                <div className="relative">
+                  <button
+                    onClick={() =>
+                      setOpenColorPickerId(showColorPicker ? null : zoneId)
+                    }
+                    className="text-xs hover:opacity-70"
+                    title="배경색 변경"
+                  >
+                    💧
+                  </button>
+                  {showColorPicker && (
+                    <div className="absolute top-6 left-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
+                      <input
+                        type="color"
+                        value={backgroundColor || "#fce7f3"}
+                        onChange={handleColorChange}
+                        className="w-8 h-8 cursor-pointer"
+                      />
+                      <button
+                        onClick={() => setOpenColorPickerId(null)}
+                        className="mt-1 text-xs text-gray-500 hover:text-gray-700 w-full"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               {onDeleteZone && (
                 <button
                   onClick={handleDelete}
