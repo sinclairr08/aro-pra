@@ -80,7 +80,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
     >
       {title !== undefined && (
         <div
-          className="w-32 px-3 flex items-center justify-center gap-2 relative flex-shrink-0"
+          className="w-28 pl-3 pr-1 flex items-center justify-center gap-1 relative flex-shrink-0 group"
           style={{ backgroundColor: backgroundColor || "#fce7f3" }}
         >
           {onMoveZone && (
@@ -116,50 +116,52 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           ) : (
             <>
               <h3
-                className="font-medium text-sm text-slate-500 whitespace-nowrap cursor-pointer"
+                className="font-bold text-sm text-slate-500 whitespace-nowrap cursor-pointer"
                 onDoubleClick={handleTitleDoubleClick}
                 title="더블클릭하여 수정"
               >
                 {title}
               </h3>
-              {onBackgroundColorChange && setOpenColorPickerId && (
-                <div className="relative">
+              <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                {onBackgroundColorChange && setOpenColorPickerId && (
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setOpenColorPickerId(showColorPicker ? null : zoneId)
+                      }
+                      className="text-xs"
+                      title="배경색 변경"
+                    >
+                      💧
+                    </button>
+                    {showColorPicker && (
+                      <div className="absolute top-6 left-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
+                        <input
+                          type="color"
+                          value={backgroundColor || "#fce7f3"}
+                          onChange={handleColorChange}
+                          className="w-8 h-8 cursor-pointer"
+                        />
+                        <button
+                          onClick={() => setOpenColorPickerId(null)}
+                          className="mt-1 text-xs text-gray-500 hover:text-gray-700 w-full"
+                        >
+                          닫기
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {onDeleteZone && (
                   <button
-                    onClick={() =>
-                      setOpenColorPickerId(showColorPicker ? null : zoneId)
-                    }
-                    className="text-xs hover:opacity-70"
-                    title="배경색 변경"
+                    onClick={handleDelete}
+                    className="text-red-400 hover:text-red-600 text-xs"
+                    title="삭제"
                   >
-                    💧
+                    ✕
                   </button>
-                  {showColorPicker && (
-                    <div className="absolute top-6 left-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
-                      <input
-                        type="color"
-                        value={backgroundColor || "#fce7f3"}
-                        onChange={handleColorChange}
-                        className="w-8 h-8 cursor-pointer"
-                      />
-                      <button
-                        onClick={() => setOpenColorPickerId(null)}
-                        className="mt-1 text-xs text-gray-500 hover:text-gray-700 w-full"
-                      >
-                        닫기
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-              {onDeleteZone && (
-                <button
-                  onClick={handleDelete}
-                  className="text-red-400 hover:text-red-600 text-xs"
-                  title="삭제"
-                >
-                  ✕
-                </button>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>
