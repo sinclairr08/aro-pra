@@ -7,7 +7,7 @@ interface UseZoneManagementProps {
 
 const STORAGE_KEY = "waifu-zones";
 
-const validateAndMigrateZones = (parsedZones: any): StudentZones | null => {
+export const validateAndMigrateZones = (parsedZones: any): StudentZones | null => {
   if (!parsedZones.rankZones || !Array.isArray(parsedZones.rankZones)) {
     return null;
   }
