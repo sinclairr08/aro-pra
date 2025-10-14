@@ -94,7 +94,7 @@ export default function WaifuPage() {
         </div>
         <div className="flex justify-center mt-6">
           <div className="text-left text-sm text-gray-600">
-            <div>우클릭 : 학생 의상 변경</div>
+            <div>학생 우클릭 : 학생 의상 변경</div>
             <div>제목 더블클릭: 제목 수정</div>
           </div>
         </div>
