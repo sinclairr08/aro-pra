@@ -116,7 +116,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           ) : (
             <>
               <h3
-                className="font-bold text-sm text-slate-500 whitespace-nowrap cursor-pointer"
+                className="font-medium text-sm text-slate-500 whitespace-nowrap cursor-pointer"
                 onDoubleClick={handleTitleDoubleClick}
                 title="더블클릭하여 수정"
               >
