@@ -7,7 +7,9 @@ interface UseZoneManagementProps {
 
 const STORAGE_KEY = "waifu-zones";
 
-export const validateAndMigrateZones = (parsedZones: any): StudentZones | null => {
+export const validateAndMigrateZones = (
+  parsedZones: any,
+): StudentZones | null => {
   if (!parsedZones.rankZones || !Array.isArray(parsedZones.rankZones)) {
     return null;
   }
@@ -21,7 +23,7 @@ export const useZoneManagement = ({
     rankZones: [
       {
         id: "rank-1",
-        title: "title-1",
+        title: "구역 1",
         students: [],
       },
     ],
@@ -75,7 +77,7 @@ export const useZoneManagement = ({
           console.warn("Invalid zone structure detected, resetting to default");
           localStorage.removeItem(STORAGE_KEY);
           currentZones = {
-            rankZones: [{ id: "rank-1", title: "title-1", students: [] }],
+            rankZones: [{ id: "rank-1", title: "구역 1", students: [] }],
             holdZone: [],
           };
         } else {
@@ -134,7 +136,7 @@ export const useZoneManagement = ({
       }, 0);
 
       const maxTitleNum = prev.rankZones.reduce((max, zone) => {
-        const match = zone.title.match(/^title-(\d+)$/);
+        const match = zone.title.match(/^구역 (\d+)$/);
         return match ? Math.max(max, parseInt(match[1])) : max;
       }, 0);
 
@@ -144,7 +146,7 @@ export const useZoneManagement = ({
           ...prev.rankZones,
           {
             id: `rank-${maxIdNum + 1}`,
-            title: `title-${maxTitleNum + 1}`,
+            title: `구역 ${maxTitleNum + 1}`,
             students: [],
           },
         ],

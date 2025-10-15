@@ -4,6 +4,8 @@ import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { DraggableStudent } from "@/components/waifu/DraggableStudent";
 import { useState } from "react";
 
+const DEFAULT_BACKGROUND_COLOR = "#fce7f3";
+
 export const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneId,
   title,
@@ -81,7 +83,9 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
       {title !== undefined && (
         <div
           className="w-28 pl-3 pr-1 flex items-center justify-center gap-1 relative flex-shrink-0 group"
-          style={{ backgroundColor: backgroundColor || "#fce7f3" }}
+          style={{
+            backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
+          }}
         >
           {onMoveZone && (
             <div className="flex flex-col gap-0.5">
@@ -138,7 +142,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
                       <div className="absolute top-6 left-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
                         <input
                           type="color"
-                          value={backgroundColor || "#fce7f3"}
+                          value={backgroundColor || DEFAULT_BACKGROUND_COLOR}
                           onChange={handleColorChange}
                           className="w-8 h-8 cursor-pointer"
                         />
