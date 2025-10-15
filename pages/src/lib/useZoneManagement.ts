@@ -128,7 +128,12 @@ export const useZoneManagement = ({
 
   const handleAddZone = useCallback(() => {
     setZones((prev) => {
-      const maxNum = prev.rankZones.reduce((max, zone) => {
+      const maxIdNum = prev.rankZones.reduce((max, zone) => {
+        const match = zone.id.match(/^rank-(\d+)$/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+
+      const maxTitleNum = prev.rankZones.reduce((max, zone) => {
         const match = zone.title.match(/^title-(\d+)$/);
         return match ? Math.max(max, parseInt(match[1])) : max;
       }, 0);
@@ -138,8 +143,8 @@ export const useZoneManagement = ({
         rankZones: [
           ...prev.rankZones,
           {
-            id: `rank-${Date.now()}`,
-            title: `title-${maxNum + 1}`,
+            id: `rank-${maxIdNum + 1}`,
+            title: `title-${maxTitleNum + 1}`,
             students: [],
           },
         ],
