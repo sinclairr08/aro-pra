@@ -82,29 +82,31 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
     >
       {title !== undefined && (
         <div
-          className="w-28 pl-3 pr-1 flex items-center justify-center gap-1 relative flex-shrink-0 group"
+          className="w-28 py-2 flex flex-col justify-center relative flex-shrink-0 group"
           style={{
             backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
           }}
         >
           {onMoveZone && (
-            <div className="flex flex-col gap-0.5">
-              <button
-                onClick={() => onMoveZone(zoneId, "up")}
-                disabled={!canMoveUp}
-                className={`text-xs ${canMoveUp ? "text-gray-600 hover:text-gray-800" : "text-gray-300 cursor-not-allowed"}`}
-                title="위로 이동"
-              >
-                ▲
-              </button>
-              <button
-                onClick={() => onMoveZone(zoneId, "down")}
-                disabled={!canMoveDown}
-                className={`text-xs ${canMoveDown ? "text-gray-600 hover:text-gray-800" : "text-gray-300 cursor-not-allowed"}`}
-                title="아래로 이동"
-              >
-                ▼
-              </button>
+            <div className="flex flex-col gap-0.5 absolute left-2 top-1/2 -translate-y-1/2 opacity-30 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+              {canMoveUp && (
+                <button
+                  onClick={() => onMoveZone(zoneId, "up")}
+                  className="text-xs text-gray-600 hover:text-gray-800 cursor-pointer"
+                  title="위로 이동"
+                >
+                  ▲
+                </button>
+              )}
+              {canMoveDown && (
+                <button
+                  onClick={() => onMoveZone(zoneId, "down")}
+                  className="text-xs text-gray-600 hover:text-gray-800 cursor-pointer"
+                  title="아래로 이동"
+                >
+                  ▼
+                </button>
+              )}
             </div>
           )}
           {isEditing ? (
@@ -114,32 +116,41 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
               onChange={handleTitleInputChange}
               onBlur={handleTitleBlur}
               onKeyDown={handleTitleKeyDown}
-              className="font-medium text-sm px-2 py-1 border border-gray-300 rounded w-20"
+              className="font-medium text-sm px-2 py-1 border border-gray-300 rounded w-16 mx-auto"
               autoFocus
             />
           ) : (
             <>
               <h3
-                className="font-medium text-sm text-slate-500 whitespace-nowrap cursor-pointer"
+                className="font-medium text-sm text-slate-500 text-center px-6 break-words leading-tight cursor-pointer"
                 onDoubleClick={handleTitleDoubleClick}
                 title="더블클릭하여 수정"
               >
                 {title}
               </h3>
-              <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex flex-col gap-1 opacity-30 md:opacity-0 md:group-hover:opacity-100 transition-opacity absolute right-1 top-1/2 -translate-y-1/2">
+                {onTitleChange && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+                    title="이름 수정"
+                  >
+                    ✎
+                  </button>
+                )}
                 {onBackgroundColorChange && setOpenColorPickerId && (
                   <div className="relative">
                     <button
                       onClick={() =>
                         setOpenColorPickerId(showColorPicker ? null : zoneId)
                       }
-                      className="text-xs"
+                      className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
                       title="배경색 변경"
                     >
-                      💧
+                      ◐
                     </button>
                     {showColorPicker && (
-                      <div className="absolute top-6 left-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
+                      <div className="absolute top-6 right-0 z-10 bg-white p-2 shadow-lg rounded border border-gray-300">
                         <input
                           type="color"
                           value={backgroundColor || DEFAULT_BACKGROUND_COLOR}
@@ -159,7 +170,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
                 {onDeleteZone && (
                   <button
                     onClick={handleDelete}
-                    className="text-red-400 hover:text-red-600 text-xs"
+                    className="text-sm text-gray-600 hover:text-red-600 cursor-pointer"
                     title="삭제"
                   >
                     ✕
