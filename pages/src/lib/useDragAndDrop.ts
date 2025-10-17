@@ -71,17 +71,20 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
       let targetZoneId: string;
       let isDropOnZone = false;
 
-      // Check if dropping on a zone container
+      // Check if dropping on a zone container or a student
       const overIdStr = over.id as string;
-      if (overIdStr === "holdZone" || overIdStr.startsWith("rank-")) {
+      const overData = over.data.current;
+
+      if (overData?.zoneId) {
+        // Dropping on a student
+        targetZoneId = overData.zoneId as string;
+        isDropOnZone = false;
+      } else if (overIdStr === "holdZone" || overIdStr.startsWith("rank-")) {
+        // Dropping on a zone container
         targetZoneId = overIdStr;
         isDropOnZone = true;
       } else {
-        const overData = over.data.current;
-        if (!overData) return;
-
-        targetZoneId = overData.zoneId as string;
-        isDropOnZone = false;
+        return;
       }
 
       if (activeZoneId !== targetZoneId) {
