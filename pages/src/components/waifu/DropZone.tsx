@@ -6,6 +6,15 @@ import { useState } from "react";
 
 const DEFAULT_BACKGROUND_COLOR = "#fce7f3";
 
+const isColorDark = (hexColor: string) => {
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 128;
+};
+
 export const DropZone: React.FC<DropStudentZoneProps> = ({
   zoneId,
   title,
@@ -122,7 +131,12 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           ) : (
             <>
               <h3
-                className="font-medium text-sm text-slate-500 text-center px-6 break-words leading-tight cursor-pointer"
+                className="font-medium text-sm text-center px-6 break-words leading-tight cursor-pointer"
+                style={{
+                  color: isColorDark(backgroundColor || DEFAULT_BACKGROUND_COLOR)
+                    ? "#ffffff"
+                    : "#334155",
+                }}
                 onDoubleClick={handleTitleDoubleClick}
                 title="더블클릭하여 수정"
               >
