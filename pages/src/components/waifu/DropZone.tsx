@@ -91,7 +91,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
     >
       {title !== undefined && (
         <div
-          className="w-28 py-2 flex flex-col justify-center relative flex-shrink-0 group"
+          className="w-36 py-2 flex flex-col justify-center relative flex-shrink-0 group"
           style={{
             backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
           }}
@@ -131,7 +131,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           ) : (
             <>
               <h3
-                className="font-medium text-sm text-center px-6 break-words leading-tight cursor-pointer"
+                className="font-medium text-sm text-center px-6 break-keep leading-tight cursor-pointer"
                 style={{
                   color: isColorDark(backgroundColor || DEFAULT_BACKGROUND_COLOR)
                     ? "#ffffff"

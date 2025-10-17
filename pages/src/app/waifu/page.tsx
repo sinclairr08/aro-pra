@@ -57,7 +57,7 @@ export default function WaifuPage() {
     >
       <div className="pt-20 pb-20 px-2">
         <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
-        <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+        <div className="flex flex-col gap-4 max-w-7xl mx-auto">
           {zones.rankZones.map((rankZone, index) => (
             <DropZone
               key={rankZone.id}
