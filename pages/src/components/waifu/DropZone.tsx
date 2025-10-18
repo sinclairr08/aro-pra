@@ -2,7 +2,7 @@ import { DropStudentZoneProps } from "@/types/waifu";
 import { useDroppable } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { DraggableStudent } from "@/components/waifu/DraggableStudent";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const DEFAULT_BACKGROUND_COLOR = "#fce7f3";
 
@@ -32,6 +32,10 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title || "");
+
+  useEffect(() => {
+    setEditedTitle(title || "");
+  }, [title]);
 
   const showColorPicker = openColorPickerId === zoneId;
 
