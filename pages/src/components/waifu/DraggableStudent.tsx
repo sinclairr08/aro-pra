@@ -120,11 +120,11 @@ export const DraggableStudent = ({
         className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"}`}
         onContextMenu={handleRightClick}
       >
-        <div className="text-center">
+        <div className="text-center w-13 h-13 md:w-20 md:h-20">
           <StudentImage
             outfit={displayOutfit}
             size={80}
-            additionalStyle="mx-auto"
+            additionalStyle="w-full h-full object-contain"
           />
         </div>
       </div>

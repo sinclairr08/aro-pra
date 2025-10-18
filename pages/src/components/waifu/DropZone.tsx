@@ -199,7 +199,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
           )}
         </div>
       )}
-      <div className="flex-1 px-2 flex items-center">
+      <div className="flex-1 px-6 md:px-2 py-2 flex items-center">
         <SortableContext
           items={sortableStudents}
           strategy={rectSortingStrategy}
@@ -209,7 +209,7 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
               드래그하세요
             </div>
           ) : (
-            <div className="flex flex-wrap gap-0 justify-start">
+            <div className="flex flex-wrap gap-0.5 justify-start">
               {students.map((item) => (
                 <DraggableStudent
                   key={`${zoneId}-${item.name}`}
