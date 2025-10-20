@@ -35,7 +35,7 @@ const StudentImage = ({
 
 export const DraggableStudent = ({
   student,
-  zone,
+  zoneId,
   onStudentUpdate,
 }: DraggableStudentProps) => {
   const {
@@ -46,8 +46,8 @@ export const DraggableStudent = ({
     transition,
     isDragging,
   } = useSortable({
-    id: `${zone}-${student.name}`,
-    data: { student, zone },
+    id: `${zoneId}-${student.name}`,
+    data: { student, zoneId },
   });
 
   const style = {
@@ -120,11 +120,11 @@ export const DraggableStudent = ({
         className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"}`}
         onContextMenu={handleRightClick}
       >
-        <div className="text-center">
+        <div className="text-center w-13 h-13 md:w-20 md:h-20">
           <StudentImage
             outfit={displayOutfit}
             size={80}
-            additionalStyle="mx-auto"
+            additionalStyle="w-full h-full object-contain"
           />
         </div>
       </div>

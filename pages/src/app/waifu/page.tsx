@@ -10,14 +10,28 @@ import { useDragAndDrop } from "@/lib/useDragAndDrop";
 import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
 import { defaultStudents } from "@/constants/defaultValues";
+import { useState } from "react";
 
 export default function WaifuPage() {
+  const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
+    null,
+  );
+
   const { data: groupedStudents } = useApi<Student[]>({
     apiUrl: "/api/v1/students/grouped/kr",
     defaultValue: defaultStudents,
   });
 
-  const { zones, setZones, handleStudentUpdate } = useZoneManagement({
+  const {
+    zones,
+    setZones,
+    handleStudentUpdate,
+    handleAddZone,
+    handleDeleteZone,
+    handleTitleChange,
+    handleMoveZone,
+    handleBackgroundColorChange,
+  } = useZoneManagement({
     groupedStudents,
   });
 
@@ -43,21 +57,46 @@ export default function WaifuPage() {
     >
       <div className="pt-20 pb-20 px-2">
         <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
-        <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+        <div className="flex flex-col gap-4 max-w-7xl mx-auto">
+          {zones.rankZones.map((rankZone, index) => (
+            <DropZone
+              key={rankZone.id}
+              zoneId={rankZone.id}
+              title={rankZone.title}
+              students={rankZone.students}
+              onStudentUpdate={handleStudentUpdate}
+              onTitleChange={handleTitleChange}
+              onDeleteZone={
+                zones.rankZones.length > 1 ? handleDeleteZone : undefined
+              }
+              onMoveZone={handleMoveZone}
+              onBackgroundColorChange={handleBackgroundColorChange}
+              backgroundColor={rankZone.backgroundColor}
+              canMoveUp={index > 0}
+              canMoveDown={index < zones.rankZones.length - 1}
+              openColorPickerId={openColorPickerId}
+              setOpenColorPickerId={setOpenColorPickerId}
+            />
+          ))}
+          <div className="flex justify-center">
+            <button
+              onClick={handleAddZone}
+              className="px-3 py-1 text-sm bg-cyan-400 text-white rounded hover:bg-cyan-500 transition-colors"
+            >
+              + 구역 추가
+            </button>
+          </div>
           <DropZone
-            zoneName="rankZone"
-            title="랭킹"
-            students={zones.rankZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
-          <DropZone
-            zoneName="holdZone"
+            zoneId="holdZone"
             students={zones.holdZone}
             onStudentUpdate={handleStudentUpdate}
           />
         </div>
-        <div className="text-center text-sm text-gray-600 mt-6">
-          tip: 우클릭으로 학생 일러 변경 가능
+        <div className="flex justify-center mt-6">
+          <div className="text-left text-sm text-gray-600">
+            <div>학생 우클릭: 학생 의상 변경</div>
+            <div>제목 더블 클릭: 제목 수정</div>
+          </div>
         </div>
         <div className="flex justify-center gap-4 mt-6">
           <button
