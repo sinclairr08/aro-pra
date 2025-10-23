@@ -18,7 +18,7 @@ class StudentController(
     fun getGroupedStudents(
         @PathVariable lang: String,
     ): ResponseEntity<List<StudentResponse>> {
-        val language = Language.fromstring(lang) ?: return ResponseEntity.notFound().build()
+        val language = Language.fromString(lang) ?: return ResponseEntity.notFound().build()
         val groupedStudents = studentService.getGroupedByBaseName(language)
         return ResponseEntity.ok(groupedStudents)
     }
