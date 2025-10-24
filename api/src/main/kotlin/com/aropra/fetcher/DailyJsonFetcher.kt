@@ -30,7 +30,7 @@ class DailyJsonFetcher(
                 .bodyToMono(String::class.java)
                 .block()
         val date = LocalDate.now(ZoneId.of("Asia/Seoul"))
-        val path = Paths.get("./data", date.toString(), "$lang.json")
+        val path = Paths.get("./data").resolve(date.toString()).resolve("$lang.json")
 
         path
             .toFile()
