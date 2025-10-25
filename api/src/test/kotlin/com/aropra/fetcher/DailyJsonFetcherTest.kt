@@ -2,7 +2,9 @@ package com.aropra.fetcher
 
 import com.aropra.enum.Language
 import org.springframework.boot.ApplicationRunner
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -17,8 +19,11 @@ class DailyJsonFetcherTest {
         havingValue = "true",
         matchIfMissing = false,
     )
-    fun run(fetcher: DailyJsonFetcher) =
-        ApplicationRunner {
-            fetcher.fetchAndSaveData(Language.KR)
-        }
+    fun run(
+        fetcher: DailyJsonFetcher,
+        context: ApplicationContext,
+    ) = ApplicationRunner {
+        fetcher.fetchAndSaveData(Language.KR)
+        SpringApplication.exit(context, { 0 })
+    }
 }
