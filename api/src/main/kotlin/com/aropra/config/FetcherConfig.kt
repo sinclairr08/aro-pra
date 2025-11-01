@@ -13,6 +13,10 @@ class FetcherConfig {
     fun webClient(): WebClient {
         val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(30))
 
-        return WebClient.builder().clientConnector(ReactorClientHttpConnector(httpClient)).build()
+        return WebClient
+            .builder()
+            .clientConnector(ReactorClientHttpConnector(httpClient))
+            .codecs { configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) }
+            .build()
     }
 }
