@@ -1,5 +1,6 @@
 package com.aropra.fetcher
 
+import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
@@ -18,7 +19,7 @@ class ExternalApiController(
     @GetMapping("/{lang}")
     fun fetchAndSaveAllData(
         @PathVariable lang: String,
-    ): ResponseEntity<Map<String, Any>> {
+    ): ResponseEntity<Map<String, ExternalStudent>> {
         val language = Language.fromString(lang) ?: return ResponseEntity.notFound().build()
         val url = properties.urlTemplate.replace("{{language}}", language.code)
         val response =
@@ -26,7 +27,7 @@ class ExternalApiController(
                 .get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(object : ParameterizedTypeReference<Map<String, Any>>() {})
+                .bodyToMono(object : ParameterizedTypeReference<Map<String, ExternalStudent>>() {})
                 .block() ?: return ResponseEntity.ok(emptyMap())
 
         val topk = response.entries.take(10).associate { it.key to it.value }
