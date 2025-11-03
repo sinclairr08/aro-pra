@@ -2,6 +2,7 @@ package com.aropra.fetcher
 
 import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +18,7 @@ class ExternalApiController(
     private val wc: WebClient,
 ) {
     @GetMapping("/{lang}")
+    @Cacheable("externalApi", key = "#lang") // TODO: move to service
     fun fetchAndSaveAllData(
         @PathVariable lang: String,
     ): ResponseEntity<Map<String, ExternalStudent>> {
