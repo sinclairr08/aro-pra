@@ -9,7 +9,7 @@ cors:
 app:
   cookie:
     secure: ${COOKIE_SECURE:false}
-  fetcher:
+  external:
     url-template: https://schaledb.com/data/{{language}}/students.min.json
 server:
   port: ${SERVER_PORT:8080}

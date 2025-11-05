@@ -8,7 +8,7 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Configuration
-class FetcherConfig {
+class WebClientConfig {
     @Bean
     fun webClient(): WebClient {
         val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(30))

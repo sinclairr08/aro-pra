@@ -1,5 +1,8 @@
-package com.aropra.fetcher
+@file:Suppress("ktlint:standard:no-wildcard-imports")
 
+package com.aropra.controller
+
+import com.aropra.config.ExternalApiProperties
 import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
 import org.springframework.cache.annotation.Cacheable
@@ -12,7 +15,7 @@ import java.net.URI
 @RestController
 @RequestMapping("/api/v1/fetch")
 class ExternalApiController(
-    private val properties: FetcherProperties,
+    private val properties: ExternalApiProperties,
     private val wc: WebClient,
 ) {
     @GetMapping("/{lang}")
