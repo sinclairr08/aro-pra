@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
 import java.net.URI
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 @RestController
 @RequestMapping("/api/v1/fetch")
@@ -52,6 +54,8 @@ class ExternalApiController(
                 .bodyToMono(object : ParameterizedTypeReference<Map<String, ExternalStudent>>() {})
                 .block() ?: return ResponseEntity.notFound().build()
 
+        val values = response.values.toList()
+
         // Logic
         // 1. find corresponding image. base image dir must be given
         // 2. save to db with image path
@@ -59,5 +63,17 @@ class ExternalApiController(
         // TODO: Fix location, use normal student api, not grouped
         val location = URI.create("/api/v1/students/grouped/$language")
         return ResponseEntity.created(location).build()
+    }
+
+    fun isPathExists(value: ExternalStudent): Boolean {
+        val baseDir = Path.of(properties.dataPath)
+        val path = baseDir.resolve(Path.of("Student_Portrait_${value.devName}.png"))
+
+        if (path.exists()) {
+            return true
+        }
+
+        val path2 = baseDir.resolve(Path.of("Student_Portrait_${value.name}.png"))
+        return path2.exists()
     }
 }
