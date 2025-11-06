@@ -3,6 +3,7 @@
 package com.aropra.controller
 
 import com.aropra.config.ExternalApiProperties
+import com.aropra.converter.toNewStudent
 import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
 import org.springframework.cache.annotation.Cacheable
@@ -55,6 +56,11 @@ class ExternalApiController(
                 .block() ?: return ResponseEntity.notFound().build()
 
         val values = response.values.toList()
+        val newStudents =
+            values.mapNotNull { value ->
+                val path = getPath(value)
+                if (path != null) value.toNewStudent(path) else null
+            }
 
         // Logic
         // 1. find corresponding image. base image dir must be given
@@ -65,15 +71,11 @@ class ExternalApiController(
         return ResponseEntity.created(location).build()
     }
 
-    fun isPathExists(value: ExternalStudent): Boolean {
+    fun getPath(externalStudent: ExternalStudent): Path? {
         val baseDir = Path.of(properties.dataPath)
-        val path = baseDir.resolve(Path.of("Student_Portrait_${value.devName}.png"))
+        val path = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.devName}.png"))
+        val backupPath = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.name}.png"))
 
-        if (path.exists()) {
-            return true
-        }
-
-        val path2 = baseDir.resolve(Path.of("Student_Portrait_${value.name}.png"))
-        return path2.exists()
+        return path.takeIf { it.exists() } ?: backupPath.takeIf { it.exists() }
     }
 }
