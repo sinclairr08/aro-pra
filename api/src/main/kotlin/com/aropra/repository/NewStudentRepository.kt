@@ -1,10 +1,8 @@
 package com.aropra.repository
 
-import com.aropra.domain.Version
+import com.aropra.domain.NewStudent
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface VersionRepository : MongoRepository<Version, String> {
-    fun findAllByOrderByUpdatedDateDesc(): List<Version>
-}
+interface NewStudentRepository : MongoRepository<NewStudent, String>

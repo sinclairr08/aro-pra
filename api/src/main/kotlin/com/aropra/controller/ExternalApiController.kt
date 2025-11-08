@@ -6,6 +6,7 @@ import com.aropra.config.ExternalApiProperties
 import com.aropra.converter.toNewStudent
 import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
+import com.aropra.service.NewStudentService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,7 @@ import kotlin.io.path.exists
 class ExternalApiController(
     private val properties: ExternalApiProperties,
     private val wc: WebClient,
+    private val newStudentService: NewStudentService,
 ) {
     @GetMapping("/{lang}")
     @Cacheable("externalApi", key = "#lang") // TODO: move to service
@@ -57,14 +59,13 @@ class ExternalApiController(
 
         val values = response.values.toList()
         val newStudents =
-            values.mapNotNull { value ->
-                val path = getPath(value)
-                if (path != null) value.toNewStudent(path) else null
-            }
+            values
+                .mapNotNull { value ->
+                    val path = getPath(value)
+                    if (path != null) value.toNewStudent(path) else null
+                }
 
-        // Logic
-        // 1. find corresponding image. base image dir must be given
-        // 2. save to db with image path
+        val saved = newStudentService.createNewStudents(newStudents)
 
         // TODO: Fix location, use normal student api, not grouped
         val location = URI.create("/api/v1/students/grouped/$language")
