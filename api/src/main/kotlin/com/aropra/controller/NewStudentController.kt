@@ -2,9 +2,7 @@
 
 package com.aropra.controller
 
-import com.aropra.config.ExternalApiProperties
 import com.aropra.converter.toNewStudent
-import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
 import com.aropra.service.NewStudentService
 import org.springframework.http.HttpStatus
@@ -14,13 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
-import java.nio.file.Path
-import kotlin.io.path.exists
 
 @RestController
 @RequestMapping("/api/v1/new-student") // TODO: rename this
 class NewStudentController(
-    private val properties: ExternalApiProperties,
     private val newStudentService: NewStudentService,
 ) {
     @PostMapping("/{lang}")
@@ -37,7 +32,7 @@ class NewStudentController(
         val newStudents =
             values
                 .mapNotNull { value ->
-                    val path = getPath(value)
+                    val path = newStudentService.getStudentPath(value)
                     if (path != null) value.toNewStudent(path) else null
                 }
 
@@ -45,13 +40,5 @@ class NewStudentController(
         val saved = newStudentService.createNewStudents(newStudents)
         val location = URI.create("/api/v1/new-students/$lang")
         return ResponseEntity.created(location).build()
-    }
-
-    fun getPath(externalStudent: ExternalStudent): Path? {
-        val baseDir = Path.of(properties.dataPath)
-        val path = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.devName}.png"))
-        val backupPath = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.name}.png"))
-
-        return path.takeIf { it.exists() } ?: backupPath.takeIf { it.exists() }
     }
 }
