@@ -2,9 +2,8 @@ package com.aropra.converter
 
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
-import java.nio.file.Path
 
-fun ExternalStudent.toNewStudent(path: Path): NewStudent =
+fun ExternalStudent.toNewStudent(imgCode: String): NewStudent =
     NewStudent(
         id = this.id,
         pathName = this.pathName,
@@ -24,5 +23,5 @@ fun ExternalStudent.toNewStudent(path: Path): NewStudent =
         schoolYear = this.schoolYear,
         characterAge = this.characterAge,
         birthDay = this.birthDay,
-        path = path.toString(),
+        imgCode = imgCode,
     )

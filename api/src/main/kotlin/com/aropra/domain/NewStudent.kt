@@ -24,5 +24,5 @@ data class NewStudent(
     val schoolYear: String,
     val characterAge: String,
     val birthDay: String,
-    val path: String,
+    val imgCode: String,
 )

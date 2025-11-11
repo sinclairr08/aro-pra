@@ -1,21 +1,22 @@
 package com.aropra.service
 
 import com.aropra.config.NewStudentProperties
+import com.aropra.converter.toNewStudent
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
 import com.aropra.enum.Language
 import com.aropra.repository.NewStudentRepository
+import com.aropra.repository.StudentImgCodeRepository
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
-import java.nio.file.Path
-import kotlin.io.path.exists
 
 @Service
 class NewStudentService(
     private val newStudentRepository: NewStudentRepository,
+    private val studentImgCodeRepository: StudentImgCodeRepository,
     private val wc: WebClient,
     private val properties: NewStudentProperties,
 ) {
@@ -39,12 +40,19 @@ class NewStudentService(
         return response
     }
 
-    // TODO: Use mongodb, not path
-    fun getStudentPath(externalStudent: ExternalStudent): Path? {
-        val baseDir = Path.of(properties.dataPath)
-        val path = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.devName}.png"))
-        val backupPath = baseDir.resolve(Path.of("Student_Portrait_${externalStudent.name}.png"))
+    fun mapStudentCode(externalStudent: ExternalStudent): NewStudent? {
+        val devImgCode = studentImgCodeRepository.findByCode(externalStudent.devName)
 
-        return path.takeIf { it.exists() } ?: backupPath.takeIf { it.exists() }
+        if (devImgCode != null) {
+            return externalStudent.toNewStudent(devImgCode.code)
+        }
+
+        val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.name)
+
+        if (nameImgCode != null) {
+            return externalStudent.toNewStudent(nameImgCode.code)
+        }
+
+        return null
     }
 }

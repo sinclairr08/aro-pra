@@ -2,7 +2,6 @@
 
 package com.aropra.controller
 
-import com.aropra.converter.toNewStudent
 import com.aropra.enum.Language
 import com.aropra.service.NewStudentService
 import org.springframework.http.HttpStatus
@@ -32,8 +31,7 @@ class NewStudentController(
         val newStudents =
             values
                 .mapNotNull { value ->
-                    val path = newStudentService.getStudentPath(value)
-                    if (path != null) value.toNewStudent(path) else null
+                    newStudentService.mapStudentCode(value)
                 }
 
         // TODO: ADD LOGGING
