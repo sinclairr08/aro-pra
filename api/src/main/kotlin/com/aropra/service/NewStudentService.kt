@@ -40,6 +40,12 @@ class NewStudentService(
         return response
     }
 
+    private val special: Map<String, String> =
+        mapOf(
+            "CH0134" to "reizyo",
+            "CH0065" to "shiroko_ridingsuit",
+        )
+
     fun mapStudentCode(externalStudent: ExternalStudent): NewStudent? {
         val devImgCode = studentImgCodeRepository.findByCode(externalStudent.devName)
 
@@ -51,6 +57,15 @@ class NewStudentService(
 
         if (nameImgCode != null) {
             return externalStudent.toNewStudent(nameImgCode.code)
+        }
+
+        val specialName = special[externalStudent.devName]
+
+        if (specialName != null) {
+            val specialImgCode = studentImgCodeRepository.findByCode(specialName)
+            if (specialImgCode != null) {
+                return externalStudent.toNewStudent(specialImgCode.code)
+            }
         }
 
         return null

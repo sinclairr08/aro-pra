@@ -18,7 +18,7 @@ class NewStudentController(
     private val newStudentService: NewStudentService,
 ) {
     @PostMapping("/{lang}")
-    fun fetchAndSaveAllData(
+    fun fetchAndSaveAllStudents(
         @PathVariable lang: String,
     ): ResponseEntity<Any> {
         val language = Language.fromString(lang) ?: return ResponseEntity.notFound().build()
