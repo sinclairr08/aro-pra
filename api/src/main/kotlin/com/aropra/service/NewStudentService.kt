@@ -14,14 +14,14 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
 
 @Service
-class NewStudentService(
+open class NewStudentService(
     private val newStudentRepository: NewStudentRepository,
     private val studentImgCodeRepository: StudentImgCodeRepository,
     private val wc: WebClient,
     private val properties: NewStudentProperties,
 ) {
     @Transactional
-    fun createNewStudents(newStudents: List<NewStudent>): List<NewStudent> {
+    open fun createNewStudents(newStudents: List<NewStudent>): List<NewStudent> {
         if (newStudents.isEmpty()) return newStudents
         return newStudentRepository.saveAll(newStudents).toList()
     }
@@ -29,7 +29,7 @@ class NewStudentService(
     fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findAll()
 
     @Cacheable("externalApi", key = "#language")
-    fun getStudentFromExternalSource(language: Language): Map<String, ExternalStudent>? {
+    open fun getStudentFromExternalSource(language: Language): Map<String, ExternalStudent>? {
         val url = properties.urlTemplate.replace("{{language}}", language.code)
         val response =
             wc
