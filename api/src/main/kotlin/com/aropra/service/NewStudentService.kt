@@ -26,6 +26,8 @@ class NewStudentService(
         return newStudentRepository.saveAll(newStudents).toList()
     }
 
+    fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findAll()
+
     @Cacheable("externalApi", key = "#language")
     fun getStudentFromExternalSource(language: Language): Map<String, ExternalStudent>? {
         val url = properties.urlTemplate.replace("{{language}}", language.code)

@@ -6,14 +6,11 @@ import com.aropra.enum.Language
 import com.aropra.service.NewStudentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 @RestController
-@RequestMapping("/api/v1/new-student") // TODO: rename this
+@RequestMapping("/api/v1/new-students") // TODO: rename this
 class NewStudentController(
     private val newStudentService: NewStudentService,
 ) {
@@ -38,5 +35,14 @@ class NewStudentController(
         val saved = newStudentService.createNewStudents(newStudents)
         val location = URI.create("/api/v1/new-students/$lang")
         return ResponseEntity.created(location).build()
+    }
+
+    @GetMapping("/{lang}")
+    fun fetchAllStudents(
+        @PathVariable lang: String,
+    ): ResponseEntity<Any> {
+        val language = Language.fromString(lang) ?: return ResponseEntity.notFound().build()
+        val newStudents = newStudentService.getAllStudents(language)
+        return ResponseEntity.ok(newStudents)
     }
 }
