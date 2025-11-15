@@ -1,5 +1,6 @@
 package com.aropra.domain
 
+import com.aropra.enum.Language
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -25,4 +26,5 @@ data class NewStudent(
     val characterAge: String,
     val birthDay: String,
     val imgCode: String,
+    val language: Language,
 )

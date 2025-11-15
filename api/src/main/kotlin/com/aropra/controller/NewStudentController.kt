@@ -2,6 +2,7 @@
 
 package com.aropra.controller
 
+import com.aropra.converter.toNewStudent
 import com.aropra.enum.Language
 import com.aropra.service.NewStudentService
 import org.springframework.http.HttpStatus
@@ -28,11 +29,16 @@ class NewStudentController(
         val newStudents =
             values
                 .mapNotNull { value ->
-                    newStudentService.mapStudentCode(value)
+                    val imgCode = newStudentService.getStudentImgCode(value)
+                    if (imgCode == null) {
+                        null
+                    } else {
+                        value.toNewStudent(imgCode = imgCode, language = language)
+                    }
                 }
 
         // TODO: ADD LOGGING
-        val saved = newStudentService.createNewStudents(newStudents)
+        newStudentService.createNewStudents(newStudents, language)
         val location = URI.create("/api/v1/new-students/$lang")
         return ResponseEntity.created(location).build()
     }

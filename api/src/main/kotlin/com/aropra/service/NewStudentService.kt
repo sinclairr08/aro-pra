@@ -1,7 +1,6 @@
 package com.aropra.service
 
 import com.aropra.config.NewStudentProperties
-import com.aropra.converter.toNewStudent
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
 import com.aropra.enum.Language
@@ -21,12 +20,15 @@ open class NewStudentService(
     private val properties: NewStudentProperties,
 ) {
     @Transactional
-    open fun createNewStudents(newStudents: List<NewStudent>): List<NewStudent> {
+    open fun createNewStudents(
+        newStudents: List<NewStudent>,
+        language: Language,
+    ): List<NewStudent> {
         if (newStudents.isEmpty()) return newStudents
         return newStudentRepository.saveAll(newStudents).toList()
     }
 
-    fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findAll()
+    fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findByLanguage(language)
 
     @Cacheable("externalApi", key = "#language")
     open fun getStudentFromExternalSource(language: Language): Map<String, ExternalStudent>? {
@@ -48,17 +50,17 @@ open class NewStudentService(
             "CH0065" to "shiroko_ridingsuit",
         )
 
-    fun mapStudentCode(externalStudent: ExternalStudent): NewStudent? {
+    fun getStudentImgCode(externalStudent: ExternalStudent): String? {
         val devImgCode = studentImgCodeRepository.findByCode(externalStudent.devName)
 
         if (devImgCode != null) {
-            return externalStudent.toNewStudent(devImgCode.code)
+            return devImgCode.code
         }
 
         val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.name)
 
         if (nameImgCode != null) {
-            return externalStudent.toNewStudent(nameImgCode.code)
+            return nameImgCode.code
         }
 
         val specialName = special[externalStudent.devName]
@@ -66,7 +68,7 @@ open class NewStudentService(
         if (specialName != null) {
             val specialImgCode = studentImgCodeRepository.findByCode(specialName)
             if (specialImgCode != null) {
-                return externalStudent.toNewStudent(specialImgCode.code)
+                return specialImgCode.code
             }
         }
 

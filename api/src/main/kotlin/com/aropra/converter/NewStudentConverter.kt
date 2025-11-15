@@ -2,8 +2,12 @@ package com.aropra.converter
 
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
+import com.aropra.enum.Language
 
-fun ExternalStudent.toNewStudent(imgCode: String): NewStudent =
+fun ExternalStudent.toNewStudent(
+    imgCode: String,
+    language: Language,
+): NewStudent =
     NewStudent(
         id = this.id,
         pathName = this.pathName,
@@ -24,4 +28,5 @@ fun ExternalStudent.toNewStudent(imgCode: String): NewStudent =
         characterAge = this.characterAge,
         birthDay = this.birthDay,
         imgCode = imgCode,
+        language = language,
     )
