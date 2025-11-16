@@ -9,7 +9,7 @@ fun ExternalStudent.toNewStudent(
     language: Language,
 ): NewStudent =
     NewStudent(
-        id = this.id,
+        id = "${this.id}_${language.code}",
         pathName = this.pathName,
         devName = this.devName,
         name = this.name,
