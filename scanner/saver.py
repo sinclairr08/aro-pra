@@ -31,8 +31,10 @@ class Saver:
         code = self.get_code(name)
         result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True)
 
-        if result.modified_count > 0:
+        if result.upserted_id is not None:
             print(f"{code} is inserted to db")
+        elif result.modified_count > 0:
+            print(f"{code} is updated to db")
 
         src = file
         dst = self.dst_dir / f"{code}.png"
