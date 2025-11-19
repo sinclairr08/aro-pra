@@ -23,12 +23,21 @@ class Saver:
             self.save_file(file)
 
     @staticmethod
-    def get_code(name):
-        return name.split("Portrait_")[1].split(".png")[0]
+    def get_code(name: str) -> str | None:
+        pattern = re.compile(r'Portrait_(.+?)\.png')
+        m = pattern.search(name)
+        if m:
+            return m.group(1)
+        return None
 
     def save_file(self, file: Path):
         name = file.name
         code = self.get_code(name)
+
+        if code is None:
+            print(f"{name} is invalid to extract code")
+            return
+
         result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True)
 
         if result.upserted_id is not None:
