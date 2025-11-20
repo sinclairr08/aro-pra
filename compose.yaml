@@ -23,5 +23,3 @@ services:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
       - COOKIE_SECURE=${COOKIE_SECURE:-false}
       - SERVER_PORT=${API_PORT:-8080}
-    volumes:
-      - ./data:/app/data
