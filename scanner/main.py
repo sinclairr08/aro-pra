@@ -38,7 +38,7 @@ def main():
     ]
 
     db = MongoClient(CONFIG.mongodb_uri).get_default_database()
-    collections = ["urls", "students"]
+    collections = ["url", "img_codes"]
 
     for collection in collections:
         if collection not in db.list_collection_names():
@@ -59,11 +59,11 @@ def main():
     extractor = Extractor(src_dir=bundle_path, dst_dir=extracted_path, target_dirs=target_dirs)
     extractor.extract()
 
-    student_collection = db["students"]
+    codes = db["img_codes"]
     saver = Saver(
         src_dir=extracted_path,
         dst_dir=public_img_path,
-        collection=student_collection
+        collection=codes
     )
     saver.save()
 

@@ -1,12 +1,14 @@
 package com.aropra.enum
 
-enum class Language {
-    KR,
-    JP,
-    EN,
+enum class Language(
+    val code: String,
+) {
+    KR("kr"),
+    JP("jp"),
+    EN("en"),
     ;
 
     companion object {
-        fun fromstring(value: String): Language? = entries.find { it.name.equals(value, ignoreCase = true) }
+        fun fromString(value: String): Language? = entries.find { it.code.equals(value, ignoreCase = true) }
     }
 }

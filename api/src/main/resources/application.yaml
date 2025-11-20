@@ -9,5 +9,8 @@ cors:
 app:
   cookie:
     secure: ${COOKIE_SECURE:false}
+  external:
+    url-template: https://schaledb.com/data/{{language}}/students.min.json
+    data-path: "./local/extracted"
 server:
   port: ${SERVER_PORT:8080}
