@@ -1,3 +1,4 @@
+import re
 import shutil
 from pathlib import Path
 
@@ -7,7 +8,9 @@ import pymongo.collection
 class Saver:
     INVALID_NAMES = ["operator", "npc"]
 
-    def __init__(self, src_dir: Path, dst_dir: Path, collection: pymongo.collection.Collection):
+    def __init__(
+        self, src_dir: Path, dst_dir: Path, collection: pymongo.collection.Collection
+    ):
         self.src_dir = src_dir
         self.dst_dir = dst_dir
         self.collection = collection
@@ -24,7 +27,7 @@ class Saver:
 
     @staticmethod
     def get_code(name: str) -> str | None:
-        pattern = re.compile(r'Portrait_(.+?)\.png')
+        pattern = re.compile(r"Portrait_(.+?)\.png")
         m = pattern.search(name)
         if m:
             return m.group(1)
@@ -38,7 +41,9 @@ class Saver:
             print(f"{name} is invalid to extract code")
             return
 
-        result = self.collection.update_one(filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True)
+        result = self.collection.update_one(
+            filter={"code": code}, update={"$setOnInsert": {"code": code}}, upsert=True
+        )
 
         if result.upserted_id is not None:
             print(f"{code} is inserted to db")
