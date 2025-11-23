@@ -7,6 +7,7 @@ Based on following projects
   - https://github.com/Sunset-Edu-Tech-Group/BA-AD
   - https://github.com/K0lb3s-Datamines/Blue-Archive---Asset-Downloader
 """
+
 import logging
 import os
 import zipfile
@@ -47,7 +48,13 @@ class BaseDownloader(ABC):
 
 
 class BundleDownloader(BaseDownloader):
-    def __init__(self, url: str, dst_dir: Path, target_bundle_names: list[str], use_update: bool = True):
+    def __init__(
+        self,
+        url: str,
+        dst_dir: Path,
+        target_bundle_names: list[str],
+        use_update: bool = True,
+    ):
         super().__init__(url=url, dst_dir=dst_dir)
         self.use_update = use_update
         self.target_bundle_names = target_bundle_names
@@ -105,6 +112,7 @@ class BundleDownloader(BaseDownloader):
                 os.remove(bundle_path)
 
             self.logger.info(f"{bundle_name} found")
+
 
 # FIXME
 # class MediaDownloader(BaseDownloader):

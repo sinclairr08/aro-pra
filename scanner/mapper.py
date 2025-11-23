@@ -20,18 +20,24 @@ class Mapper:
         students = requests.get(url, timeout=30).json()
 
         df = pd.DataFrame(
-            data=[[student.get("Name"), student.get("Id"), student.get("DevName"), student.get("PathName"),
-                   student.get("PersonalName")] for student
-                  in students.values()],
-            columns=[f"{lang}_name", "id", "code", "sub_code", f"{lang}_base_name"]
+            data=[
+                [
+                    student.get("Name"),
+                    student.get("Id"),
+                    student.get("DevName"),
+                    student.get("PathName"),
+                    student.get("PersonalName"),
+                ]
+                for student in students.values()
+            ],
+            columns=[f"{lang}_name", "id", "code", "sub_code", f"{lang}_base_name"],
         )
 
         col = f"{lang}_name"
         mask = (
-                (df[col].str.contains(' ', na=False, regex=False) |
-                 df[col].str.contains('*', na=False, regex=False)) &
-                ~df[col].str.contains(' (', na=False, regex=False)
-        )
+            df[col].str.contains(" ", na=False, regex=False)
+            | df[col].str.contains("*", na=False, regex=False)
+        ) & ~df[col].str.contains(" (", na=False, regex=False)
         df.loc[mask, f"{lang}_base_name"] = df.loc[mask, f"{lang}_name"]
 
         return df
@@ -43,8 +49,10 @@ class Mapper:
             dfs.append(self.make_lang_table(lang))
 
         df = reduce(
-            lambda left, right: pd.merge(left, right, on=["id", "code", "sub_code"], how="inner"),
-            dfs
+            lambda left, right: pd.merge(
+                left, right, on=["id", "code", "sub_code"], how="inner"
+            ),
+            dfs,
         )
         df.to_csv(self.BASE_LOCATION, index=False)
 
@@ -56,7 +64,9 @@ class Mapper:
 
         sub_code = old_code.lower()
         if self.name_table["sub_code"].isin([sub_code]).any():
-            return self.name_table.loc[self.name_table["sub_code"] == sub_code, "code"].iloc[0]
+            return self.name_table.loc[
+                self.name_table["sub_code"] == sub_code, "code"
+            ].iloc[0]
 
         return self.SPECIAL_MAPPING.get(sub_code, None)
 

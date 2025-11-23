@@ -10,8 +10,28 @@ from requests_cache import CachedSession
 
 from apk_extractor import Apk
 
-MAGIC_PATTERN = [0x47, 0x61, 0x6D, 0x65, 0x4D, 0x61, 0x69, 0x6E, 0x43, 0x6F, 0x6E, 0x66, 0x69, 0x67, 0x00, 0x00, 0x92,
-                 0x03, 0x00, 0x00]
+MAGIC_PATTERN = [
+    0x47,
+    0x61,
+    0x6D,
+    0x65,
+    0x4D,
+    0x61,
+    0x69,
+    0x6E,
+    0x43,
+    0x6F,
+    0x6E,
+    0x66,
+    0x69,
+    0x67,
+    0x00,
+    0x00,
+    0x92,
+    0x03,
+    0x00,
+    0x00,
+]
 
 
 def get_today():
@@ -45,9 +65,10 @@ class UrlFetcher:
         if self.server_url is None:
             raise ValueError("server url does not exist")
 
-        server_data = fetch_data(url=self.server_url, cache_name='serverapi')
-        self.catalog_url = server_data['ConnectionGroups'][0]['OverrideConnectionGroups'][-1][
-            'AddressablesCatalogUrlRoot']
+        server_data = fetch_data(url=self.server_url, cache_name="serverapi")
+        self.catalog_url = server_data["ConnectionGroups"][0][
+            "OverrideConnectionGroups"
+        ][-1]["AddressablesCatalogUrlRoot"]
 
         if self.catalog_url is None:
             raise ValueError("catalog url does not exist")
@@ -61,7 +82,7 @@ class UrlFetcher:
             self.collection.update_one(
                 {"kind": url_data["kind"], "date": url_data["date"]},
                 {"$set": url_data},
-                upsert=True
+                upsert=True,
             )
 
     def download_and_extract_apk(self):
@@ -77,28 +98,28 @@ class UrlFetcher:
 
     def find_game_config(self) -> None | bytes:
         pattern = bytes(MAGIC_PATTERN)
-        game_path = self.cache_dir / 'data' / 'assets' / 'bin' / 'Data'
+        game_path = self.cache_dir / "data" / "assets" / "bin" / "Data"
 
-        for config_file in game_path.rglob('*'):
+        for config_file in game_path.rglob("*"):
             if config_file.is_file():
                 content = config_file.read_bytes()
 
                 if pattern in content:
                     start_index = content.index(pattern)
-                    data = content[start_index + len(pattern):]
+                    data = content[start_index + len(pattern) :]
                     return data[:-2]
         return None
 
     def decrypt_game_config(self, data) -> str:
         encoded_data = b64encode(data).decode()
 
-        game_config = create_key(b'GameMainConfig')
-        server_data = create_key(b'ServerInfoDataUrl')
+        game_config = create_key(b"GameMainConfig")
+        server_data = create_key(b"ServerInfoDataUrl")
 
         decrypted_data = convert_string(encoded_data, game_config)
         loaded_data = json.loads(decrypted_data)
 
-        decrypted_key = new_encrypt_string('ServerInfoDataUrl', server_data)
+        decrypted_key = new_encrypt_string("ServerInfoDataUrl", server_data)
         decrypted_value = loaded_data[decrypted_key]
         return convert_string(decrypted_value, server_data)
 
