@@ -37,6 +37,7 @@ class NewStudentController(
                     }
                 }
 
+        // TODO: Check that the number of newStudents and externalStudents are same
         // TODO: ADD LOGGING
         newStudentService.createNewStudents(newStudents, language)
         val location = URI.create("/api/v1/new-students/$lang")

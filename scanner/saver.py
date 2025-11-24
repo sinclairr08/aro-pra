@@ -30,7 +30,7 @@ class Saver:
         pattern = re.compile(r"Portrait_(.+?)\.png")
         m = pattern.search(name)
         if m:
-            return m.group(1)
+            return m.group(1).lower()
         return None
 
     def save_file(self, file: Path):
