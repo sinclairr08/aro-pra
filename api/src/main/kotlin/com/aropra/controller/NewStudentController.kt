@@ -3,6 +3,7 @@
 package com.aropra.controller
 
 import com.aropra.converter.toNewStudent
+import com.aropra.domain.ExternalStudent
 import com.aropra.enum.Language
 import com.aropra.service.NewStudentService
 import org.springframework.http.HttpStatus
@@ -25,19 +26,25 @@ class NewStudentController(
                 .status(
                     HttpStatus.BAD_GATEWAY,
                 ).build()
-        val values = response.values.toList()
+        val externalStudents = response.values.toList()
+        val skippedStudents = mutableListOf<ExternalStudent>()
         val newStudents =
-            values
+            externalStudents
                 .mapNotNull { value ->
                     val imgCode = newStudentService.getStudentImgCode(value)
                     if (imgCode == null) {
+                        skippedStudents += value
                         null
                     } else {
                         value.toNewStudent(imgCode = imgCode, language = language)
                     }
                 }
 
-        // TODO: Check that the number of newStudents and externalStudents are same
+        if (skippedStudents.isNotEmpty()) {
+            val errBody =
+                mapOf("students" to skippedStudents.map { it -> mapOf("devName" to it.devName, "name" to it.name) })
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errBody)
+        }
         // TODO: ADD LOGGING
         newStudentService.createNewStudents(newStudents, language)
         val location = URI.create("/api/v1/new-students/$lang")
