@@ -42,7 +42,15 @@ class NewStudentController(
 
         if (skippedStudents.isNotEmpty()) {
             val errBody =
-                mapOf("students" to skippedStudents.map { it -> mapOf("devName" to it.devName, "name" to it.name) })
+                mapOf(
+                    "students" to
+                        skippedStudents.map { it ->
+                            mapOf(
+                                "devName" to it.devName,
+                                "pathName" to it.pathName,
+                            )
+                        },
+                )
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errBody)
         }
         // TODO: ADD LOGGING

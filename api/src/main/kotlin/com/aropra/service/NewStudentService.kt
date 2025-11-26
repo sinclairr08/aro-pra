@@ -57,7 +57,7 @@ open class NewStudentService(
             return devImgCode.code
         }
 
-        val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.name.lowercase())
+        val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.pathName.lowercase())
 
         if (nameImgCode != null) {
             return nameImgCode.code
