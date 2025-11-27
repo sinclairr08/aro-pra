@@ -26,7 +26,7 @@ class NewStudentController(
                 .status(
                     HttpStatus.BAD_GATEWAY,
                 ).build()
-        val externalStudents = response.values.toList()
+        val externalStudents = response.values.filterNot { it -> it.devName.contains("_") }.toList()
         val skippedStudents = mutableListOf<ExternalStudent>()
         val newStudents =
             externalStudents
