@@ -44,10 +44,12 @@ def main():
         if collection not in db.list_collection_names():
             db.create_collection(collection)
 
+    print("#1: get url")
     url_collection = db["urls"]
     url_fetcher = UrlFetcher(cache_dir=apk_path, collection=url_collection)
-
     patch_url = url_fetcher.patch_url
+
+    print("#2: download bundle")
     bundle_downloader = BundleDownloader(
         url=patch_url,
         dst_dir=bundle_path,
@@ -56,11 +58,13 @@ def main():
     )
     bundle_downloader.download()
 
+    print("#3: extract")
     extractor = Extractor(
         src_dir=bundle_path, dst_dir=extracted_path, target_dirs=target_dirs
     )
     extractor.extract()
 
+    print("#4: save")
     codes = db["img_codes"]
     saver = Saver(src_dir=extracted_path, dst_dir=public_img_path, collection=codes)
     saver.save()
