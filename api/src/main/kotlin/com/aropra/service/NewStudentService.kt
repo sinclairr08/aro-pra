@@ -51,13 +51,13 @@ open class NewStudentService(
         )
 
     fun getStudentImgCode(externalStudent: ExternalStudent): String? {
-        val devImgCode = studentImgCodeRepository.findByCode(externalStudent.devName)
+        val devImgCode = studentImgCodeRepository.findByCode(externalStudent.devName.lowercase())
 
         if (devImgCode != null) {
             return devImgCode.code
         }
 
-        val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.name)
+        val nameImgCode = studentImgCodeRepository.findByCode(externalStudent.pathName.lowercase())
 
         if (nameImgCode != null) {
             return nameImgCode.code
@@ -66,7 +66,7 @@ open class NewStudentService(
         val specialName = special[externalStudent.devName]
 
         if (specialName != null) {
-            val specialImgCode = studentImgCodeRepository.findByCode(specialName)
+            val specialImgCode = studentImgCodeRepository.findByCode(specialName.lowercase())
             if (specialImgCode != null) {
                 return specialImgCode.code
             }

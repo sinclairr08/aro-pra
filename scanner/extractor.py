@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from typing import Optional
 
@@ -22,7 +21,6 @@ class Extractor:
         self.src_dir = src_dir
         self.dst_dir = dst_dir
         self.target_dirs = [Path(target_dir) for target_dir in target_dirs]
-        self.logger = logging.getLogger(__name__)
 
         self.dst_dir.mkdir(parents=True, exist_ok=True)
 
@@ -37,7 +35,7 @@ class Extractor:
         try:
             env = UnityPy.load(str(file_path))
         except Exception as e:
-            self.logger.warning(f"Failed to load {file_path}, {e=}")
+            print(f"Failed to load {file_path}, {e=}")
             return
 
         for obj in env.objects:
@@ -77,4 +75,4 @@ class Extractor:
         data = obj.read()
         data.image.save(dst_file)
 
-        self.logger.info(f"{str(dst_file)} extracted")
+        print(f"{str(dst_file)} extracted")
