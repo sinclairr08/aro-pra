@@ -69,4 +69,13 @@ class NewStudentController(
         val newStudents = newStudentService.getAllStudents(language)
         return ResponseEntity.ok(newStudents)
     }
+
+    @GetMapping("/grouped/{lang}")
+    fun getGroupedByBaseName(
+        @PathVariable lang: String,
+    ): ResponseEntity<Any> {
+        val language = Language.fromString(lang) ?: return ResponseEntity.notFound().build()
+        val newStudents = newStudentService.getGroupedByBaseName(language)
+        return ResponseEntity.ok(newStudents)
+    }
 }

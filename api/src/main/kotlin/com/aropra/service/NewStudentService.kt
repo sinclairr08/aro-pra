@@ -1,8 +1,10 @@
 package com.aropra.service
 
 import com.aropra.config.NewStudentProperties
+import com.aropra.converter.toStudentOutfit
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
+import com.aropra.dto.NewStudentResponse
 import com.aropra.enum.Language
 import com.aropra.repository.NewStudentRepository
 import com.aropra.repository.StudentImgCodeRepository
@@ -74,4 +76,16 @@ open class NewStudentService(
 
         return null
     }
+
+    fun getGroupedByBaseName(language: Language): List<NewStudentResponse> =
+        newStudentRepository
+            .findByLanguage(language)
+            .groupBy { it.personalName }
+            .map { (name, students) ->
+                NewStudentResponse(
+                    name = name,
+                    outfits = students.map { it.toStudentOutfit() },
+                    currentOutfitCode = students.minBy { it.name.length }.imgCode,
+                )
+            }
 }
