@@ -27,7 +27,17 @@ open class NewStudentService(
         language: Language,
     ): List<NewStudent> {
         if (newStudents.isEmpty()) return newStudents
-        return newStudentRepository.saveAll(newStudents).toList()
+
+        // 이름에 *가 있는 경우만 예외적으로 변경
+        val processedStudents =
+            newStudents.map { student ->
+                if ("*" in student.name) {
+                    student.copy(personalName = student.name)
+                } else {
+                    student
+                }
+            }
+        return newStudentRepository.saveAll(processedStudents).toList()
     }
 
     fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findByLanguage(language)
