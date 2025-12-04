@@ -31,7 +31,7 @@ open class NewStudentService(
         // 이름에 *가 있는 경우만 예외적으로 변경
         val processedStudents =
             newStudents.map { student ->
-                if ("*" in student.name) {
+                if ("*" in student.name || " " in student.name) {
                     student.copy(personalName = student.name)
                 } else {
                     student
