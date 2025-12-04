@@ -18,7 +18,7 @@ export default function WaifuPage() {
   );
 
   const { data: groupedStudents } = useApi<Student[]>({
-    apiUrl: "/api/v1/students/grouped/kr",
+    apiUrl: "/api/v1/new-students/grouped/kr",
     defaultValue: defaultStudents,
   });
 
