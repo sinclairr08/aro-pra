@@ -96,6 +96,11 @@ open class NewStudentService(
                     name = name,
                     outfits = students.map { it.toStudentOutfit() },
                     currentOutfitCode = students.minBy { it.name.length }.imgCode,
+                    school = students.first().school,
+                    club = students.first().club,
+                    schoolYear = students.first().schoolYear,
+                    characterAge = students.first().characterAge,
+                    birthDay = students.first().birthDay,
                 )
             }
 }
