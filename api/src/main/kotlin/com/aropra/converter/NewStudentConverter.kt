@@ -2,6 +2,7 @@ package com.aropra.converter
 
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
+import com.aropra.dto.StudentOutfit
 import com.aropra.enum.Language
 
 fun ExternalStudent.toNewStudent(
@@ -29,4 +30,10 @@ fun ExternalStudent.toNewStudent(
         birthDay = this.birthDay,
         imgCode = imgCode,
         language = language,
+    )
+
+fun NewStudent.toStudentOutfit(): StudentOutfit =
+    StudentOutfit(
+        code = this.imgCode,
+        outfitName = this.name,
     )

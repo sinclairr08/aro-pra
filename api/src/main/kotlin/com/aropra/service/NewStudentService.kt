@@ -1,8 +1,10 @@
 package com.aropra.service
 
 import com.aropra.config.NewStudentProperties
+import com.aropra.converter.toStudentOutfit
 import com.aropra.domain.ExternalStudent
 import com.aropra.domain.NewStudent
+import com.aropra.dto.NewStudentResponse
 import com.aropra.enum.Language
 import com.aropra.repository.NewStudentRepository
 import com.aropra.repository.StudentImgCodeRepository
@@ -25,7 +27,17 @@ open class NewStudentService(
         language: Language,
     ): List<NewStudent> {
         if (newStudents.isEmpty()) return newStudents
-        return newStudentRepository.saveAll(newStudents).toList()
+
+        // 이름에 *가 있는 경우만 예외적으로 변경
+        val processedStudents =
+            newStudents.map { student ->
+                if ("*" in student.name || " " in student.name) {
+                    student.copy(personalName = student.name)
+                } else {
+                    student
+                }
+            }
+        return newStudentRepository.saveAll(processedStudents).toList()
     }
 
     fun getAllStudents(language: Language): List<NewStudent> = newStudentRepository.findByLanguage(language)
@@ -74,4 +86,21 @@ open class NewStudentService(
 
         return null
     }
+
+    fun getGroupedByBaseName(language: Language): List<NewStudentResponse> =
+        newStudentRepository
+            .findByLanguage(language)
+            .groupBy { it.personalName }
+            .map { (name, students) ->
+                NewStudentResponse(
+                    name = name,
+                    outfits = students.map { it.toStudentOutfit() },
+                    currentOutfitCode = students.minBy { it.name.length }.imgCode,
+                    school = students.first().school,
+                    club = students.first().club,
+                    schoolYear = students.first().schoolYear,
+                    characterAge = students.first().characterAge,
+                    birthDay = students.first().birthDay,
+                )
+            }
 }
