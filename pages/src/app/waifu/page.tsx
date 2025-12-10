@@ -16,6 +16,7 @@ export default function WaifuPage() {
   const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
     null,
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: groupedStudents } = useApi<Student[]>({
     apiUrl: "/api/v1/new-students/grouped/kr",
@@ -46,6 +47,10 @@ export default function WaifuPage() {
 
   const { fileInputRef, downloadZones, uploadZones, handleUploadClick } =
     useFileOperations({ zones, setZones });
+
+  const filteredHoldZone = zones.holdZone.filter((student) =>
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <DndContext
@@ -86,9 +91,18 @@ export default function WaifuPage() {
               + 구역 추가
             </button>
           </div>
+          <div className="mt-6">
+            <input
+              type="text"
+              placeholder="학생 이름 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+            />
+          </div>
           <DropZone
             zoneId="holdZone"
-            students={zones.holdZone}
+            students={filteredHoldZone}
             onStudentUpdate={handleStudentUpdate}
           />
         </div>
