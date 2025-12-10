@@ -13,6 +13,13 @@ export const validateAndMigrateZones = (
   if (!parsedZones.rankZones || !Array.isArray(parsedZones.rankZones)) {
     return null;
   }
+
+  const firstStudent =
+    parsedZones.rankZones[0]?.students[0] || parsedZones.holdZone?.[0];
+  if (firstStudent && !("school" in firstStudent)) {
+    return null;
+  }
+
   return parsedZones as StudentZones;
 };
 
@@ -43,7 +50,11 @@ export const useZoneManagement = ({
           existingNames.add(oldStudent.name);
           const updatedStudent = studentDataMap.get(oldStudent.name);
           return updatedStudent
-            ? { ...oldStudent, outfits: updatedStudent.outfits }
+            ? {
+                ...oldStudent,
+                outfits: updatedStudent.outfits,
+                school: updatedStudent.school,
+              }
             : oldStudent;
         }),
       })),
@@ -51,7 +62,11 @@ export const useZoneManagement = ({
         existingNames.add(oldStudent.name);
         const updatedStudent = studentDataMap.get(oldStudent.name);
         return updatedStudent
-          ? { ...oldStudent, outfits: updatedStudent.outfits }
+          ? {
+              ...oldStudent,
+              outfits: updatedStudent.outfits,
+              school: updatedStudent.school,
+            }
           : oldStudent;
       }),
     };

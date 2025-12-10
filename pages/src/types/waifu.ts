@@ -7,6 +7,7 @@ export interface Student {
   name: string;
   outfits: StudentOutfit[];
   currentOutfitCode: string;
+  school: string;
 }
 
 export interface RankZone {

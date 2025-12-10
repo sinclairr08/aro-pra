@@ -16,6 +16,7 @@ export const defaultStudents: Student[] = [
       },
     ],
     currentOutfitCode: "yoshimi",
+    school: "Trinity",
   },
   {
     name: "시로코",
@@ -30,6 +31,7 @@ export const defaultStudents: Student[] = [
       },
     ],
     currentOutfitCode: "shiroko",
+    school: "Abydos",
   },
   {
     name: "아루",
@@ -48,6 +50,7 @@ export const defaultStudents: Student[] = [
       },
     ],
     currentOutfitCode: "aru",
+    school: "Gehenna",
   },
 ];
 
