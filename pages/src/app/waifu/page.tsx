@@ -52,6 +52,22 @@ export default function WaifuPage() {
     student.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  // Group holdZone students by school
+  const groupedBySchool = filteredHoldZone.reduce(
+    (acc, student) => {
+      const school = student.school || "Unknown";
+      if (!acc[school]) {
+        acc[school] = [];
+      }
+      acc[school].push(student);
+      return acc;
+    },
+    {} as Record<string, Student[]>,
+  );
+
+  // Sort schools alphabetically
+  const sortedSchools = Object.keys(groupedBySchool).sort();
+
   return (
     <DndContext
       sensors={sensors}
@@ -100,11 +116,15 @@ export default function WaifuPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
           </div>
-          <DropZone
-            zoneId="holdZone"
-            students={filteredHoldZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
+          {sortedSchools.map((school) => (
+            <DropZone
+              key={`holdZone-${school}`}
+              zoneId={`holdZone-${school}`}
+              title={school}
+              students={groupedBySchool[school]}
+              onStudentUpdate={handleStudentUpdate}
+            />
+          ))}
         </div>
         <div className="flex justify-center mt-6">
           <div className="text-left text-sm text-gray-600">
