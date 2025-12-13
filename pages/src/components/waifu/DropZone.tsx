@@ -2,7 +2,7 @@ import { DropStudentZoneProps } from "@/types/waifu";
 import { useDroppable } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { DraggableStudent } from "@/components/waifu/DraggableStudent";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const DEFAULT_BACKGROUND_COLOR = "#fce7f3";
 
@@ -88,10 +88,13 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
     }
   };
 
+  const isSchoolHoldZone = zoneId.startsWith("holdZone-");
+  const minHeight = isSchoolHoldZone ? "min-h-16" : "min-h-28";
+
   return (
     <div
       ref={setNodeRef}
-      className="bg-white shadow min-h-28 flex items-stretch gap-0"
+      className={`bg-white shadow ${minHeight} flex items-stretch gap-0`}
     >
       {title !== undefined && (
         <div
@@ -137,7 +140,9 @@ export const DropZone: React.FC<DropStudentZoneProps> = ({
               <h3
                 className="font-medium text-sm text-center px-6 break-keep leading-tight cursor-pointer"
                 style={{
-                  color: isColorDark(backgroundColor || DEFAULT_BACKGROUND_COLOR)
+                  color: isColorDark(
+                    backgroundColor || DEFAULT_BACKGROUND_COLOR,
+                  )
                     ? "#ffffff"
                     : "#334155",
                 }}

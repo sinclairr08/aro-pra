@@ -116,15 +116,18 @@ export default function WaifuPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
           </div>
-          {sortedSchools.map((school) => (
-            <DropZone
-              key={`holdZone-${school}`}
-              zoneId={`holdZone-${school}`}
-              title={school}
-              students={groupedBySchool[school]}
-              onStudentUpdate={handleStudentUpdate}
-            />
-          ))}
+          <div className="flex flex-col gap-1">
+            {sortedSchools.map((school) => (
+              <DropZone
+                key={`holdZone-${school}`}
+                zoneId={`holdZone-${school}`}
+                title={school}
+                students={groupedBySchool[school]}
+                onStudentUpdate={handleStudentUpdate}
+                backgroundColor="#eeeeee"
+              />
+            ))}
+          </div>
         </div>
         <div className="flex justify-center mt-6">
           <div className="text-left text-sm text-gray-600">
