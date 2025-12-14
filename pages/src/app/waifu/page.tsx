@@ -9,8 +9,11 @@ import { DropZone } from "@/components/waifu/DropZone";
 import { useDragAndDrop } from "@/lib/useDragAndDrop";
 import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
-import { defaultStudents } from "@/constants/defaultValues";
+import { defaultStudents, schoolNames } from "@/constants/defaultValues";
 import { useState } from "react";
+
+const getSchoolName = (schoolCode: string): string =>
+  schoolNames[schoolCode] ?? "기타";
 
 export default function WaifuPage() {
   const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
@@ -121,7 +124,7 @@ export default function WaifuPage() {
               <DropZone
                 key={`holdZone-${school}`}
                 zoneId={`holdZone-${school}`}
-                title={school}
+                title={getSchoolName(school)}
                 students={groupedBySchool[school]}
                 onStudentUpdate={handleStudentUpdate}
                 backgroundColor="#eeeeee"

@@ -67,3 +67,19 @@ export const defaultVersionCards: VersionCardProps[] = [
     description: ["프로젝트 설정"],
   },
 ];
+
+export const schoolNames: Record<string, string> = {
+  Gehenna: "게헨나",
+  Millennium: "밀레니엄",
+  Trinity: "트리니티",
+  Abydos: "아비도스",
+  Shanhaijing: "산해경",
+  Hyakkiyako: "백귀야행",
+  Arius: "아리우스",
+  Highlander: "하이랜더",
+  RedWinter: "붉은겨울",
+  SRT: "SRT",
+  Valkyrie: "발키리",
+  WildHunt: "와일드헌트",
+  ETC: "기타",
+};
