@@ -69,7 +69,6 @@ export default function WaifuPage() {
     {} as Record<string, Student[]>,
   );
 
-  // Sort schools: "기타" at the end, others alphabetically
   const sortedSchools = Object.keys(groupedBySchool).sort((a, b) => {
     if (a === "기타") return 1;
     if (b === "기타") return -1;
