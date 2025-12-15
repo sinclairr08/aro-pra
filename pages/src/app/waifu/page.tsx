@@ -58,7 +58,7 @@ export default function WaifuPage() {
   // Group holdZone students by school
   const groupedBySchool = filteredHoldZone.reduce(
     (acc, student) => {
-      const school = student.school || "Unknown";
+      const school = student.school || "ETC";
       const schoolName = getSchoolName(school);
       if (!acc[schoolName]) {
         acc[schoolName] = [];
