@@ -59,17 +59,22 @@ export default function WaifuPage() {
   const groupedBySchool = filteredHoldZone.reduce(
     (acc, student) => {
       const school = student.school || "Unknown";
-      if (!acc[school]) {
-        acc[school] = [];
+      const schoolName = getSchoolName(school);
+      if (!acc[schoolName]) {
+        acc[schoolName] = [];
       }
-      acc[school].push(student);
+      acc[schoolName].push(student);
       return acc;
     },
     {} as Record<string, Student[]>,
   );
 
-  // Sort schools alphabetically
-  const sortedSchools = Object.keys(groupedBySchool).sort();
+  // Sort schools: "기타" at the end, others alphabetically
+  const sortedSchools = Object.keys(groupedBySchool).sort((a, b) => {
+    if (a === "기타") return 1;
+    if (b === "기타") return -1;
+    return a.localeCompare(b);
+  });
 
   return (
     <DndContext
@@ -120,12 +125,12 @@ export default function WaifuPage() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            {sortedSchools.map((school) => (
+            {sortedSchools.map((schoolName) => (
               <DropZone
-                key={`holdZone-${school}`}
-                zoneId={`holdZone-${school}`}
-                title={getSchoolName(school)}
-                students={groupedBySchool[school]}
+                key={`holdZone-${schoolName}`}
+                zoneId={`holdZone-${schoolName}`}
+                title={schoolName}
+                students={groupedBySchool[schoolName]}
                 onStudentUpdate={handleStudentUpdate}
                 backgroundColor="#eeeeee"
               />
