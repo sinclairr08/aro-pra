@@ -14,14 +14,12 @@ interface StudentContextMenuProps {
 interface StudentImageProps {
   outfit: StudentOutfit;
   size: number;
-  gray?: boolean;
   additionalStyle?: string;
 }
 
 const StudentImage = ({
   outfit,
   size,
-  gray,
   additionalStyle,
 }: StudentImageProps) => {
   return (
@@ -30,15 +28,14 @@ const StudentImage = ({
       alt={outfit.outfitName}
       width={size}
       height={size}
-      className={`${gray ? "grayscale" : ""} ${additionalStyle || ""}`}
+      className={additionalStyle || ""}
     />
   );
 };
 
 export const DraggableStudent = ({
   student,
-  zone,
-  rank,
+  zoneId,
   onStudentUpdate,
 }: DraggableStudentProps) => {
   const {
@@ -49,8 +46,8 @@ export const DraggableStudent = ({
     transition,
     isDragging,
   } = useSortable({
-    id: `${zone}-${student.name}`,
-    data: { student, zone },
+    id: `${zoneId}-${student.name}`,
+    data: { student, zoneId },
   });
 
   const style = {
@@ -117,36 +114,19 @@ export const DraggableStudent = ({
     <>
       <div
         ref={setNodeRef}
-        style={style}
+        style={{ ...style, touchAction: "none" }}
         {...attributes}
         {...listeners}
-        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"} ${zone === "rankZone" ? "mb-2" : ""}`}
+        className={`${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"}`}
         onContextMenu={handleRightClick}
       >
-        {zone === "rankZone" ? (
-          <div className="flex items-center">
-            <span className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs mr-2">
-              {rank}
-            </span>
-            <StudentImage
-              outfit={displayOutfit}
-              size={64}
-              additionalStyle="w-16 h-16 object-contain"
-            />
-            <span className="min-w-0 truncate text-base leading-tight">
-              {student.name}
-            </span>
-          </div>
-        ) : (
-          <div className="text-center">
-            <StudentImage
-              outfit={displayOutfit}
-              size={80}
-              gray={zone === "excludeZone"}
-              additionalStyle="mx-auto"
-            />
-          </div>
-        )}
+        <div className="text-center w-13 h-13 md:w-20 md:h-20">
+          <StudentImage
+            outfit={displayOutfit}
+            size={80}
+            additionalStyle="w-full h-full object-contain"
+          />
+        </div>
       </div>
       {contextMenu.visible && (
         <div

@@ -7,7 +7,7 @@ Based on following projects
   - https://github.com/Sunset-Edu-Tech-Group/BA-AD
   - https://github.com/K0lb3s-Datamines/Blue-Archive---Asset-Downloader
 """
-import logging
+
 import os
 import zipfile
 from abc import ABC, abstractmethod
@@ -25,7 +25,6 @@ class BaseDownloader(ABC):
         self.url = url
         self.dst_dir = dst_dir
         self.session = requests.Session()
-        self.logger = logging.getLogger(__name__)
 
         self.dst_dir.mkdir(parents=True, exist_ok=True)
 
@@ -37,17 +36,23 @@ class BaseDownloader(ABC):
         data = self.session.get(download_url).content
 
         if len(data) != size:
-            self.logger.warning(f"No file matched {len(data)=}, {size=}, skip saving")
+            print(f"No file matched {len(data)=}, {size=}, skip saving")
             return
 
         with open(local_path, "wb") as f:
             f.write(data)
 
-        self.logger.info(f"Downloaded {local_path} successfully")
+        print(f"Downloaded {local_path} successfully")
 
 
 class BundleDownloader(BaseDownloader):
-    def __init__(self, url: str, dst_dir: Path, target_bundle_names: list[str], use_update: bool = True):
+    def __init__(
+        self,
+        url: str,
+        dst_dir: Path,
+        target_bundle_names: list[str],
+        use_update: bool = True,
+    ):
         super().__init__(url=url, dst_dir=dst_dir)
         self.use_update = use_update
         self.target_bundle_names = target_bundle_names
@@ -74,10 +79,10 @@ class BundleDownloader(BaseDownloader):
         local_path = self.dst_dir / pack_name
 
         if is_file_exist_and_valid(local_path=local_path, size=pack_size):
-            self.logger.info(f"Already exist, skip {pack_name}")
+            print(f"Already exist, skip {pack_name}")
             return
 
-        self.logger.info(f"Downloading {pack_name}")
+        print(f"Downloading {pack_name}")
         self.download_file(download_url=pack_url, local_path=local_path, size=pack_size)
 
     def download(self):
@@ -104,7 +109,8 @@ class BundleDownloader(BaseDownloader):
             if not self.is_target_bundle_name(bundle_name):
                 os.remove(bundle_path)
 
-            self.logger.info(f"{bundle_name} found")
+            print(f"{bundle_name} found")
+
 
 # FIXME
 # class MediaDownloader(BaseDownloader):

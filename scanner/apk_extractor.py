@@ -23,22 +23,26 @@ def delete_directory(directory: Path) -> bool:
 
 
 def check_extracted_files(data_dir: Path) -> bool:
-    required_path = data_dir / 'data' / 'assets' / 'bin' / 'Data'
+    required_path = data_dir / "data" / "assets" / "bin" / "Data"
     return required_path.exists() and any(required_path.iterdir())
 
 
 def get_zip_file_infos(zip_file: Path) -> list:
-    with ZipFile(zip_file, 'r') as zip:
+    with ZipFile(zip_file, "r") as zip:
         return [file_info for file_info in zip.infolist() if not file_info.is_dir()]
 
 
-def extract_files_from_zip(zip_file: Path, extract_path: Path, file_infos: list = None,
-                           filter_path: str = None) -> None:
-    with ZipFile(zip_file, 'r') as zip:
+def extract_files_from_zip(
+    zip_file: Path, extract_path: Path, file_infos: list = None, filter_path: str = None
+) -> None:
+    with ZipFile(zip_file, "r") as zip:
         if file_infos is None:
             if filter_path:
-                file_infos = [file for file in zip.infolist() if
-                              not file.is_dir() and file.filename.startswith(filter_path)]
+                file_infos = [
+                    file
+                    for file in zip.infolist()
+                    if not file.is_dir() and file.filename.startswith(filter_path)
+                ]
             else:
                 file_infos = [file for file in zip.infolist() if not file.is_dir()]
 
@@ -50,12 +54,14 @@ def extract_files_from_zip(zip_file: Path, extract_path: Path, file_infos: list 
 
 
 class Apk:
-    def __init__(self, cache_dir: Path, apk_url: str | None = None, apk_path: str | None = None) -> None:
+    def __init__(
+        self, cache_dir: Path, apk_url: str | None = None, apk_path: str | None = None
+    ) -> None:
         self.apk_url = apk_url or APK_URL
 
         self.root = Path(__file__).parent.parent
         self.cache_dir = cache_dir
-        self.apk_path = apk_path or self.cache_dir / 'BlueArchive.xapk'
+        self.apk_path = apk_path or self.cache_dir / "BlueArchive.xapk"
 
         self.scraper = cloudscraper.create_scraper()
 
@@ -76,22 +82,30 @@ class Apk:
     def _fetch_size(self) -> int | None:
         try:
             response = self.scraper.get(self.apk_url, stream=True)
-            return int(response.headers.get('content-length', 0))
-        except (ConnectionError, TimeoutError, requests.exceptions.RequestException) as e:
+            return int(response.headers.get("content-length", 0))
+        except (
+            ConnectionError,
+            TimeoutError,
+            requests.exceptions.RequestException,
+        ) as e:
             print(e)
             return None
 
     def _get_response(self) -> requests.Response | SystemExit:
         try:
             return self.scraper.get(self.apk_url, stream=True)
-        except (ConnectionError, TimeoutError, requests.exceptions.RequestException) as e:
+        except (
+            ConnectionError,
+            TimeoutError,
+            requests.exceptions.RequestException,
+        ) as e:
             print(e)
             raise SystemExit(1) from e
 
     def _download_file(self, response: requests.Response) -> None:
         apk_path = Path(self.apk_path)
 
-        with open(apk_path, 'wb') as f:
+        with open(apk_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
@@ -104,17 +118,25 @@ class Apk:
 
     def _delete_outdated_files(self) -> None:
         xapk_path = Path(self.apk_path)
-        apk_folder = xapk_path.parent / 'apk'
-        data_folder = xapk_path.parent / 'data'
+        apk_folder = xapk_path.parent / "apk"
+        data_folder = xapk_path.parent / "data"
 
         for folder in [apk_folder, data_folder]:
             delete_directory(folder)
 
-    def _parse_zipfile(self, apk_path: Path, extract_path: Path, filter_path: str = None) -> None:
+    def _parse_zipfile(
+        self, apk_path: Path, extract_path: Path, filter_path: str = None
+    ) -> None:
         file_infos = get_zip_file_infos(apk_path)
         self._extract_files(apk_path, file_infos, extract_path, filter_path)
 
-    def _extract_files(self, zip_path: Path, file_infos: list, extract_path: Path, filter_path: str = None) -> None:
+    def _extract_files(
+        self,
+        zip_path: Path,
+        file_infos: list,
+        extract_path: Path,
+        filter_path: str = None,
+    ) -> None:
         extract_files_from_zip(zip_path, extract_path, file_infos, filter_path)
 
     def download_apk(self, update: bool = False) -> None:
@@ -135,10 +157,10 @@ class Apk:
             return
 
         xapk_path = Path(self.apk_path)
-        apk_path = self.cache_dir / 'apk'
-        data_path = self.cache_dir / 'data'
-        unity_apk = apk_path / 'UnityDataAssetPack.apk'
+        apk_path = self.cache_dir / "apk"
+        data_path = self.cache_dir / "data"
+        unity_apk = apk_path / "UnityDataAssetPack.apk"
 
         self._parse_zipfile(xapk_path, apk_path)
 
-        self._parse_zipfile(unity_apk, data_path, 'assets/bin/Data')
+        self._parse_zipfile(unity_apk, data_path, "assets/bin/Data")

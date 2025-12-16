@@ -7,26 +7,39 @@ export interface Student {
   name: string;
   outfits: StudentOutfit[];
   currentOutfitCode: string;
+  school: string;
+}
+
+export interface RankZone {
+  id: string;
+  title: string;
+  students: Student[];
+  backgroundColor?: string;
 }
 
 export interface StudentZones {
-  rankZone: Student[];
+  rankZones: RankZone[];
   holdZone: Student[];
-  excludeZone: Student[];
 }
-
-export type StudentZoneKeys = keyof StudentZones;
 
 export interface DraggableStudentProps {
   student: Student;
-  zone: keyof StudentZones;
-  rank?: number;
+  zoneId: string;
   onStudentUpdate: (name: string, outfitCode: string) => void;
 }
 
 export interface DropStudentZoneProps {
-  zoneName: keyof StudentZones;
-  title: string;
+  zoneId: string;
+  title?: string;
   students: Student[];
   onStudentUpdate: (name: string, outfitCode: string) => void;
+  onTitleChange?: (zoneId: string, newTitle: string) => void;
+  onDeleteZone?: (zoneId: string) => void;
+  onMoveZone?: (zoneId: string, direction: "up" | "down") => void;
+  onBackgroundColorChange?: (zoneId: string, newColor: string) => void;
+  backgroundColor?: string;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  openColorPickerId?: string | null;
+  setOpenColorPickerId?: (id: string | null) => void;
 }

@@ -7,47 +7,50 @@ export const defaultStudents: Student[] = [
     name: "요시미",
     outfits: [
       {
-        code: "CH0220",
+        code: "ch0220",
         outfitName: "요시미(밴드)",
       },
       {
-        code: "Yoshimi",
+        code: "yoshimi",
         outfitName: "요시미",
       },
     ],
-    currentOutfitCode: "Yoshimi",
+    currentOutfitCode: "yoshimi",
+    school: "Trinity",
   },
   {
     name: "시로코",
     outfits: [
       {
-        code: "Shiroko",
+        code: "shiroko",
         outfitName: "시로코",
       },
       {
-        code: "CH0188",
+        code: "ch0188",
         outfitName: "시로코(수영복)",
       },
     ],
-    currentOutfitCode: "Shiroko",
+    currentOutfitCode: "shiroko",
+    school: "Abydos",
   },
   {
     name: "아루",
     outfits: [
       {
-        code: "CH0240",
+        code: "ch0240",
         outfitName: "아루(드레스)",
       },
       {
-        code: "Aru",
+        code: "aru",
         outfitName: "아루",
       },
       {
-        code: "CH0084",
+        code: "ch0084",
         outfitName: "아루(새해)",
       },
     ],
-    currentOutfitCode: "Aru",
+    currentOutfitCode: "aru",
+    school: "Gehenna",
   },
 ];
 
@@ -80,3 +83,19 @@ export const defaultVersionCards: VersionCardProps[] = [
     description: ["프로젝트 설정"],
   },
 ];
+
+export const schoolNames: Record<string, string> = {
+  Gehenna: "게헨나",
+  Millennium: "밀레니엄",
+  Trinity: "트리니티",
+  Abydos: "아비도스",
+  Shanhaijing: "산해경",
+  Hyakkiyako: "백귀야행",
+  Arius: "아리우스",
+  Highlander: "하이랜더",
+  RedWinter: "붉은겨울",
+  SRT: "SRT",
+  Valkyrie: "발키리",
+  WildHunt: "와일드헌트",
+  ETC: "기타",
+};

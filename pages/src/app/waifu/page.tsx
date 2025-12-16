@@ -11,14 +11,33 @@ import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
 import { defaultStudents } from "@/constants/defaultValues";
 import { ContentLayout } from "@/components/layout/ContentLayout";
+import { defaultStudents, schoolNames } from "@/constants/defaultValues";
+import { useState } from "react";
+
+const getSchoolName = (schoolCode: string): string =>
+  schoolNames[schoolCode] ?? "기타";
 
 export default function WaifuPage() {
+  const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
+    null,
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { data: groupedStudents } = useApi<Student[]>({
-    apiUrl: "/api/v1/students/grouped/kr",
+    apiUrl: "/api/v1/new-students/grouped/kr",
     defaultValue: defaultStudents,
   });
 
-  const { zones, setZones, handleStudentUpdate } = useZoneManagement({
+  const {
+    zones,
+    setZones,
+    handleStudentUpdate,
+    handleAddZone,
+    handleDeleteZone,
+    handleTitleChange,
+    handleMoveZone,
+    handleBackgroundColorChange,
+  } = useZoneManagement({
     groupedStudents,
   });
 
@@ -34,37 +53,97 @@ export default function WaifuPage() {
   const { fileInputRef, downloadZones, uploadZones, handleUploadClick } =
     useFileOperations({ zones, setZones });
 
+  const filteredHoldZone = zones.holdZone.filter((student) =>
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // Group holdZone students by school
+  const groupedBySchool = filteredHoldZone.reduce(
+    (acc, student) => {
+      const school = student.school || "ETC";
+      const schoolName = getSchoolName(school);
+      if (!acc[schoolName]) {
+        acc[schoolName] = [];
+      }
+      acc[schoolName].push(student);
+      return acc;
+    },
+    {} as Record<string, Student[]>,
+  );
+
+  const sortedSchools = Object.keys(groupedBySchool).sort((a, b) => {
+    if (a === "기타") return 1;
+    if (b === "기타") return -1;
+    return a.localeCompare(b);
+  });
+
   return (
     <ContentLayout title="애정도 순위">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={customCollisionDetection}
-        onDragStart={handleDragStart}
-        onDragCancel={handleDragCancel}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-2 gap-y-4 max-w-6xl mx-auto">
-          <DropZone
-            zoneName="rankZone"
-            title="랭킹"
-            students={zones.rankZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
-          <DropZone
-            zoneName="holdZone"
-            title="대기"
-            students={zones.holdZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
-          <DropZone
-            zoneName="excludeZone"
-            title="제외"
-            students={zones.excludeZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
+    <DndContext
+      sensors={sensors}
+      collisionDetection={customCollisionDetection}
+      onDragStart={handleDragStart}
+      onDragCancel={handleDragCancel}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="pt-20 pb-20 px-2">
+        <h1 className="text-xl font-bold text-center mb-6">애정도 순위</h1>
+        <div className="flex flex-col gap-4 max-w-7xl mx-auto">
+          {zones.rankZones.map((rankZone, index) => (
+            <DropZone
+              key={rankZone.id}
+              zoneId={rankZone.id}
+              title={rankZone.title}
+              students={rankZone.students}
+              onStudentUpdate={handleStudentUpdate}
+              onTitleChange={handleTitleChange}
+              onDeleteZone={
+                zones.rankZones.length > 1 ? handleDeleteZone : undefined
+              }
+              onMoveZone={handleMoveZone}
+              onBackgroundColorChange={handleBackgroundColorChange}
+              backgroundColor={rankZone.backgroundColor}
+              canMoveUp={index > 0}
+              canMoveDown={index < zones.rankZones.length - 1}
+              openColorPickerId={openColorPickerId}
+              setOpenColorPickerId={setOpenColorPickerId}
+            />
+          ))}
+          <div className="flex justify-center">
+            <button
+              onClick={handleAddZone}
+              className="px-3 py-1 text-sm bg-cyan-400 text-white rounded hover:bg-cyan-500 transition-colors"
+            >
+              + 구역 추가
+            </button>
+          </div>
+          <div className="mt-6">
+            <input
+              type="text"
+              placeholder="학생 이름 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            {sortedSchools.map((schoolName) => (
+              <DropZone
+                key={`holdZone-${schoolName}`}
+                zoneId={`holdZone-${schoolName}`}
+                title={schoolName}
+                students={groupedBySchool[schoolName]}
+                onStudentUpdate={handleStudentUpdate}
+                backgroundColor="#eeeeee"
+              />
+            ))}
+          </div>
         </div>
-        <div className="text-center text-sm text-gray-600 mt-6">
-          tip: 우클릭으로 학생 일러 변경 가능
+        <div className="flex justify-center mt-6">
+          <div className="text-left text-sm text-gray-600">
+            <div>학생 우클릭: 학생 의상 변경</div>
+            <div>제목 더블 클릭: 제목 수정</div>
+          </div>
         </div>
         <div className="flex justify-center gap-4 mt-6">
           <button

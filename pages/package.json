@@ -1,6 +1,6 @@
 {
   "name": "aro-pra",
-  "version": "0.2.1",
+  "version": "0.2.10",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -14,9 +14,9 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.1.1",
     "axios": "^1.9.0",
-    "next": "15.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "next": "^15.3.6",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-hook-form": "^7.57.0",
     "zod": "^3.25.56"
   },
@@ -27,7 +27,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.3.1",
+    "eslint-config-next": "^15.3.6",
     "prettier": "^3.5.3",
     "tailwindcss": "^4",
     "typescript": "^5"

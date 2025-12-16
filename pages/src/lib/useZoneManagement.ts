@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Student, StudentZoneKeys, StudentZones } from "@/types/waifu";
+import { Student, StudentZones } from "@/types/waifu";
 
 interface UseZoneManagementProps {
   groupedStudents?: Student[];
@@ -7,13 +7,34 @@ interface UseZoneManagementProps {
 
 const STORAGE_KEY = "waifu-zones";
 
+export const validateAndMigrateZones = (
+  parsedZones: any,
+): StudentZones | null => {
+  if (!parsedZones.rankZones || !Array.isArray(parsedZones.rankZones)) {
+    return null;
+  }
+
+  const firstStudent =
+    parsedZones.rankZones[0]?.students[0] || parsedZones.holdZone?.[0];
+  if (firstStudent && !("school" in firstStudent)) {
+    return null;
+  }
+
+  return parsedZones as StudentZones;
+};
+
 export const useZoneManagement = ({
   groupedStudents,
 }: UseZoneManagementProps) => {
   const [zones, setZones] = useState<StudentZones>({
-    rankZone: [],
+    rankZones: [
+      {
+        id: "rank-1",
+        title: "구역 1",
+        students: [],
+      },
+    ],
     holdZone: [],
-    excludeZone: [],
   });
 
   const syncZone = (studentData: Student[], currentZones: StudentZones) => {
@@ -23,21 +44,32 @@ export const useZoneManagement = ({
 
     const existingNames = new Set<string>();
     const newZones: StudentZones = {
-      rankZone: [],
-      holdZone: [],
-      excludeZone: [],
-    };
-
-    Object.entries(currentZones).forEach(([zoneKey, students]) => {
-      const zone = zoneKey as StudentZoneKeys;
-      newZones[zone] = students.map((oldStudent: Student) => {
+      rankZones: (currentZones.rankZones || []).map((rankZone) => ({
+        ...rankZone,
+        students: rankZone.students.map((oldStudent: Student) => {
+          existingNames.add(oldStudent.name);
+          const updatedStudent = studentDataMap.get(oldStudent.name);
+          return updatedStudent
+            ? {
+                ...oldStudent,
+                outfits: updatedStudent.outfits,
+                school: updatedStudent.school,
+              }
+            : oldStudent;
+        }),
+      })),
+      holdZone: (currentZones.holdZone || []).map((oldStudent: Student) => {
         existingNames.add(oldStudent.name);
         const updatedStudent = studentDataMap.get(oldStudent.name);
         return updatedStudent
-          ? { ...oldStudent, outfits: updatedStudent.outfits }
+          ? {
+              ...oldStudent,
+              outfits: updatedStudent.outfits,
+              school: updatedStudent.school,
+            }
           : oldStudent;
-      });
-    });
+      }),
+    };
 
     const newStudents = studentData.filter(
       (student) => !existingNames.has(student.name),
@@ -54,10 +86,22 @@ export const useZoneManagement = ({
     if (savedZones) {
       try {
         const parsedZones = JSON.parse(savedZones);
-        setZones(parsedZones);
-        currentZones = parsedZones;
+        const validated = validateAndMigrateZones(parsedZones);
+
+        if (!validated) {
+          console.warn("Invalid zone structure detected, resetting to default");
+          localStorage.removeItem(STORAGE_KEY);
+          currentZones = {
+            rankZones: [{ id: "rank-1", title: "구역 1", students: [] }],
+            holdZone: [],
+          };
+        } else {
+          setZones(validated);
+          currentZones = validated;
+        }
       } catch (error) {
         console.error("Failed to parse saved zones:", error);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
 
@@ -77,19 +121,108 @@ export const useZoneManagement = ({
   const handleStudentUpdate = useCallback(
     (name: string, outfitCode: string): void => {
       setZones((prev) => {
-        const newZones = { ...prev };
-
-        Object.keys(newZones).forEach((zoneKey) => {
-          const zone = zoneKey as keyof StudentZones;
-          newZones[zone] = newZones[zone].map((student) =>
+        const newZones: StudentZones = {
+          rankZones: prev.rankZones.map((rankZone) => ({
+            ...rankZone,
+            students: rankZone.students.map((student) =>
+              student.name === name
+                ? { ...student, currentOutfitCode: outfitCode }
+                : student,
+            ),
+          })),
+          holdZone: prev.holdZone.map((student) =>
             student.name === name
               ? { ...student, currentOutfitCode: outfitCode }
               : student,
-          );
-        });
+          ),
+        };
 
         return newZones;
       });
+    },
+    [],
+  );
+
+  const handleAddZone = useCallback(() => {
+    setZones((prev) => {
+      const maxIdNum = prev.rankZones.reduce((max, zone) => {
+        const match = zone.id.match(/^rank-(\d+)$/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+
+      const maxTitleNum = prev.rankZones.reduce((max, zone) => {
+        const match = zone.title.match(/^구역 (\d+)$/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+
+      return {
+        ...prev,
+        rankZones: [
+          ...prev.rankZones,
+          {
+            id: `rank-${maxIdNum + 1}`,
+            title: `구역 ${maxTitleNum + 1}`,
+            students: [],
+          },
+        ],
+      };
+    });
+  }, []);
+
+  const handleDeleteZone = useCallback((zoneId: string) => {
+    setZones((prev) => {
+      const zoneToDelete = prev.rankZones.find((z) => z.id === zoneId);
+      if (!zoneToDelete) return prev;
+
+      return {
+        ...prev,
+        rankZones: prev.rankZones.filter((z) => z.id !== zoneId),
+        holdZone: [...prev.holdZone, ...zoneToDelete.students],
+      };
+    });
+  }, []);
+
+  const handleTitleChange = useCallback((zoneId: string, newTitle: string) => {
+    setZones((prev) => ({
+      ...prev,
+      rankZones: prev.rankZones.map((zone) =>
+        zone.id === zoneId ? { ...zone, title: newTitle } : zone,
+      ),
+    }));
+  }, []);
+
+  const handleMoveZone = useCallback(
+    (zoneId: string, direction: "up" | "down") => {
+      setZones((prev) => {
+        const index = prev.rankZones.findIndex((z) => z.id === zoneId);
+        if (index === -1) return prev;
+
+        const newIndex = direction === "up" ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= prev.rankZones.length) return prev;
+
+        const newRankZones = [...prev.rankZones];
+        [newRankZones[index], newRankZones[newIndex]] = [
+          newRankZones[newIndex],
+          newRankZones[index],
+        ];
+
+        return {
+          ...prev,
+          rankZones: newRankZones,
+        };
+      });
+    },
+    [],
+  );
+
+  const handleBackgroundColorChange = useCallback(
+    (zoneId: string, newColor: string) => {
+      setZones((prev) => ({
+        ...prev,
+        rankZones: prev.rankZones.map((zone) =>
+          zone.id === zoneId ? { ...zone, backgroundColor: newColor } : zone,
+        ),
+      }));
     },
     [],
   );
@@ -98,5 +231,10 @@ export const useZoneManagement = ({
     zones,
     setZones,
     handleStudentUpdate,
+    handleAddZone,
+    handleDeleteZone,
+    handleTitleChange,
+    handleMoveZone,
+    handleBackgroundColorChange,
   };
 };
