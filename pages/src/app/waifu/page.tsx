@@ -9,13 +9,17 @@ import { DropZone } from "@/components/waifu/DropZone";
 import { useDragAndDrop } from "@/lib/useDragAndDrop";
 import { useZoneManagement } from "@/lib/useZoneManagement";
 import { useFileOperations } from "@/lib/useFileOperations";
-import { defaultStudents } from "@/constants/defaultValues";
+import { defaultStudents, schoolNames } from "@/constants/defaultValues";
 import { useState } from "react";
+
+const getSchoolName = (schoolCode: string): string =>
+  schoolNames[schoolCode] ?? "기타";
 
 export default function WaifuPage() {
   const [openColorPickerId, setOpenColorPickerId] = useState<string | null>(
     null,
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: groupedStudents } = useApi<Student[]>({
     apiUrl: "/api/v1/new-students/grouped/kr",
@@ -46,6 +50,30 @@ export default function WaifuPage() {
 
   const { fileInputRef, downloadZones, uploadZones, handleUploadClick } =
     useFileOperations({ zones, setZones });
+
+  const filteredHoldZone = zones.holdZone.filter((student) =>
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // Group holdZone students by school
+  const groupedBySchool = filteredHoldZone.reduce(
+    (acc, student) => {
+      const school = student.school || "ETC";
+      const schoolName = getSchoolName(school);
+      if (!acc[schoolName]) {
+        acc[schoolName] = [];
+      }
+      acc[schoolName].push(student);
+      return acc;
+    },
+    {} as Record<string, Student[]>,
+  );
+
+  const sortedSchools = Object.keys(groupedBySchool).sort((a, b) => {
+    if (a === "기타") return 1;
+    if (b === "기타") return -1;
+    return a.localeCompare(b);
+  });
 
   return (
     <DndContext
@@ -86,11 +114,27 @@ export default function WaifuPage() {
               + 구역 추가
             </button>
           </div>
-          <DropZone
-            zoneId="holdZone"
-            students={zones.holdZone}
-            onStudentUpdate={handleStudentUpdate}
-          />
+          <div className="mt-6">
+            <input
+              type="text"
+              placeholder="학생 이름 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            {sortedSchools.map((schoolName) => (
+              <DropZone
+                key={`holdZone-${schoolName}`}
+                zoneId={`holdZone-${schoolName}`}
+                title={schoolName}
+                students={groupedBySchool[schoolName]}
+                onStudentUpdate={handleStudentUpdate}
+                backgroundColor="#eeeeee"
+              />
+            ))}
+          </div>
         </div>
         <div className="flex justify-center mt-6">
           <div className="text-left text-sm text-gray-600">

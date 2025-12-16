@@ -19,6 +19,9 @@ interface UseDragAndDropProps {
   setZones: React.Dispatch<React.SetStateAction<StudentZones>>;
 }
 
+// Helper function to check if a zoneId is a holdZone (including school-specific ones)
+const isHoldZone = (zoneId: string) => zoneId === "holdZone" || zoneId.startsWith("holdZone-");
+
 export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
   const [activePreview, setActivePreview] = useState<StudentOutfit | null>(
     null,
@@ -79,7 +82,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
         // Dropping on a student
         targetZoneId = overData.zoneId as string;
         isDropOnZone = false;
-      } else if (overIdStr === "holdZone" || overIdStr.startsWith("rank-")) {
+      } else if (isHoldZone(overIdStr) || overIdStr.startsWith("rank-")) {
         // Dropping on a zone container
         targetZoneId = overIdStr;
         isDropOnZone = true;
@@ -87,7 +90,11 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
         return;
       }
 
-      if (activeZoneId !== targetZoneId) {
+      // Treat all holdZone variants as the same zone
+      const isSameZone = activeZoneId === targetZoneId ||
+                         (isHoldZone(activeZoneId) && isHoldZone(targetZoneId));
+
+      if (!isSameZone) {
         // Moving between zones
         setZones((prev) => {
           const newZones = { ...prev };
@@ -95,7 +102,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           let targetItems: Student[];
 
           // Get active zone items
-          if (activeZoneId === "holdZone") {
+          if (isHoldZone(activeZoneId)) {
             activeItems = [...prev.holdZone];
           } else {
             const activeRankZone = prev.rankZones.find(
@@ -106,7 +113,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           }
 
           // Get target zone items
-          if (targetZoneId === "holdZone") {
+          if (isHoldZone(targetZoneId)) {
             targetItems = [...prev.holdZone];
           } else {
             const targetRankZone = prev.rankZones.find(
@@ -139,7 +146,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           }
 
           // Update zones
-          if (activeZoneId === "holdZone") {
+          if (isHoldZone(activeZoneId)) {
             newZones.holdZone = activeItems;
           } else {
             newZones.rankZones = newZones.rankZones.map((z) =>
@@ -147,7 +154,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
             );
           }
 
-          if (targetZoneId === "holdZone") {
+          if (isHoldZone(targetZoneId)) {
             newZones.holdZone = targetItems;
           } else {
             newZones.rankZones = newZones.rankZones.map((z) =>
@@ -163,7 +170,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           const newZones = { ...prev };
           let items: Student[];
 
-          if (activeZoneId === "holdZone") {
+          if (isHoldZone(activeZoneId)) {
             items = [...prev.holdZone];
           } else {
             const rankZone = prev.rankZones.find((z) => z.id === activeZoneId);
@@ -182,7 +189,7 @@ export const useDragAndDrop = ({ setZones }: UseDragAndDropProps) => {
           if (activeIdx !== -1 && overIdx !== -1) {
             const reorderItems = arrayMove(items, activeIdx, overIdx);
 
-            if (activeZoneId === "holdZone") {
+            if (isHoldZone(activeZoneId)) {
               newZones.holdZone = reorderItems;
             } else {
               newZones.rankZones = newZones.rankZones.map((z) =>
