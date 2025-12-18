@@ -16,7 +16,8 @@ export default function HomePage() {
 
   const groupedBySection = linkCards.reduce(
     (acc, card) => {
-      (acc[card.section] ||= []).push(card);
+      const section = card.section?.trim() || "기타";
+      (acc[section] ||= []).push(card);
       return acc;
     },
     {} as Record<string, LinkCardProps[]>,
