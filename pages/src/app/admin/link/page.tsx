@@ -38,7 +38,7 @@ export default function AdminLinkPage() {
   };
 
   return (
-    <FormLayout title="링크 추가용 관리자">
+    <FormLayout title="링크 추가용 아로나">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputField
           label="이름"

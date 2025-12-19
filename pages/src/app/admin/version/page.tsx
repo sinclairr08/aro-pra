@@ -46,7 +46,7 @@ export default function AdminVersionPage() {
   };
 
   return (
-    <FormLayout title="버전 추가용 관리자">
+    <FormLayout title="버전 추가용 아로나">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputField
           label="버전"
