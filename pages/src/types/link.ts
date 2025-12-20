@@ -8,6 +8,7 @@ export interface LinkCardProps {
 export interface LinkRequest {
   name: string;
   url: string;
+  section: string;
 }
 
 export interface SimpleLinkCardProps {

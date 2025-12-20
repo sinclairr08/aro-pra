@@ -22,6 +22,7 @@ export default function AdminLinkPage() {
     defaultValues: {
       name: "",
       url: "",
+      section: "",
     },
   });
   const { postData, loading } = usePostApi<LinkRequest>({
@@ -56,6 +57,15 @@ export default function AdminLinkPage() {
           register={register}
           placeholder="https://site.url"
           error={errors.url?.message}
+        />
+
+        <InputField
+          label="섹션"
+          name="section"
+          type="text"
+          register={register}
+          placeholder="섹션 이름을 입력하세요"
+          error={errors.section?.message}
         />
 
         <div className="flex gap-4 mt-6">
