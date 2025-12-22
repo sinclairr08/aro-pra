@@ -5,7 +5,7 @@ import { SimpleLinkCard } from "@/components/link/SimpleLinkCard";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/lib/useAdminAuth";
-import { ContentLayout } from "@/components/layout/ContentLayout";
+import { FormLayout } from "@/components/layout/FormLayout";
 
 interface AdminLoginedPageProps {
   onLogout: () => void;
@@ -20,8 +20,8 @@ const AdminLoginedPage = ({ onLogout }: AdminLoginedPageProps) => {
   };
 
   return (
-    <ContentLayout title="Admin Page">
-      <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+    <FormLayout title="Admin Page">
+      <div className="flex flex-col gap-4">
         {subPages.map((subPage, index) => (
           <SimpleLinkCard
             key={index}
@@ -32,14 +32,12 @@ const AdminLoginedPage = ({ onLogout }: AdminLoginedPageProps) => {
         ))}
       </div>
 
-      <div className="flex justify-center pt-4">
-        <div className="w-32">
-          <SubmitButton type="button" classType="red" onClick={handleLogout}>
-            로그아웃
-          </SubmitButton>
-        </div>
+      <div className="pt-6 mt-6 border-t border-gray-100">
+        <SubmitButton type="button" classType="red" onClick={handleLogout}>
+          로그아웃
+        </SubmitButton>
       </div>
-    </ContentLayout>
+    </FormLayout>
   );
 };
 
