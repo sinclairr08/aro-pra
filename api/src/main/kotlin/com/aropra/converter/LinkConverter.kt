@@ -9,6 +9,7 @@ fun Link.toLinkResponse(): LinkResponse =
         id = this.id!!,
         name = this.name,
         url = this.url,
+        section = this.section,
     )
 
-fun LinkRequest.toLink(): Link = Link(name = this.name, url = this.url)
+fun LinkRequest.toLink(): Link = Link(name = this.name, url = this.url, section = this.section)

@@ -10,5 +10,6 @@ data class Link(
     val id: String? = null,
     val name: String,
     val url: String,
+    val section: String,
     val createdAt: LocalDateTime = LocalDateTime.now(),
 )
