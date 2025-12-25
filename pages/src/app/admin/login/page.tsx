@@ -1,9 +1,11 @@
 "use client";
 
+import "@/app/globals.css";
 import { useForm } from "react-hook-form";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import { BaseInput } from "@/components/form/BaseInput";
+import { FormLayout } from "@/components/layout/FormLayout";
 
 interface AdminLoginFormData {
   password: string;
@@ -19,23 +21,19 @@ const AdminLoginForm = ({ onLogin }: AdminLoginFormProps) => {
     await onLogin(password);
   };
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <BaseInput name="password" type="password" register={register} />
-          </div>
+    <FormLayout title="싯딤의 상자" centered={true}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <BaseInput name="password" type="password" register={register} />
 
-          <SubmitButton
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            classType="blue"
-          >
-            Access
-          </SubmitButton>
-        </form>
-      </div>
-    </div>
+        <SubmitButton
+          type="submit"
+          onClick={handleSubmit(onSubmit)}
+          classType="blue"
+        >
+          Access
+        </SubmitButton>
+      </form>
+    </FormLayout>
   );
 };
 

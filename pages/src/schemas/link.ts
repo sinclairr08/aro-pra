@@ -17,4 +17,11 @@ export const LinkSchema = z.object({
       (url: string) => url.startsWith("http://") || url.startsWith("https://"),
       "http 혹은 https로 시작되는 URL을 입력해 주세요",
     ),
+  section: z
+    .string()
+    .transform((str) => str.trim())
+    .refine(
+      (str) => str.length > 0 && str.length <= 50,
+      "공백 제외 1자 이상 50자 이하로 입력해 주세요",
+    ),
 }) satisfies z.ZodType<LinkRequest>;

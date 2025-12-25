@@ -9,6 +9,7 @@ import { usePostApi } from "@/lib/usePostApi";
 import { Loading } from "@/components/common/Loading";
 import { LinkRequest } from "@/types/link";
 import { LinkSchema } from "@/schemas/link";
+import { FormLayout } from "@/components/layout/FormLayout";
 
 export default function AdminLinkPage() {
   const {
@@ -21,6 +22,7 @@ export default function AdminLinkPage() {
     defaultValues: {
       name: "",
       url: "",
+      section: "",
     },
   });
   const { postData, loading } = usePostApi<LinkRequest>({
@@ -37,11 +39,7 @@ export default function AdminLinkPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
-        링크 추가용 관리자
-      </h1>
-
+    <FormLayout title="링크 추가용 아로나">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputField
           label="이름"
@@ -61,6 +59,15 @@ export default function AdminLinkPage() {
           error={errors.url?.message}
         />
 
+        <InputField
+          label="섹션"
+          name="section"
+          type="text"
+          register={register}
+          placeholder="섹션 이름을 입력하세요"
+          error={errors.section?.message}
+        />
+
         <div className="flex gap-4 mt-6">
           <SubmitButton
             type="submit"
@@ -75,6 +82,6 @@ export default function AdminLinkPage() {
         </div>
       </form>
       {loading && <Loading />}
-    </div>
+    </FormLayout>
   );
 }

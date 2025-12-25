@@ -10,6 +10,7 @@ import { usePostApi } from "@/lib/usePostApi";
 import { Loading } from "@/components/common/Loading";
 import { VersionRequest } from "@/types/version";
 import { VersionSchema } from "@/schemas/version";
+import { FormLayout } from "@/components/layout/FormLayout";
 
 export default function AdminVersionPage() {
   const {
@@ -45,11 +46,7 @@ export default function AdminVersionPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
-        버전 추가용 관리자
-      </h1>
-
+    <FormLayout title="버전 추가용 아로나">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputField
           label="버전"
@@ -95,6 +92,6 @@ export default function AdminVersionPage() {
         </div>
       </form>
       {loading && <Loading />}
-    </div>
+    </FormLayout>
   );
 }

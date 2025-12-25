@@ -14,12 +14,12 @@ export const SubmitButton = ({
   disabled = false,
 }: SubmitButtonProps) => {
   const baseClass =
-    "flex-1 text-white py-2 px-4 rounded-md transition-colors font-medium min-w-[60px] whitespace-nowrap";
+    "flex-1 py-2 px-4 rounded-md transition-colors font-medium min-w-[60px] whitespace-nowrap";
 
   const typeClass = {
-    blue: "bg-blue-500 hover:bg-blue-600 focus:ring-blue-600 disabled:bg-blue-300",
-    gray: "bg-gray-500 hover:bg-gray-600 focus:ring-gray-600 disabled:bg-gray-300",
-    red: "bg-red-500 hover:bg-red-600 focus:ring-red-600 disabled:bg-red-300",
+    blue: "bg-cyan-400 hover:bg-cyan-500 focus:ring-cyan-500 disabled:bg-cyan-200 text-cyan-900",
+    gray: "bg-gray-500 hover:bg-gray-600 focus:ring-gray-600 disabled:bg-gray-300 text-white",
+    red: "bg-red-500 hover:bg-red-600 focus:ring-red-600 disabled:bg-red-300 text-white",
   };
 
   const totalClass = `

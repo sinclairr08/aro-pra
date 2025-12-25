@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ContentLayout } from "@/components/layout/ContentLayout";
 
 const Custom401Page = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center px-4">
+    <ContentLayout className="min-h-screen flex flex-col justify-center items-center -mt-4 -mb-8">
       <div className="text-center">
         <Image
           src="/imgs/401.png"
@@ -27,7 +28,7 @@ const Custom401Page = () => {
           height={64}
         />
       </Link>
-    </div>
+    </ContentLayout>
   );
 };
 
