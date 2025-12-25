@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.aro-pra"
-version = "0.2.10"
+version = "0.3.0"
 
 java {
     toolchain {
